@@ -1,6 +1,5 @@
 package br.meetingplace.entities.usuario
 
-import br.meetingplace.application.UserManagement
 import br.meetingplace.servicies.Authentication
 
 open class User(): Authentication(){

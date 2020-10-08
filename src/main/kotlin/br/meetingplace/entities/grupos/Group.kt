@@ -1,6 +1,6 @@
 package br.meetingplace.entities.grupos
 
-import br.meetingplace.application.GroupManagement
+import br.meetingplace.management.EntitiesManagement
 import br.meetingplace.servicies.Authentication
 import br.meetingplace.servicies.chat.Chat
 
@@ -12,7 +12,22 @@ open class Group(): Authentication(){
     private var about: String? = null
     var members = mutableListOf<Member>() // NEEDS WORK HERE and on the methods that use this list
     private var chat = Chat()
-    val management = GroupManagement()
+    val management = EntitiesManagement()
+
+
+    //GETTERS
+    fun getCreator() = creator
+
+    fun getNameGroup() = name
+
+    fun getConversation() = chat.conversation
+
+    fun getAbout() = about
+
+    fun getChat() = chat
+
+    fun getId() = id
+    //GETTERS
 
     fun changeName(new: String){
         name = new
@@ -39,17 +54,4 @@ open class Group(): Authentication(){
                 chat.conversation.add(Conversation.message)
         }
     }
-    //GETTERS
-    fun getCreator() = creator
-
-    fun getNameGroup() = name
-
-    fun getConversation() = chat.conversation
-
-    fun getAbout() = about
-
-    fun getChat() = chat
-
-    fun getId() = id
-    //GETTERS
 }

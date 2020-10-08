@@ -1,8 +1,8 @@
 package br.meetingplace
 
-import br.meetingplace.application.*
 import br.meetingplace.entities.grupos.*
 import br.meetingplace.entities.usuario.*
+import br.meetingplace.management.EntitiesManagement
 
 import io.ktor.application.*
 import io.ktor.features.*
@@ -14,10 +14,9 @@ import io.ktor.routing.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 
-val SystemV = GeneralManagement()
+val SystemV = EntitiesManagement()
 
 fun main (){
-
 
     embeddedServer(Netty, 8823) {
         routing {
@@ -28,19 +27,17 @@ fun main (){
             }
             get("/user"){
                 call.respond(SystemV.getUsers())
-                println(SystemV.cache)
             }
             get("/logged"){
 
                 call.respond(SystemV.getUserLogged())
             }
             get("/logged2"){
-
-                call.respond(SystemV.getUserLogged2())
+                call.respond(SystemV.getUserLoggedAuto())
             }
             post("/user/create"){
                 val user = call.receive<Profile>()
-                call.respond(SystemV.addUser(user))
+                call.respond(SystemV.createUser(user))
             }
             post("/user/login"){
                 val user = call.receive<Login>()
@@ -56,7 +53,7 @@ fun main (){
             }
             post("/user/message"){
                 val chat = call.receive<Conversation>()
-                call.respond(SystemV.messenger(chat))
+                call.respond(SystemV.messengerUser(chat))
             }
 
 
@@ -66,7 +63,7 @@ fun main (){
             }
             post("/group/create"){
                 val group = call.receive<Group>()
-                call.respond(SystemV.addGroup(group))
+                call.respond(SystemV.createGroup(group))
             }
             post("/group/member"){
                 val member = call.receive<UserMember>()
@@ -78,7 +75,7 @@ fun main (){
             }
             post("/group/message"){
                 val chatGroup = call.receive<GroupConversation>()
-                call.respond(SystemV.message(chatGroup))
+                call.respond(SystemV.messengerGroup(chatGroup))
             }
             //Group related
         }
