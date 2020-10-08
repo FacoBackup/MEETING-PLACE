@@ -6,12 +6,11 @@ import br.meetingplace.servicies.Authentication
 open class User(): Authentication(){
 
     private var id = -1
-    private var name: String? = null
-    private var userEmail: String? = null
-    private var pass: String? = null
-    val management =  UserManagement()
-    var age: Int? = null
+    private var name= ""
+    private var userEmail= ""
+    private var pass= ""
 
+    var age= -1
 
     //Update
     fun changeEmail(new: String) {

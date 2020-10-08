@@ -18,7 +18,7 @@ val SystemV = GeneralManagement()
 
 fun main (){
 
-    /*
+
     embeddedServer(Netty, 8823) {
         routing {
             install(ContentNegotiation) {
@@ -26,46 +26,63 @@ fun main (){
                     setPrettyPrinting()
                 }
             }
+            get("/user"){
+                call.respond(SystemV.getUsers())
+                println(SystemV.cache)
+            }
+            get("/logged"){
 
-            // Relacionado a usuarios
-            get("/usuario/mostrar_usuarios"){
-                call.respond(sysManagement.obterListaUsuario())
+                call.respond(SystemV.getUserLogged())
             }
-            post("/usuario/cadastrar"){
-                var novoUsuario = call.receive<Perfil>()
-                call.respond(sysManagement.criarUsuario(novoUsuario))
+            get("/logged2"){
+
+                call.respond(SystemV.getUserLogged2())
             }
-            patch("/login"){
-                var login = call.receive<Login>()
-                call.respond(sysManagement.logarNaConta(login))
+            post("/user/create"){
+                val user = call.receive<Profile>()
+                call.respond(SystemV.addUser(user))
             }
-            get("/login/usuario_logado"){
-                call.respond(
-                        if(sysManagement.obterLogin().obterStatus())
-                            sysManagement.obterUsuarioLogado().toString()
-                        else
-                            "Ninguém está logado"
-                )
+            post("/user/login"){
+                val user = call.receive<Login>()
+                call.respond(SystemV.login(user))
             }
-            get("/login/grupos_do_usuario"){
-                call.respond(sysManagement.obterUsuarioLogado().grupos)
+            post("/user/follow"){
+                val follow = call.receive<Follower>()
+                call.respond(SystemV.follow(follow))
             }
-            post("/login/criar_grupo"){
-                var novoGrupo = call.receive<Grupo>()
-                call.respond(sysManagement.criarGrupo(novoGrupo))
+            post("/user/unfollow"){
+                val follow = call.receive<Follower>()
+                call.respond(SystemV.unfollow(follow))
             }
-            get("/grupo/mostrar_grupos"){
-                call.respond(sysManagement.obterListaGrupos().toString())
-            }
-            delete("/grupos/apagar_grupo"){
-                var grupo = call.receive<Grupo>()
-                call.respond(sysManagement.apagarGrupo(grupo))
+            post("/user/message"){
+                val chat = call.receive<Conversation>()
+                call.respond(SystemV.messenger(chat))
             }
 
+
+            //Group related
+            get("/group"){
+                call.respond(SystemV.getGroups())
+            }
+            post("/group/create"){
+                val group = call.receive<Group>()
+                call.respond(SystemV.addGroup(group))
+            }
+            post("/group/member"){
+                val member = call.receive<UserMember>()
+                call.respond(SystemV.addMember(member))
+            }
+            post("/group/member/remove"){
+                val member = call.receive<UserMember>()
+                call.respond(SystemV.removeMember(member))
+            }
+            post("/group/message"){
+                val chatGroup = call.receive<GroupConversation>()
+                call.respond(SystemV.message(chatGroup))
+            }
+            //Group related
         }
     }.start(wait = true)
-
-     */
 }
 
 

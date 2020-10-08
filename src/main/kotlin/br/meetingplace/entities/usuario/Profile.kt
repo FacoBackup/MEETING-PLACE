@@ -1,17 +1,18 @@
 package br.meetingplace.entities.usuario
 
 import br.meetingplace.servicies.chat.Chat
+import br.meetingplace.servicies.notificacao.Inbox
 
 class Profile(): User(){
 
-    var userName: String? = null
-    var gender: String? = null
-    var nacionality: String? = null
-    var about: String? = null
-    private var groupRole = mutableListOf<Int>()
+    var userName = ""
+    var gender= ""
+    var nacionality= ""
+    var about= ""
 
-    fun getGroupRole() = groupRole
     var chat = mutableListOf<Chat>()
-    var friends = mutableListOf<Int>()
+    var followers = mutableListOf<Int>()
     var groups = mutableListOf<Int>()
+    var inbox = mutableListOf<Inbox>()
+
 }

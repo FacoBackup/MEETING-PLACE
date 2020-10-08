@@ -4,12 +4,11 @@ import br.meetingplace.entities.grupos.Group
 import br.meetingplace.entities.grupos.GroupConversation
 import br.meetingplace.entities.grupos.Member
 import br.meetingplace.entities.grupos.UserMember
-import br.meetingplace.entities.usuario.User
 
 open class GroupManagement:  GeneralManagement(){
 
 
-    fun message(conversation: GroupConversation){
+    override fun message(conversation: GroupConversation){
 
         val indexUser = getIndexUser(conversation.sender)
         val indexGroup = getIndexGroup(conversation.group)
@@ -24,32 +23,33 @@ open class GroupManagement:  GeneralManagement(){
         }
     }
 
-    fun addGroup(group: Group){
+    override fun addGroup(group: Group){
 
         val creator = group.getCreator()
+        val indexCreator = getIndexUser(creator)
 
-        if(group.getId() == -1){
+        if(group.getId() == -1 && verifyGroupName(group.getNameGroup())){
             group.updateId(generateIdUser())
+            userList[indexCreator].groups.add(group.getId())
             if(creator != -1 && creator == logged)
                 groupList.add(group)
         }
     }
 
-    fun removeGroup(member: UserMember){
+    override fun removeGroup(member: UserMember){
 
         val indexGroup = getIndexGroup(member.group)
 
         if(indexGroup != -1 && groupList[indexGroup].getCreator() == member.id && member.id == logged){ //ONLY THE CREATOR OF THE GROUP CAN DELETE IT
-
-            // percorre a lista de usuarios e remove todos os que tem o usuario como amigo
+            // percorre a lista de usuarios e remove todos que fazem parte do grupo
             for(i in 0 until userList.size)
-                userList[i].groups.remove(member.group)
+                userList[i].groups.remove(member.group) // removing the group id from the users profile
 
             groupList.remove(groupList[indexGroup])
         }
     }
 
-    fun addMember(member: UserMember){
+    override fun addMember(member: UserMember){
 
         val indexGroup = getIndexGroup(member.group)
         val indexUser = getIndexUser(member.id)
@@ -65,7 +65,7 @@ open class GroupManagement:  GeneralManagement(){
         }
     }
 
-    fun removeMember(member: UserMember){
+    override fun removeMember(member: UserMember){
 
         val user = member.id
         val indexGroup = getIndexGroup(member.group)
@@ -73,8 +73,9 @@ open class GroupManagement:  GeneralManagement(){
         val indexMember = getIndexUser(user)
 
         // checks if the logged user is on the group and is an admin or the creator
-        if(indexGroup != -1 && indexUser != -1 && user == logged && indexMember != -1)
-                groupList[indexGroup].members.remove(groupList[indexGroup].members[indexMember])
+        if(indexGroup != -1 && indexUser != -1 && user == logged && indexMember != -1){
+            groupList[indexGroup].members.remove(groupList[indexGroup].members[indexMember])
+        }
     }
 
     /*

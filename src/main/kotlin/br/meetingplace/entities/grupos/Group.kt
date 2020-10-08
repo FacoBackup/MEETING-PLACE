@@ -42,6 +42,8 @@ open class Group(): Authentication(){
     //GETTERS
     fun getCreator() = creator
 
+    fun getNameGroup() = name
+
     fun getConversation() = chat.conversation
 
     fun getAbout() = about
