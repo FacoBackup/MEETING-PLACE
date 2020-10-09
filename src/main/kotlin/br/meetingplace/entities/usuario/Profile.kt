@@ -12,6 +12,7 @@ class Profile(): User(){
 
     var chat = mutableListOf<Chat>()
     var followers = mutableListOf<Int>()
+    var following = mutableListOf<Int>()
     var groups = mutableListOf<Int>()
     var inbox = mutableListOf<Inbox>()
 

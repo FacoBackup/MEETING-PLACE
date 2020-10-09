@@ -1,5 +1,6 @@
 package br.meetingplace
 
+import br.meetingplace.data.*
 import br.meetingplace.entities.grupos.*
 import br.meetingplace.entities.usuario.*
 import br.meetingplace.management.EntitiesManagement
@@ -7,7 +8,6 @@ import br.meetingplace.management.EntitiesManagement
 import io.ktor.application.*
 import io.ktor.features.*
 import io.ktor.gson.*
-import io.ktor.http.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
@@ -42,6 +42,10 @@ fun main (){
             post("/user/login"){
                 val user = call.receive<Login>()
                 call.respond(SystemV.login(user))
+            }
+            post("/user/logoff"){
+
+                call.respond(SystemV.logoff())
             }
             post("/user/follow"){
                 val follow = call.receive<Follower>()

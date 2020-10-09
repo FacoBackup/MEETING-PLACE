@@ -1,8 +1,9 @@
 package br.meetingplace.management
 
 import br.meetingplace.entities.grupos.Group
-import br.meetingplace.entities.grupos.UserMember
-import br.meetingplace.entities.usuario.Login
+import br.meetingplace.data.UserMember
+import br.meetingplace.data.Follower
+import br.meetingplace.data.Login
 import br.meetingplace.entities.usuario.Profile
 import br.meetingplace.servicies.Authentication
 import kotlin.random.Random
@@ -22,7 +23,7 @@ open class GeneralEntitiesManagement{
         //GETTERS
 
     //STARTUP NECESSITIES
-    fun createUser(user: Profile){
+        fun createUser(user: Profile){
 
             if(user.getId() == -1 && verifyUserName(user.userName)){
                 user.updateId(generateIdUser())
@@ -32,6 +33,7 @@ open class GeneralEntitiesManagement{
 
         protected fun deleteUser(User: Int){
 
+            val management = EntitiesManagement() // should use an override here
             if(User == logged){
 
                 val indexUser = getIndexUser(User)
@@ -39,12 +41,12 @@ open class GeneralEntitiesManagement{
 
                 if(indexUser != -1){
 
-                    for(i in 0 until userList.size)   // percorre a lista de usuarios e remove todos os que tem o usuario como amigo
+                    for(i in 0 until userList.size)
                         userList[i].followers.remove(User)
 
                     for(i in 0 until groupList.size){
                         member = UserMember(User,groupList[i].getId())
-                        groupList[i].management.removeMember(member)
+                        management.removeMember(member) // should use an override here
                     }
 
                     userList.remove(userList[indexUser])
@@ -54,13 +56,13 @@ open class GeneralEntitiesManagement{
 
         fun createGroup(group: Group){
 
-            val creator = group.getCreator()
-            val indexCreator = getIndexUser(creator)
+            group.updateCreator(getUserLogged())
+            val indexCreator = getIndexUser(getUserLogged())
 
             if(group.getId() == -1 && verifyGroupName(group.getNameGroup())){
                 group.updateId(generateIdUser())
                 userList[indexCreator].groups.add(group.getId())
-                if(creator != -1 && creator == logged)
+                if(getUserLogged() != -1 && getUserLogged()  == logged)
                     groupList.add(group)
             }
         }
@@ -88,7 +90,7 @@ open class GeneralEntitiesManagement{
             }
 
         }
-        protected fun logoff(){
+        fun logoff(){
             if(logged != -1){
                 auto.updateLoggedUser(-1, logged)
                 logged = -1
@@ -140,10 +142,20 @@ open class GeneralEntitiesManagement{
             }
             return true
         }
+        protected fun verifyFollower(data: Follower): Int{
+            val indexExternal = getIndexUser(data.external)
 
+            for (i in 0 until userList[indexExternal].followers.size){
+                if(userList[indexExternal].followers[i] == getUserLogged()){
+                    return 1
+                }
+            }
+            return 0
+        }
     //VERIFIERS
 
     //INDEX FINDERS
+
         protected fun getIndexGroup(id: Int): Int {
             for(i in 0 until groupList.size) {
                 if (groupList[i].getId() == id)

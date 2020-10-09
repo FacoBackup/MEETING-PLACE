@@ -1,5 +1,7 @@
 package br.meetingplace.entities.grupos
 
+import br.meetingplace.data.GroupConversation
+import br.meetingplace.data.Member
 import br.meetingplace.management.EntitiesManagement
 import br.meetingplace.servicies.Authentication
 import br.meetingplace.servicies.chat.Chat
@@ -10,9 +12,8 @@ open class Group(): Authentication(){
     private var id = -1
     private var name = ""
     private var about: String? = null
-    var members = mutableListOf<Member>() // NEEDS WORK HERE and on the methods that use this list
+    var members = mutableListOf<Member>()
     private var chat = Chat()
-    val management = EntitiesManagement()
 
 
     //GETTERS
