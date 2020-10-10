@@ -1,9 +1,10 @@
-package br.meetingplace.entities.usuario
+package br.meetingplace.entities.usuario.profiles
 
+import br.meetingplace.entities.usuario.User
 import br.meetingplace.servicies.chat.Chat
-import br.meetingplace.servicies.notificacao.Inbox
+import br.meetingplace.servicies.notification.Inbox
 
-class Profile(): User(){
+class SocialProfile(): User(){
 
     var userName = ""
     var gender= ""

@@ -1,4 +1,4 @@
-package br.meetingplace.management
+package br.meetingplace.servicies.management
 
 import br.meetingplace.data.GroupConversation
 import br.meetingplace.data.Member
@@ -6,7 +6,7 @@ import br.meetingplace.data.UserMember
 import br.meetingplace.data.Conversation
 import br.meetingplace.data.Follower
 import br.meetingplace.servicies.chat.Chat
-import br.meetingplace.servicies.notificacao.Inbox
+import br.meetingplace.servicies.notification.Inbox
 
 class EntitiesManagement: GeneralEntitiesManagement() {
 

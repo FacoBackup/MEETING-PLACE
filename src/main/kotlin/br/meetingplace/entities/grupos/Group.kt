@@ -2,7 +2,6 @@ package br.meetingplace.entities.grupos
 
 import br.meetingplace.data.GroupConversation
 import br.meetingplace.data.Member
-import br.meetingplace.management.EntitiesManagement
 import br.meetingplace.servicies.Authentication
 import br.meetingplace.servicies.chat.Chat
 

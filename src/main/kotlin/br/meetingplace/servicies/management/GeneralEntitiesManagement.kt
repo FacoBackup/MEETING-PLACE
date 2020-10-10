@@ -1,17 +1,17 @@
-package br.meetingplace.management
+package br.meetingplace.servicies.management
 
 import br.meetingplace.entities.grupos.Group
 import br.meetingplace.data.UserMember
 import br.meetingplace.data.Follower
 import br.meetingplace.data.Login
-import br.meetingplace.entities.usuario.Profile
+import br.meetingplace.entities.usuario.profiles.SocialProfile
 import br.meetingplace.servicies.Authentication
 import kotlin.random.Random
 
 open class GeneralEntitiesManagement{
 
         protected val groupList = mutableListOf<Group>()
-        protected val userList = mutableListOf<Profile>()
+        protected val userList = mutableListOf<SocialProfile>()
         private var logged = -1
         private val auto = Authentication()
 
@@ -23,7 +23,7 @@ open class GeneralEntitiesManagement{
         //GETTERS
 
     //STARTUP NECESSITIES
-        fun createUser(user: Profile){
+        fun createUser(user: SocialProfile){
 
             if(user.getId() == -1 && verifyUserName(user.userName)){
                 user.updateId(generateIdUser())

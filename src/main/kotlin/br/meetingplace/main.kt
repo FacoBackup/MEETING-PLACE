@@ -2,8 +2,9 @@ package br.meetingplace
 
 import br.meetingplace.data.*
 import br.meetingplace.entities.grupos.*
-import br.meetingplace.entities.usuario.*
-import br.meetingplace.management.EntitiesManagement
+import br.meetingplace.entities.usuario.profiles.SocialProfile
+
+import br.meetingplace.servicies.management.EntitiesManagement
 
 import io.ktor.application.*
 import io.ktor.features.*
@@ -36,7 +37,7 @@ fun main (){
                 call.respond(SystemV.getUserLoggedAuto())
             }
             post("/user/create"){
-                val user = call.receive<Profile>()
+                val user = call.receive<SocialProfile>()
                 call.respond(SystemV.createUser(user))
             }
             post("/user/login"){
