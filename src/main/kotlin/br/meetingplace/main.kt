@@ -2,7 +2,7 @@ package br.meetingplace
 
 import br.meetingplace.data.*
 import br.meetingplace.entities.grupos.*
-import br.meetingplace.entities.usuario.profiles.SocialProfile
+import br.meetingplace.entities.user.profiles.SocialProfile
 
 import br.meetingplace.servicies.management.EntitiesManagement
 
@@ -29,12 +29,9 @@ fun main (){
             get("/user"){
                 call.respond(SystemV.getUsers())
             }
-            get("/logged"){
+            get("/logged") {
 
                 call.respond(SystemV.getUserLogged())
-            }
-            get("/logged2"){
-                call.respond(SystemV.getUserLoggedAuto())
             }
             post("/user/create"){
                 val user = call.receive<SocialProfile>()

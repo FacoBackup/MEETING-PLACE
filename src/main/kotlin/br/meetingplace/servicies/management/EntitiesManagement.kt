@@ -19,7 +19,7 @@ class EntitiesManagement: GeneralEntitiesManagement() {
             val notification = Inbox("${userList[indexCurrent].userName} is now following you.", "New follower.")
 
             if(indexExternal != -1 && verifyFollower(data) == 0){ // verifies if the user you want to follow exists
-                userList[indexExternal].inbox.add(notification)
+                userList[indexExternal].updateInbox(notification)
                 userList[indexExternal].followers.add(getUserLogged())
                 userList[indexCurrent].following.add(data.external)
             }
@@ -42,30 +42,25 @@ class EntitiesManagement: GeneralEntitiesManagement() {
 
     fun messengerUser(chat: Conversation){
 
-
         val indexReceiver = getIndexUser(chat.receiver)
-
         if(getUserLogged() != -1 && indexReceiver != -1 && chat.receiver != getUserLogged()){
             val indexSender = getIndexUser(getUserLogged())
             val chatId = userList[indexReceiver].getId() + userList[indexSender].getId()
-            val indexChatReceiver = getChatIndex(indexReceiver, chatId)
-            val indexChatSender = getChatIndex(indexSender, chatId)
 
-            if(indexChatReceiver != -1){
+            if(userList[indexReceiver].getChatIndex(chatId) != -1){ // The conversation already exists
                 val notification = Inbox("${userList[indexSender].userName} sent a new message.", "Message.")
-                userList[indexReceiver].chat[indexChatReceiver].conversation.add((chat.message+" - "+userList[indexSender].userName))
-                userList[indexReceiver].inbox.add(notification)
-                userList[indexSender].chat[indexChatSender].conversation.add((chat.message+" - "+userList[indexSender].userName))
+                chat.message+=" - "+userList[indexSender].userName
+                userList[indexReceiver].updateChat(chat, chatId)
+                userList[indexReceiver].updateInbox(notification)
             }
-            else {
+            else { // The conversation doesn't exist
                 val notification = Inbox("${userList[indexSender].userName} started a conversation with you.", "Message.")
-                val newChat = Chat()
+                val newChat = Chat(chatId)
                 newChat.conversation.add(chat.message+" - "+userList[indexSender].userName)
-                newChat.id = chatId
 
-                userList[indexReceiver].chat.add(newChat)
-                userList[indexReceiver].inbox.add(notification)
-                userList[indexSender].chat.add(newChat)
+                userList[indexReceiver].startChat(newChat)
+                userList[indexReceiver].updateInbox(notification)
+                userList[indexSender].startChat(newChat)
             }
         }
     }
@@ -97,14 +92,9 @@ class EntitiesManagement: GeneralEntitiesManagement() {
 
         val indexUser = getIndexUser(getUserLogged())
         val indexGroup = getIndexGroup(conversation.group)
-        if(getUserLogged() == getUserLogged() && indexGroup != -1 ){
 
-            val indexMember = getIndexMember(getUserLogged(), conversation.group)
-            if(indexMember != -1){ // If indexMember == 1 then the user isnt part of the group
-                conversation.message += userList[indexUser].userName
-                groupList[indexGroup].sendMsg(conversation, getUserLogged())
-            }
-        }
+        if(getUserLogged() != -1 && indexGroup != -1)
+            groupList[indexGroup].sendMsg(conversation.message +" - " + userList[indexUser].userName, getUserLogged())
     }
 
     fun addMember(member: UserMember){

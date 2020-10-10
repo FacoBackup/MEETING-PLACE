@@ -1,17 +1,13 @@
-package br.meetingplace.entities.usuario
+package br.meetingplace.entities.user
 
-import br.meetingplace.servicies.Authentication
-
-open class User(): Authentication(){
+open class User(){
 
     private var id = -1
-    private var name= ""
     private var userEmail= ""
     private var pass= ""
-
     var age= -1
 
-    //Update
+    //Setters
     fun changeEmail(new: String) {
         userEmail = new
     }
@@ -19,21 +15,18 @@ open class User(): Authentication(){
     fun changePass(oldPass: String, newPass: String){
         if(oldPass == pass)
             pass = newPass
-
     }
 
     fun updateId (new: Int){
         if(id == -1)
             id = new
     }
-    //Update
+    //Setters
 
     //Getters
     fun getId() = id
 
     fun getPass() = pass
-
-    fun getName() = name
 
     fun getEmail() = userEmail
     //Getters

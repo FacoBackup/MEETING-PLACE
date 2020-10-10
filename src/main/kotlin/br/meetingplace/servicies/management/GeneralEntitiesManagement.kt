@@ -4,8 +4,7 @@ import br.meetingplace.entities.grupos.Group
 import br.meetingplace.data.UserMember
 import br.meetingplace.data.Follower
 import br.meetingplace.data.Login
-import br.meetingplace.entities.usuario.profiles.SocialProfile
-import br.meetingplace.servicies.Authentication
+import br.meetingplace.entities.user.profiles.SocialProfile
 import kotlin.random.Random
 
 open class GeneralEntitiesManagement{
@@ -13,13 +12,11 @@ open class GeneralEntitiesManagement{
         protected val groupList = mutableListOf<Group>()
         protected val userList = mutableListOf<SocialProfile>()
         private var logged = -1
-        private val auto = Authentication()
 
         //GETTERS
         fun getGroups() = groupList
         fun getUsers() = userList
         fun getUserLogged() = logged
-        fun getUserLoggedAuto() = auto.getLoggedUser()
         //GETTERS
 
     //STARTUP NECESSITIES
@@ -60,7 +57,7 @@ open class GeneralEntitiesManagement{
             val indexCreator = getIndexUser(getUserLogged())
 
             if(group.getId() == -1 && verifyGroupName(group.getNameGroup())){
-                group.updateId(generateIdUser())
+                group.updateId(generateIdGroup())
                 userList[indexCreator].groups.add(group.getId())
                 if(getUserLogged() != -1 && getUserLogged()  == logged)
                     groupList.add(group)
@@ -82,19 +79,15 @@ open class GeneralEntitiesManagement{
 
         //AUTHENTICATION SYSTEM
         fun login(log: Login){
+
             val indexUser = getIndexUser(log.user)
-
-            if(indexUser != -1 && userList[indexUser].getPass() == log.pass && logged == -1){
-                auto.updateLoggedUser(log.user, -1)
+            if(indexUser != -1 && userList[indexUser].getPass() == log.pass && logged == -1)
                 logged = log.user
-            }
-
         }
         fun logoff(){
-            if(logged != -1){
-                auto.updateLoggedUser(-1, logged)
+
+            if(logged != -1)
                 logged = -1
-            }
         }
         //AUTHENTICATION SYSTEM
 
@@ -135,6 +128,16 @@ open class GeneralEntitiesManagement{
             }
             return true
         }
+
+        private fun verifyUser(id: Int): Boolean {
+
+            for(i in 0 until userList.size){
+                if(userList[i].getId() == id)
+                    return true
+            }
+            return false
+        }
+
         private fun verifyGroupName(name: String): Boolean {
             for(i in 0 until groupList.size){
                 if(groupList[i].getNameGroup() == name)
@@ -142,6 +145,16 @@ open class GeneralEntitiesManagement{
             }
             return true
         }
+
+        private fun verifyGroup(id: Int): Boolean {
+
+            for(i in 0 until groupList.size){
+                if(groupList[i].getId() == id)
+                    return true
+            }
+            return false
+        }
+
         protected fun verifyFollower(data: Follower): Int{
             val indexExternal = getIndexUser(data.external)
 
@@ -157,36 +170,36 @@ open class GeneralEntitiesManagement{
     //INDEX FINDERS
 
         protected fun getIndexGroup(id: Int): Int {
-            for(i in 0 until groupList.size) {
-                if (groupList[i].getId() == id)
-                    return i
+            if(verifyGroup(id)){
+                for(i in 0 until groupList.size) {
+                    if (groupList[i].getId() == id)
+                        return i
+                }
+                return -1
             }
-            return -1
+            else return -1
         }
 
         protected fun getIndexUser(id: Int): Int {
-            for(i in 0 until userList.size) {
-                if (userList[i].getId() == id)
-                    return i
+            if(verifyUser(id)) {
+                for (i in 0 until userList.size) {
+                    if (userList[i].getId() == id)
+                        return i
+                }
+                return -1
             }
-            return -1
+            else return -1
         }
 
         protected fun getIndexMember(id: Int, idGroup: Int): Int {
-
             val indexGroup = getIndexGroup(idGroup)
 
-            for(i in 0 until groupList[indexGroup].members.size) {
-                if (groupList[indexGroup].members[i].user == id)
-                    return i
-            }
-            return -1
-        }
-
-        protected fun getChatIndex(indexUser: Int, chatId: Int): Int{
-            for(i in 0 until userList[indexUser].chat.size){
-                if(userList[indexUser].chat[i].id == chatId)
-                    return i
+            if(indexGroup != -1 && groupList[indexGroup].members.size > 0){
+                for(i in 0 until groupList[indexGroup].members.size) {
+                    if (groupList[indexGroup].members[i].user == id)
+                        return i
+                }
+                return -1
             }
             return -1
         }

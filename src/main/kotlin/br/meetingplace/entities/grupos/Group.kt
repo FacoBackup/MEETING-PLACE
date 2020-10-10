@@ -1,19 +1,16 @@
 package br.meetingplace.entities.grupos
 
-import br.meetingplace.data.GroupConversation
 import br.meetingplace.data.Member
-import br.meetingplace.servicies.Authentication
 import br.meetingplace.servicies.chat.Chat
 
-open class Group(): Authentication(){
+open class Group(){
 
     private var creator = -1
     private var id = -1
     private var name = ""
-    private var about: String? = null
+    private var about= ""
     var members = mutableListOf<Member>()
-    private var chat = Chat()
-
+    private val chat = Chat(-1)
 
     //GETTERS
     fun getCreator() = creator
@@ -29,29 +26,34 @@ open class Group(): Authentication(){
     fun getId() = id
     //GETTERS
 
-    fun changeName(new: String){
+    fun changeName(new: String){ // Needs work here
         name = new
     }
 
-    fun updateId (new: Int){
+    fun updateId (new: Int){ // Needs work here
         if(id == -1)
             id = new
     }
 
-    fun updateCreator (new: Int){
+    fun updateCreator (new: Int){ // Needs work here
         if(creator == -1)
             creator = new
     }
 
-    fun sendMsg(Conversation: GroupConversation, Verifier: Int){
-
-        if(Verifier == getLoggedUser()){
-            if(chat.id == -1){
-                chat.id = id
-                chat.conversation.add(Conversation.message)
-            }
-            else
-                chat.conversation.add(Conversation.message)
-        }
+    fun sendMsg(message: String, sender: Int){
+        if(verifyMember(sender))
+            chat.conversation.add(message)
     }
+
+    private fun verifyMember(idMember: Int): Boolean{
+        if(idMember != creator){
+            for(i in 0 until members.size){
+                if(members[i].user == idMember)
+                    return true
+            }
+            return false
+        }
+        else return true
+    }
+
 }
