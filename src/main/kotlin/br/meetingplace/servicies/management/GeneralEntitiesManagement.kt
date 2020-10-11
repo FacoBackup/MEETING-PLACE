@@ -4,9 +4,11 @@ import br.meetingplace.entities.grupos.Group
 import br.meetingplace.data.UserMember
 import br.meetingplace.data.Follower
 import br.meetingplace.data.Login
+import br.meetingplace.data.Operations
 import br.meetingplace.entities.user.User
 import br.meetingplace.entities.user.profiles.ProfessionalProfile
 import br.meetingplace.entities.user.profiles.SocialProfile
+import br.meetingplace.servicies.conversationThread.MainThread
 import kotlin.random.Random
 
 open class GeneralEntitiesManagement{
@@ -14,7 +16,7 @@ open class GeneralEntitiesManagement{
         protected val groupList = mutableListOf<Group>()
         protected val userList = mutableListOf<User>()
         private var logged = -1
-
+        protected var cachedPass = ""
         //GETTERS
         fun getGroups() = groupList
         fun getUsers() = userList
@@ -22,7 +24,7 @@ open class GeneralEntitiesManagement{
 
         fun getSocialNameById(id: Int): String{
             if(verifyUser(id)){
-                val index = getIndexUser(id)
+                val index = getUserIndex(id)
                 return userList[index].social.userName
             }
             return ""
@@ -31,55 +33,54 @@ open class GeneralEntitiesManagement{
 
     //STARTUP NECESSITIES
         fun createUser(user: User){
-
-            if(user.getId() == -1){
-                user.startUser(generateIdUser())
+            if(user.getId() == -1 && logged == -1){
+                user.startUser(generateUserId())
                 userList.add(user)
             }
         }
 
         fun createSocialProfile(user: SocialProfile){
 
-            if(user.getId() == -1 && getLoggedUser() != -1){
-                createSocialProfile(user)
+            if(getLoggedUser() != -1){
+
+                val indexUser = getUserIndex(getLoggedUser())
+                userList[indexUser].socialProfile(user)
             }
         }
 
         fun createProfessionalProfile(user: ProfessionalProfile){
 
-            if(user.getId() == -1 && getLoggedUser() != -1)
+            if(getLoggedUser() != -1)
                 createProfessionalProfile(user)
         }
-        protected fun deleteUser(User: Int){
+        fun deleteUser(operation: Operations){
 
             val management = EntitiesManagement() // should use an override here
-            if(User == logged){
+            if(logged != -1 && operation.id == logged && operation.pass == cachedPass){
 
-                val indexUser = getIndexUser(User)
+                val indexUser = getUserIndex(operation.id)
                 var member: UserMember
 
-                if(indexUser != -1){
-
                     for(i in 0 until userList.size)
-                        userList[i].social.followers.remove(User)
+                        userList[i].social.followers.remove(operation.id)
 
                     for(i in 0 until groupList.size){
-                        member = UserMember(User,groupList[i].getId())
+                        member = UserMember(operation.id,groupList[i].getId())
                         management.removeMember(member) // should use an override here
                     }
 
                     userList.remove(userList[indexUser])
-                }
+                    logoff()
             }
         }
 
         fun createGroup(group: Group){
 
             group.updateCreator(logged)
-            val indexCreator = getIndexUser(logged)
+            val indexCreator = getUserIndex(logged)
 
             if(group.getId() == -1 && verifyGroupName(group.getNameGroup())){
-                group.startGroup(generateIdGroup())
+                group.startGroup(generateGroupId())
                 userList[indexCreator].social.groups.add(group.getId())
                 if(logged != -1)
                     groupList.add(group)
@@ -88,7 +89,7 @@ open class GeneralEntitiesManagement{
 
         protected fun deleteGroup(member: UserMember){
 
-            val indexGroup = getIndexGroup(member.group)
+            val indexGroup = getGroupIndex(member.group)
 
             if(indexGroup != -1 && groupList[indexGroup].getCreator() == member.id && member.id == logged){ //ONLY THE CREATOR OF THE GROUP CAN DELETE IT
                 // percorre a lista de usuarios e remove todos que fazem parte do grupo
@@ -102,33 +103,47 @@ open class GeneralEntitiesManagement{
         //AUTHENTICATION SYSTEM
         fun login(log: Login){
 
-            val indexUser = getIndexUser(log.user)
-            if(indexUser != -1 && userList[indexUser].getPass() == log.pass && logged == -1)
+            val indexUser = getUserIndex(log.user)
+            if(verifyUser(log.user) && userList[indexUser].getPass() == log.pass && logged == -1){
                 logged = log.user
+                cachedPass = log.pass
+            }
+
+
         }
         fun logoff(){
 
-            if(logged != -1)
+            if(logged != -1){
                 logged = -1
+                cachedPass = ""
+            }
         }
         //AUTHENTICATION SYSTEM
 
     // STARTUP NECESSITIES
 
-
-
     //GENERATORS
-        private fun generateIdUser(): Int{
+        private fun generateUserId(): Int{
             var id = Random.nextInt(1, 20000)
 
             for (i in userList){
-                while(id == i.getId()) // enquanto novo ID existir ele gera diferentes
+                while(id == i.getId())
                     id = Random.nextInt(1, 20000)
             }
             return id
         }
 
-        private fun generateIdGroup(): Int {
+        fun generateThreadId(ThreadList: List<MainThread>): Int{
+            var id = Random.nextInt(1, 20000)
+
+            for (element in ThreadList){
+                while(id == element.getId())
+                    id = Random.nextInt(1, 20000)
+            }
+            return id
+        }
+
+        private fun generateGroupId(): Int {
             var id = Random.nextInt(1, 20000)
 
             for (i in groupList) {
@@ -178,7 +193,7 @@ open class GeneralEntitiesManagement{
         }
 
         protected fun verifyFollower(data: Follower): Int{
-            val indexExternal = getIndexUser(data.external)
+            val indexExternal = getUserIndex(data.external)
 
             for (i in 0 until userList[indexExternal].social.followers.size){
                 if(userList[indexExternal].social.followers[i] == logged){
@@ -190,7 +205,21 @@ open class GeneralEntitiesManagement{
     //VERIFIERS
 
     //INDEX FINDERS
-        protected fun getIndexGroup(id: Int): Int {
+        protected fun getThreadIndex( threadId: Int): Int {
+
+            if(getLoggedUser() != -1){
+                val indexUser = getUserIndex(getLoggedUser())
+                val thread = userList[indexUser].social.getThreads()
+
+                for (i in 0 until thread.size){
+                    if(thread[i].getId() == threadId)
+                        return i
+                }
+                return -1
+            }
+        return -1
+        }
+        protected fun getGroupIndex(id: Int): Int {
             if(verifyGroup(id)){
                 for(i in 0 until groupList.size) {
                     if (groupList[i].getId() == id)
@@ -201,7 +230,7 @@ open class GeneralEntitiesManagement{
             else return -1
         }
 
-        protected fun getIndexUser(id: Int): Int {
+        protected fun getUserIndex(id: Int): Int {
             if(verifyUser(id)) {
                 for (i in 0 until userList.size) {
                     if (userList[i].getId() == id)
@@ -212,8 +241,8 @@ open class GeneralEntitiesManagement{
             else return -1
         }
 
-        protected fun getIndexMember(id: Int, idGroup: Int): Int {
-            val indexGroup = getIndexGroup(idGroup)
+        protected fun getMemberIndex(id: Int, idGroup: Int): Int {
+            val indexGroup = getGroupIndex(idGroup)
 
             if(indexGroup != -1 && groupList[indexGroup].members.size > 0){
                 for(i in 0 until groupList[indexGroup].members.size) {

@@ -1,11 +1,8 @@
 package br.meetingplace.servicies.management
 
-import br.meetingplace.data.GroupConversation
-import br.meetingplace.data.Member
-import br.meetingplace.data.UserMember
-import br.meetingplace.data.Conversation
-import br.meetingplace.data.Follower
+import br.meetingplace.data.*
 import br.meetingplace.servicies.chat.Chat
+import br.meetingplace.servicies.conversationThread.MainThread
 import br.meetingplace.servicies.notification.Inbox
 
 class EntitiesManagement: GeneralEntitiesManagement() {
@@ -14,8 +11,8 @@ class EntitiesManagement: GeneralEntitiesManagement() {
     fun follow(data: Follower){
 
         if(getLoggedUser() != -1){
-            val indexExternal = getIndexUser(data.external)
-            val indexCurrent = getIndexUser(getLoggedUser())
+            val indexExternal = getUserIndex(data.external)
+            val indexCurrent = getUserIndex(getLoggedUser())
             val notification = Inbox("${userList[indexCurrent].social.userName} is now following you.", "New follower.")
 
             if(indexExternal != -1 && verifyFollower(data) == 0){ // verifies if the user you want to follow exists
@@ -31,8 +28,8 @@ class EntitiesManagement: GeneralEntitiesManagement() {
 
         val logged = getLoggedUser()
         if(logged != -1){
-            val indexExternal = getIndexUser(data.external)
-            val indexCurrent = getIndexUser(logged)
+            val indexExternal = getUserIndex(data.external)
+            val indexCurrent = getUserIndex(logged)
 
             if( indexCurrent != -1 && indexExternal != -1){
                 userList[indexCurrent].social.following.remove(data.external)
@@ -43,10 +40,10 @@ class EntitiesManagement: GeneralEntitiesManagement() {
 
     fun messengerUser(chat: Conversation){
 
-        val indexReceiver = getIndexUser(chat.receiver)
+        val indexReceiver = getUserIndex(chat.receiver)
         val logged = getLoggedUser()
         if(logged != -1 && indexReceiver != -1 && chat.receiver != logged){
-            val indexSender = getIndexUser(logged)
+            val indexSender = getUserIndex(logged)
             val chatId = userList[indexReceiver].getId() + userList[indexSender].getId()
 
             if(userList[indexReceiver].social.getChatIndex(chatId) != -1){ // The conversation already exists
@@ -72,7 +69,7 @@ class EntitiesManagement: GeneralEntitiesManagement() {
         val logged = getLoggedUser()
         if( logged != -1){
 
-            val indexGroup = getIndexGroup(member.group)
+            val indexGroup = getGroupIndex(member.group)
             if(indexGroup != -1)
                 addMember(member)
         }
@@ -83,7 +80,7 @@ class EntitiesManagement: GeneralEntitiesManagement() {
         val logged = getLoggedUser()
         if( logged != -1){
 
-            val indexGroup = getIndexGroup(member.group)
+            val indexGroup = getGroupIndex(member.group)
 
             if(indexGroup != -1 && groupList[indexGroup].getCreator() != logged)
                 removeMember(member)
@@ -91,13 +88,43 @@ class EntitiesManagement: GeneralEntitiesManagement() {
     }
     //USERS
 
+    //THREADS
+    fun createMainThread(content: ThreadContent){
+        if(getLoggedUser() != -1){
+            val thread = MainThread()
+            val indexUser = getUserIndex(getLoggedUser())
+            val id = generateThreadId(userList[indexUser].social.getThreads())
+            println(content.body)
+            thread.startThread(content, id, userList[indexUser].social.userName, getLoggedUser())
+            println(thread.getContent())
+            userList[indexUser].social.addNewThread(thread)
+        }
+
+    }
+
+    fun deleteThread(operations: Operations){
+
+        if(getLoggedUser() != -1 && operations.pass == cachedPass){
+            val indexThread = getThreadIndex(operations.id)
+            val indexUser = getUserIndex(getLoggedUser())
+
+            userList[indexUser].social.removeThread(indexThread)
+        }
+
+    }
+
+    fun createSubThread(content: ThreadContent){
+        println("THICC CODE")
+    }
+    //THREADS
+
     //GROUPS
     fun messengerGroup(conversation: GroupConversation){
 
         val logged = getLoggedUser()
-        val indexGroup = getIndexGroup(conversation.group)
+        val indexGroup = getGroupIndex(conversation.group)
         if(logged != -1 && indexGroup != -1){
-            val indexUser = getIndexUser(logged)
+            val indexUser = getUserIndex(logged)
             groupList[indexGroup].sendMsg(conversation.message +" - " + userList[indexUser].social.userName, logged)
         }
 
@@ -105,14 +132,14 @@ class EntitiesManagement: GeneralEntitiesManagement() {
 
     fun addMember(member: UserMember){
 
-        val indexGroup = getIndexGroup(member.group)
-        val indexUser = getIndexUser(member.id)
+        val indexGroup = getGroupIndex(member.group)
+        val indexUser = getUserIndex(member.id)
         val mem = Member(member.id, 0)
         val logged = getLoggedUser()
 
         if(indexGroup != -1 && indexUser != -1 && member.id != logged && logged != -1){
             // checks if the logged user is on the group
-            val indexMember = getIndexMember(member.id, member.group)
+            val indexMember = getMemberIndex(member.id, member.group)
             if(indexMember == -1) // isnt part of the group then add
                 groupList[indexGroup].members.add(mem)
 
@@ -122,9 +149,9 @@ class EntitiesManagement: GeneralEntitiesManagement() {
     fun removeMember(member: UserMember){
 
         val user = member.id
-        val indexGroup = getIndexGroup(member.group)
-        val indexUser = getIndexUser(user)
-        val indexMember = getIndexMember(user, member.group)
+        val indexGroup = getGroupIndex(member.group)
+        val indexUser = getUserIndex(user)
+        val indexMember = getMemberIndex(user, member.group)
         val logged = getLoggedUser()
         // checks if the logged user is on the group and is an admin or the creator
         if(indexGroup != -1 && indexUser != -1 && user == logged && indexMember != -1 && groupList[indexGroup].members[indexMember].role == 1 && logged != -1)

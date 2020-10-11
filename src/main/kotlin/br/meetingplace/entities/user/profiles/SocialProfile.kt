@@ -6,7 +6,7 @@ import br.meetingplace.servicies.chat.Chat
 import br.meetingplace.servicies.conversationThread.MainThread
 import br.meetingplace.servicies.notification.Inbox
 
-class SocialProfile(): User(){
+class SocialProfile(){
 
     var userName = ""
     var gender= ""
@@ -22,13 +22,24 @@ class SocialProfile(): User(){
     private var myThreads = mutableListOf<MainThread>()
 
 
+    fun getThreads() = myThreads
+
     // SUB METHODS
     fun updateInbox(notification: Inbox){
         inbox.add(notification)
     }
 
+    fun addNewThread(new: MainThread){
+        myThreads.add(new)
+    }
+
     fun startChat(conversation: Chat){
         chat.add(conversation)
+    }
+
+    fun removeThread (indexThread: Int){
+        if(indexThread != -1 && myThreads.size > 0)
+            myThreads.remove(myThreads[indexThread])
     }
 
     fun updateChat(conversation: Conversation, idChat: Int){

@@ -2,7 +2,6 @@ package br.meetingplace.entities.user
 
 import br.meetingplace.entities.user.profiles.ProfessionalProfile
 import br.meetingplace.entities.user.profiles.SocialProfile
-import br.meetingplace.servicies.management.GeneralEntitiesManagement
 
 open class User(){
 
@@ -20,7 +19,7 @@ open class User(){
             id = new
     }
 
-    fun createSocialProfile(profile: SocialProfile){
+    fun socialProfile(profile: SocialProfile){
         if(age >= 16 && id != -1){
             social.userName = profile.userName
             social.about = profile.about
@@ -29,7 +28,7 @@ open class User(){
         }
     }
 
-    fun createProfessionalProfile(profile: ProfessionalProfile){
+    fun professionalProfile(profile: ProfessionalProfile){
         if(age >= 18 && id != -1){
             /*
             professional.userName = profile.userName

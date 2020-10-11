@@ -41,6 +41,10 @@ fun main (){
                 val user = call.receive<User>()
                 call.respond(SystemV.createUser(user))
             }
+            post("/user/delete"){
+                val user = call.receive<Operations>()
+                call.respond(SystemV.deleteUser(user))
+            }
 
             post("/user/login"){
                 val user = call.receive<Login>()
@@ -51,12 +55,12 @@ fun main (){
                 val user = call.receive<SocialProfile>()
                 call.respond(SystemV.createSocialProfile(user))
             }
-
+    /*
             post("/user/create/professional"){
                 val user = call.receive<ProfessionalProfile>()
                 call.respond(SystemV.createProfessionalProfile(user))
             }
-
+     */
 
             post("/user/logoff"){
 
@@ -75,6 +79,15 @@ fun main (){
                 call.respond(SystemV.messengerUser(chat))
             }
 
+            post("/user/thread"){
+                val new = call.receive<ThreadContent>()
+                call.respond(SystemV.createMainThread(new))
+            }
+
+            post("/user/delete/thread"){
+                val thread = call.receive<Operations>()
+                call.respond(SystemV.deleteThread(thread))
+            }
 
             //Group related
             get("/group"){
