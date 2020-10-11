@@ -30,7 +30,7 @@ open class Group(){
         name = new
     }
 
-    fun updateId (new: Int){ // Needs work here
+    fun startGroup (new: Int){ // updates the ID
         if(id == -1)
             id = new
     }

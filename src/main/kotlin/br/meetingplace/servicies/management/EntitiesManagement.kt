@@ -13,15 +13,15 @@ class EntitiesManagement: GeneralEntitiesManagement() {
     //USERS
     fun follow(data: Follower){
 
-        if(getUserLogged() != -1){
+        if(getLoggedUser() != -1){
             val indexExternal = getIndexUser(data.external)
-            val indexCurrent = getIndexUser(getUserLogged())
-            val notification = Inbox("${userList[indexCurrent].userName} is now following you.", "New follower.")
+            val indexCurrent = getIndexUser(getLoggedUser())
+            val notification = Inbox("${userList[indexCurrent].social.userName} is now following you.", "New follower.")
 
             if(indexExternal != -1 && verifyFollower(data) == 0){ // verifies if the user you want to follow exists
-                userList[indexExternal].updateInbox(notification)
-                userList[indexExternal].followers.add(getUserLogged())
-                userList[indexCurrent].following.add(data.external)
+                userList[indexExternal].social.updateInbox(notification)
+                userList[indexExternal].social.followers.add(getLoggedUser())
+                userList[indexCurrent].social.following.add(data.external)
             }
 
         }
@@ -29,13 +29,14 @@ class EntitiesManagement: GeneralEntitiesManagement() {
 
     fun unfollow(data: Follower){
 
-        if(getUserLogged() != -1){
+        val logged = getLoggedUser()
+        if(logged != -1){
             val indexExternal = getIndexUser(data.external)
-            val indexCurrent = getIndexUser(getUserLogged())
+            val indexCurrent = getIndexUser(logged)
 
             if( indexCurrent != -1 && indexExternal != -1){
-                userList[indexCurrent].following.remove(data.external)
-                userList[indexExternal].followers.remove(getUserLogged())
+                userList[indexCurrent].social.following.remove(data.external)
+                userList[indexExternal].social.followers.remove(logged)
             }
         }
     }
@@ -43,31 +44,33 @@ class EntitiesManagement: GeneralEntitiesManagement() {
     fun messengerUser(chat: Conversation){
 
         val indexReceiver = getIndexUser(chat.receiver)
-        if(getUserLogged() != -1 && indexReceiver != -1 && chat.receiver != getUserLogged()){
-            val indexSender = getIndexUser(getUserLogged())
+        val logged = getLoggedUser()
+        if(logged != -1 && indexReceiver != -1 && chat.receiver != logged){
+            val indexSender = getIndexUser(logged)
             val chatId = userList[indexReceiver].getId() + userList[indexSender].getId()
 
-            if(userList[indexReceiver].getChatIndex(chatId) != -1){ // The conversation already exists
-                val notification = Inbox("${userList[indexSender].userName} sent a new message.", "Message.")
-                chat.message+=" - "+userList[indexSender].userName
-                userList[indexReceiver].updateChat(chat, chatId)
-                userList[indexReceiver].updateInbox(notification)
+            if(userList[indexReceiver].social.getChatIndex(chatId) != -1){ // The conversation already exists
+                val notification = Inbox("${userList[indexSender].social.userName} sent a new message.", "Message.")
+                chat.message+=" - "+userList[indexSender].social.userName
+                userList[indexReceiver].social.updateChat(chat, chatId)
+                userList[indexReceiver].social.updateInbox(notification)
             }
             else { // The conversation doesn't exist
-                val notification = Inbox("${userList[indexSender].userName} started a conversation with you.", "Message.")
+                val notification = Inbox("${userList[indexSender].social.userName} started a conversation with you.", "Message.")
                 val newChat = Chat(chatId)
-                newChat.conversation.add(chat.message+" - "+userList[indexSender].userName)
+                newChat.conversation.add(chat.message+" - "+userList[indexSender].social.userName)
 
-                userList[indexReceiver].startChat(newChat)
-                userList[indexReceiver].updateInbox(notification)
-                userList[indexSender].startChat(newChat)
+                userList[indexReceiver].social.startChat(newChat)
+                userList[indexReceiver].social.updateInbox(notification)
+                userList[indexSender].social.startChat(newChat)
             }
         }
     }
 
     fun joinGroup(member: UserMember){
 
-        if( getUserLogged() != -1){
+        val logged = getLoggedUser()
+        if( logged != -1){
 
             val indexGroup = getIndexGroup(member.group)
             if(indexGroup != -1)
@@ -77,11 +80,12 @@ class EntitiesManagement: GeneralEntitiesManagement() {
 
     fun leaveGroup(member: UserMember){
 
-        if( getUserLogged() != -1){
+        val logged = getLoggedUser()
+        if( logged != -1){
 
             val indexGroup = getIndexGroup(member.group)
 
-            if(indexGroup != -1 && groupList[indexGroup].getCreator() != getUserLogged())
+            if(indexGroup != -1 && groupList[indexGroup].getCreator() != logged)
                 removeMember(member)
         }
     }
@@ -90,11 +94,13 @@ class EntitiesManagement: GeneralEntitiesManagement() {
     //GROUPS
     fun messengerGroup(conversation: GroupConversation){
 
-        val indexUser = getIndexUser(getUserLogged())
+        val logged = getLoggedUser()
         val indexGroup = getIndexGroup(conversation.group)
+        if(logged != -1 && indexGroup != -1){
+            val indexUser = getIndexUser(logged)
+            groupList[indexGroup].sendMsg(conversation.message +" - " + userList[indexUser].social.userName, logged)
+        }
 
-        if(getUserLogged() != -1 && indexGroup != -1)
-            groupList[indexGroup].sendMsg(conversation.message +" - " + userList[indexUser].userName, getUserLogged())
     }
 
     fun addMember(member: UserMember){
@@ -102,14 +108,14 @@ class EntitiesManagement: GeneralEntitiesManagement() {
         val indexGroup = getIndexGroup(member.group)
         val indexUser = getIndexUser(member.id)
         val mem = Member(member.id, 0)
+        val logged = getLoggedUser()
 
-        if(indexGroup != -1 && indexUser != -1 && member.id != getUserLogged() ){
+        if(indexGroup != -1 && indexUser != -1 && member.id != logged && logged != -1){
             // checks if the logged user is on the group
             val indexMember = getIndexMember(member.id, member.group)
-            if(indexMember == -1){ // isnt part of the group then add
-
+            if(indexMember == -1) // isnt part of the group then add
                 groupList[indexGroup].members.add(mem)
-            }
+
         }
     }
 
@@ -119,9 +125,9 @@ class EntitiesManagement: GeneralEntitiesManagement() {
         val indexGroup = getIndexGroup(member.group)
         val indexUser = getIndexUser(user)
         val indexMember = getIndexMember(user, member.group)
-
+        val logged = getLoggedUser()
         // checks if the logged user is on the group and is an admin or the creator
-        if(indexGroup != -1 && indexUser != -1 && user == getUserLogged() && indexMember != -1 && groupList[indexGroup].members[indexMember].role == 1)
+        if(indexGroup != -1 && indexUser != -1 && user == logged && indexMember != -1 && groupList[indexGroup].members[indexMember].role == 1 && logged != -1)
             groupList[indexGroup].members.remove(groupList[indexGroup].members[indexMember])
     }
     //GROUPS

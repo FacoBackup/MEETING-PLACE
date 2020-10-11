@@ -3,8 +3,8 @@ package br.meetingplace.entities.user.profiles
 import br.meetingplace.data.Conversation
 import br.meetingplace.entities.user.User
 import br.meetingplace.servicies.chat.Chat
+import br.meetingplace.servicies.conversationThread.MainThread
 import br.meetingplace.servicies.notification.Inbox
-import br.meetingplace.servicies.publication.Post
 
 class SocialProfile(): User(){
 
@@ -13,19 +13,16 @@ class SocialProfile(): User(){
     var nacionality= ""
     var about= ""
 
-    private var posts = mutableListOf<Post>()
+    //private var conversationThread = mutableListOf<>()
     private var chat = mutableListOf<Chat>()
     var followers = mutableListOf<Int>()
     var following = mutableListOf<Int>()
     var groups = mutableListOf<Int>()
     private var inbox = mutableListOf<Inbox>()
-
+    private var myThreads = mutableListOf<MainThread>()
 
 
     // SUB METHODS
-
-    fun makePost()
-
     fun updateInbox(notification: Inbox){
         inbox.add(notification)
     }

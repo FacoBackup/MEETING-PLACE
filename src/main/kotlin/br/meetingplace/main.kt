@@ -2,6 +2,8 @@ package br.meetingplace
 
 import br.meetingplace.data.*
 import br.meetingplace.entities.grupos.*
+import br.meetingplace.entities.user.User
+import br.meetingplace.entities.user.profiles.ProfessionalProfile
 import br.meetingplace.entities.user.profiles.SocialProfile
 
 import br.meetingplace.servicies.management.EntitiesManagement
@@ -26,21 +28,36 @@ fun main (){
                     setPrettyPrinting()
                 }
             }
+
             get("/user"){
                 call.respond(SystemV.getUsers())
             }
-            get("/logged") {
 
-                call.respond(SystemV.getUserLogged())
+            get("/logged") {
+                call.respond(SystemV.getLoggedUser())
             }
+
             post("/user/create"){
-                val user = call.receive<SocialProfile>()
+                val user = call.receive<User>()
                 call.respond(SystemV.createUser(user))
             }
+
             post("/user/login"){
                 val user = call.receive<Login>()
                 call.respond(SystemV.login(user))
             }
+
+            post("/user/create/social"){
+                val user = call.receive<SocialProfile>()
+                call.respond(SystemV.createSocialProfile(user))
+            }
+
+            post("/user/create/professional"){
+                val user = call.receive<ProfessionalProfile>()
+                call.respond(SystemV.createProfessionalProfile(user))
+            }
+
+
             post("/user/logoff"){
 
                 call.respond(SystemV.logoff())
