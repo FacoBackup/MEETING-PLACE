@@ -1,9 +1,11 @@
 package br.meetingplace.servicies.management
 
 import br.meetingplace.data.Operations
+import br.meetingplace.data.SubThreadData
 import br.meetingplace.data.ThreadContent
 import br.meetingplace.data.ThreadOperations
 import br.meetingplace.servicies.conversationThread.MainThread
+import br.meetingplace.servicies.conversationThread.SubThread
 
 
 open class ThreadManagement:GeneralManagement() {
@@ -30,24 +32,35 @@ open class ThreadManagement:GeneralManagement() {
         }
 
     }
-    /*
-    fun createSubThread(content: ThreadContent, subThread: ThreadOperations){
 
-        if(getLoggedUser() != -1){
+    fun createSubThread(operations: SubThreadData){
 
-            val indexMainThreadCreator = getUserIndex(subThread.idUser)
+        if(getLoggedUser() != -1 && verifyUserSocialProfile(getLoggedUser())){
+
+            val indexMainThreadCreator = getUserIndex(operations.idCreator)
             val indexSubThreadCreator = getUserIndex(getLoggedUser())
-            val indexThread = if(getThreadIndex(subThread.idThread) == -1) getThreadIndex(subThread.idThread, subThread.idUser) else getThreadIndex(subThread.idThread)
-            val thread = SubThread()
+            val indexThread = if(getThreadIndex(operations.idThread) == -1) getThreadIndex(operations.idThread, operations.idCreator) else getThreadIndex(operations.idThread)
+            val newThread = SubThread()
 
-            val idSubThread = generateSubThreadId(threadsCopy[indexThread])
+            if(indexThread != -1){
+                val idSubThread = generateSubThreadId(userList[indexMainThreadCreator].social.getThreadById(operations.idThread))
+                val threadContent = ThreadContent( operations.title, operations.body)
 
-            thread.startThread(content, idSubThread, userList[indexSubThreadCreator].social.userName, getLoggedUser())
-            userList[indexMainThreadCreator].social.threadOperations(indexThread,thread)
+                newThread.startThread(threadContent, idSubThread, userList[indexSubThreadCreator].social.userName, getLoggedUser())
+                userList[indexMainThreadCreator].social.threadOperations(indexThread,newThread)
+            }
         }
     }
 
-     */
+    fun deleteSubThread(operations: SubThreadData){
+
+        if(getLoggedUser() != -1 && verifyUserSocialProfile(getLoggedUser())){
+            val indexThread = getThreadIndex(operations.idThread)
+            val indexMainCreator = getUserIndex(operations.idCreator)
+            userList[indexMainCreator].social.subThreadOperations(indexThread,operations.idSubThread, getLoggedUser())
+        }
+    }
+
     // 1 -> LIKE; 2 -> DISLIKE
     fun likeThread(like: ThreadOperations){
 
@@ -83,6 +96,8 @@ open class ThreadManagement:GeneralManagement() {
             }
         }
     }
+
+    //private fun changeLikeState(operation: Int, )
 
     private fun checkLikeDislike(thread: MainThread): Boolean {// IF TRUE THE USER ALREADY LIKED OR DISLIKED THE THREAD
 

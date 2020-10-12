@@ -57,18 +57,17 @@ open class GeneralManagement {
         }
         return id
     }
-    /*
+
     protected fun generateSubThreadId(thread: MainThread): Int {
         var id = Random.nextInt(1, 20000)
 
-        for (element in thread.getSubthreads()){
-            while(id == element.getId())
+        for (element in thread.getSubThreadsId()){
+            while(id == element)
                 id = Random.nextInt(1, 20000)
         }
         return id
     }
 
-     */
     protected fun generateGroupId(): Int {
         var id = Random.nextInt(1, 20000)
 
@@ -155,7 +154,7 @@ open class GeneralManagement {
         else -1
     }
 
-    protected fun getThreadIndex( threadId: Int): Int {
+    protected fun getThreadIndex(threadId: Int): Int {
         val indexUser = getUserIndex(getLoggedUser())
         return if(getLoggedUser() != -1 && indexUser != -1){
 

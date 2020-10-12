@@ -6,6 +6,7 @@ import br.meetingplace.servicies.chat.Chat
 import br.meetingplace.servicies.conversationThread.MainThread
 import br.meetingplace.servicies.conversationThread.SubThread
 import br.meetingplace.servicies.notification.Inbox
+import com.google.gson.InstanceCreator
 import kotlin.concurrent.thread
 
 class SocialProfile(){
@@ -67,6 +68,11 @@ class SocialProfile(){
             myThread[indexThread].addSubThread(subThread)
     }
 
+    fun subThreadOperations(indexThread: Int, idSubThread: Int, idCreator: Int){
+        if (myThread[indexThread].getSubThreadCreator(idSubThread) == idCreator)
+            myThread[indexThread].removeSubThread(idSubThread,idCreator)
+    }
+
     // SUB METHODS
     fun updateInbox(notification: Inbox){
         inbox.add(notification)
@@ -82,8 +88,11 @@ class SocialProfile(){
     }
 
     fun removeThread (indexThread: Int){
-        if(indexThread != -1 && myThread.size > 0)
+        if(indexThread != -1 && myThread.size > 0){
+            threadId.remove(myThread[indexThread].getId())
             myThread.remove(myThread[indexThread])
+        }
+
     }
 
     fun updateChat(conversation: Conversation, idChat: Int){

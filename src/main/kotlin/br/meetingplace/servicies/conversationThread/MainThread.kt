@@ -2,7 +2,7 @@ package br.meetingplace.servicies.conversationThread
 
 import br.meetingplace.data.ThreadContent
 
-open class MainThread(){
+class MainThread(){
 
     private var likes = mutableListOf<Int>() // Stores the IDs from the users who liked it
     private var dislikes = mutableListOf<Int>() // Stores the IDs from the users who disliked it
@@ -11,6 +11,7 @@ open class MainThread(){
     private var body = ""
     private var footer = "" // Receives the name of the logged user
     private var subThread = mutableListOf<SubThread>()
+    private var subThreadId = mutableListOf<Int>()
     private var id = -1
 
     //SETTERS
@@ -26,24 +27,54 @@ open class MainThread(){
         likes.add(Id)
     }
 
-    open fun dislike(Id: Int){
+    fun dislike(Id: Int){
         dislikes.add(Id)
     }
 
-    open fun addSubThread(sub: SubThread){
-        if(sub.getCreator() != -1)
+    fun addSubThread(sub: SubThread){
+        if(sub.getCreator() != -1){
+            subThreadId.add(sub.getId())
             subThread.add(sub)
+        }
+
+    }
+    fun removeSubThread(idSubThread: Int, idCreator: Int){
+
+        val indexSubThread = getSubThreadIndex(idSubThread)
+        if(indexSubThread != -1 && idCreator == subThread[indexSubThread].getId()){
+            subThreadId.remove(subThread[indexSubThread].getId())
+            subThread.remove(subThread[indexSubThread])
+        }
     }
     //SETTERS
 
     //GETTERS
-    open fun getLikes() = likes
-    open fun getDislikes() = dislikes
+    private fun getSubThreadIndex(id: Int): Int {
+
+        if(id in subThreadId){
+            for(i in 0 until subThread.size){
+                if (subThread[i].getId() == id)
+                    return i
+            }
+            return -1
+        }
+        else return -1
+    }
+    fun getSubThreadCreator(id: Int): Int {
+
+        val indexSubThread = getSubThreadIndex(id)
+        return if(indexSubThread != -1)
+            subThread[indexSubThread].getCreator()
+        else
+            -1
+    }
+    fun getLikes() = likes
+    fun getDislikes() = dislikes
     fun getId() = id
-    open fun getLikeSize() = likes.size
-    open fun getDislikeSize() = dislikes.size
+    fun getLikeSize() = likes.size
+    fun getDislikeSize() = dislikes.size
     fun getContent() = listOf(header, body, footer)
     fun getCreator() = creator
-    fun getSubthreads() = subThread
+    fun getSubThreadsId () = subThreadId
     //GETTERS
 }

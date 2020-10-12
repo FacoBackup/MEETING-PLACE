@@ -80,7 +80,14 @@ fun main (){
                 val new = call.receive<ThreadContent>()
                 call.respond(SystemV.createMainThread(new))
             }
-
+            post("/user/subthread"){
+                val content = call.receive<SubThreadData>()
+                call.respond(SystemV.createSubThread(content))
+            }
+            post("/user/delete/subthread"){
+                val content = call.receive<SubThreadData>()
+                call.respond(SystemV.deleteSubThread(content))
+            }
             post("/user/like"){
                 val post = call.receive<ThreadOperations>()
                 call.respond(SystemV.likeThread(post))
