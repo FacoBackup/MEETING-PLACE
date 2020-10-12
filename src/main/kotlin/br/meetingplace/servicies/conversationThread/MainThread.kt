@@ -68,6 +68,21 @@ class MainThread(){
         else
             -1
     }
+
+    fun likeToDislike(userId: Int){
+        if(userId in likes){
+            likes.remove(userId)
+            dislikes.add(userId)
+        }
+    }
+
+    fun dislikeToLike(userId: Int) {
+        if(userId in dislikes){
+            dislikes.remove(userId)
+            likes.add(userId)
+        }
+    }
+
     fun getLikes() = likes
     fun getDislikes() = dislikes
     fun getId() = id

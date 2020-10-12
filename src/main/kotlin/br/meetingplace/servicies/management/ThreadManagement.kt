@@ -6,6 +6,7 @@ import br.meetingplace.data.ThreadContent
 import br.meetingplace.data.ThreadOperations
 import br.meetingplace.servicies.conversationThread.MainThread
 import br.meetingplace.servicies.conversationThread.SubThread
+import br.meetingplace.servicies.notification.Inbox
 
 
 open class ThreadManagement:GeneralManagement() {
@@ -66,16 +67,28 @@ open class ThreadManagement:GeneralManagement() {
 
         val indexUser = getUserIndex(like.idUser)
 
+
         if(getLoggedUser() != -1 && indexUser != -1  && verifyUserSocialProfile(getLoggedUser())){
 
             val indexThread = if(getThreadIndex(like.idThread) == -1) getThreadIndex(like.idThread, like.idUser) else getThreadIndex(like.idThread)
             val thread = userList[indexUser].social.getThreadById(like.idThread)
+            val notification = Inbox("${userList[indexUser].social.userName} liked your thread.", "Thread.")
 
-            if (thread.getId() != -1){
+            if (thread.getId() != -1)
+                when (checkLikeDislike(thread)) {
+                    // 0 -> ALREADY LIKED so do nothing
+                    1-> {// DISLIKED to LIKED
+                        if(like.idUser != getLoggedUser())
+                            userList[indexUser].social.updateInbox(notification)
+                        userList[indexUser].social.threadOperations(indexThread, -1, like.idUser)// -1 CHANGE FROM DISLIKED TO LIKED
+                    }
+                    2 -> {// 2 hasn't DISLIKED or liked yet
+                        if(like.idUser != getLoggedUser())
+                            userList[indexUser].social.updateInbox(notification)
+                        userList[indexUser].social.threadOperations(indexThread, 1, like.idUser)
+                    }
+                }
 
-                if(!checkLikeDislike(thread)) //MAIN THREAD
-                    userList[indexUser].social.threadOperations(indexThread,1,like.idUser)
-            }
         }
     }
     // 1 -> LIKE; 2 -> DISLIKE
@@ -83,24 +96,39 @@ open class ThreadManagement:GeneralManagement() {
 
         val indexUser = getUserIndex(dislike.idUser)
 
-
         if(getLoggedUser() != -1 && indexUser != -1  && verifyUserSocialProfile(getLoggedUser())){
 
             val indexThread = if(getThreadIndex(dislike.idThread) == -1) getThreadIndex(dislike.idThread, dislike.idUser) else getThreadIndex(dislike.idThread)
             val thread = userList[indexUser].social.getThreadById(dislike.idThread)
 
-            if (thread.getId() != -1){
+            val notification = Inbox("${userList[indexUser].social.userName} disliked your thread.", "Thread.")
 
-                if(!checkLikeDislike(thread)) //MAIN THREAD
-                    userList[indexUser].social.threadOperations(indexThread,2,dislike.idUser)
-            }
+            if (thread.getId() != -1)
+                when (checkLikeDislike(thread)) {
+                    // -1 CHANGE FROM DISLIKED TO LIKED
+                    0 -> {// 0 ALREADY LIKED
+                        if(dislike.idUser != getLoggedUser())
+                            userList[indexUser].social.updateInbox(notification)
+                        userList[indexUser].social.threadOperations(indexThread, -2, dislike.idUser)
+                    }
+                    //1 ALREADY DISLIKED so do nothing
+                    2 -> {// 2 hasn't DISLIKED or liked yet
+                        if(dislike.idUser != getLoggedUser())
+                            userList[indexUser].social.updateInbox(notification)
+                        userList[indexUser].social.threadOperations(indexThread, 2, dislike.idUser)
+                    }
+                }
         }
     }
 
-    //private fun changeLikeState(operation: Int, )
+    private fun checkLikeDislike(thread: MainThread): Int {// IF TRUE THE USER ALREADY LIKED OR DISLIKED THE THREAD
 
-    private fun checkLikeDislike(thread: MainThread): Boolean {// IF TRUE THE USER ALREADY LIKED OR DISLIKED THE THREAD
-
-        return getLoggedUser() in thread.getLikes() || getLoggedUser() in thread.getDislikes()
+        return when {
+            getLoggedUser() in thread.getLikes() // 0 ALREADY LIKED
+            -> 0
+            getLoggedUser() in thread.getDislikes() // 1 ALREADY DISLIKED
+            -> 1
+            else -> 2 // 2 hasn't DISLIKED or liked yet
+        }
     }
 }

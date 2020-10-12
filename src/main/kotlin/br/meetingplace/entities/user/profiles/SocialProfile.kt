@@ -56,6 +56,8 @@ class SocialProfile(){
 
         if (indexThread != -1){
             when(operation){
+                -2-> myThread[indexThread].likeToDislike(idUser) //CHANGE FROM LIKED TO DISLIKED
+                -1-> myThread[indexThread].dislikeToLike(idUser) //CHANGE FROM DISLIKED TO LIKED
                 1-> myThread[indexThread].like(idUser)
                 2-> myThread[indexThread].dislike(idUser)
             }
