@@ -3,10 +3,8 @@ package br.meetingplace
 import br.meetingplace.data.*
 import br.meetingplace.entities.grupos.*
 import br.meetingplace.entities.user.User
-import br.meetingplace.entities.user.profiles.ProfessionalProfile
 import br.meetingplace.entities.user.profiles.SocialProfile
-
-import br.meetingplace.servicies.management.EntitiesManagement
+import br.meetingplace.servicies.management.UserManagement
 
 import io.ktor.application.*
 import io.ktor.features.*
@@ -17,7 +15,7 @@ import io.ktor.routing.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 
-val SystemV = EntitiesManagement()
+val SystemV = UserManagement()
 
 fun main (){
 
@@ -63,7 +61,6 @@ fun main (){
      */
 
             post("/user/logoff"){
-
                 call.respond(SystemV.logoff())
             }
             post("/user/follow"){
@@ -84,6 +81,14 @@ fun main (){
                 call.respond(SystemV.createMainThread(new))
             }
 
+            post("/user/like"){
+                val post = call.receive<ThreadOperations>()
+                call.respond(SystemV.likeThread(post))
+            }
+            post("/user/dislike"){
+                val post = call.receive<ThreadOperations>()
+                call.respond(SystemV.dislikeThread(post))
+            }
             post("/user/delete/thread"){
                 val thread = call.receive<Operations>()
                 call.respond(SystemV.deleteThread(thread))
