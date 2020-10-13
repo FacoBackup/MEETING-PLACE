@@ -1,9 +1,9 @@
 package br.meetingplace.servicies.management
 
-import br.meetingplace.data.GroupConversation
-import br.meetingplace.data.Member
-import br.meetingplace.data.UserMember
-import br.meetingplace.entities.grupos.Group
+import br.meetingplace.data.conversation.GroupConversation
+import br.meetingplace.data.user.Member
+import br.meetingplace.data.user.UserMember
+import br.meetingplace.entities.groups.Group
 
 open class GroupManagement:ThreadManagement() {
 

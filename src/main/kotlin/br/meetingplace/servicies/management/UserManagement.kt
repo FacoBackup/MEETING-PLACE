@@ -1,7 +1,7 @@
 package br.meetingplace.servicies.management
 
 import br.meetingplace.data.Operations
-import br.meetingplace.data.UserMember
+import br.meetingplace.data.user.UserMember
 import br.meetingplace.entities.user.User
 
 class UserManagement: ProfileManagement() {

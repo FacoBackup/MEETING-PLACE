@@ -1,13 +1,9 @@
 package br.meetingplace.entities.user.profiles
 
-import br.meetingplace.data.Conversation
-import br.meetingplace.entities.user.User
+import br.meetingplace.data.conversation.Conversation
 import br.meetingplace.servicies.chat.Chat
 import br.meetingplace.servicies.conversationThread.MainThread
-import br.meetingplace.servicies.conversationThread.SubThread
 import br.meetingplace.servicies.notification.Inbox
-import com.google.gson.InstanceCreator
-import kotlin.concurrent.thread
 
 class SocialProfile(){
 
@@ -23,13 +19,88 @@ class SocialProfile(){
     var groups = mutableListOf<Int>()
     private var inbox = mutableListOf<Inbox>()
     private var myThread = mutableListOf<MainThread>()
-    private var threadId = mutableListOf<Int>()
+    private var myThreadId = mutableListOf<Int>()
+    private var timeline = mutableListOf<MainThread>()
+    private var timelineId = mutableListOf<Int>()
 
-    fun getThreadId ()=threadId
+    // SUB METHODS
 
-    fun getThreadIndex(idThread: Int): Int {
+    fun updateInbox(notification: Inbox){
+        inbox.add(notification)
+    }
 
-        if(idThread in threadId){
+    fun addMyThread(thread:MainThread){
+        val indexThread = getMyThreadIndex(thread.getId())
+        if (indexThread == -1 ){
+            myThread.add(thread)
+            myThreadId.add(thread.getId())
+        }
+    }
+
+    fun removeMyThread(thread:MainThread){
+        val indexThread = getMyThreadIndex(thread.getId())
+        if (indexThread != -1 && indexThread in myThreadId){
+            myThread.remove(thread)
+            myThreadId.remove(thread.getId())
+        }
+    }
+
+    fun updateMyThreads(thread:MainThread){
+        val indexThread = getMyThreadIndex(thread.getId())
+        if (indexThread != -1 && indexThread in myThreadId){
+            myThread.remove(myThread[indexThread])
+            myThread.add(thread)
+        }
+    }
+
+    fun addTimelineThread(thread:MainThread){
+        val indexThread = getTimelineThreadIndex(thread.getId())
+        if (indexThread != -1 && indexThread in timelineId){
+            timeline.add(thread)
+            timelineId.add(thread.getId())
+        }
+    }
+    fun removeTimelineThread(thread:MainThread){
+        val indexThread = getTimelineThreadIndex(thread.getId())
+        if (indexThread != -1 && indexThread in timelineId){
+            timeline.remove(thread)
+            timelineId.remove(thread.getId())
+        }
+    }
+
+    fun updateTimeline(thread: MainThread){
+        val indexThread = getTimelineThreadIndex(thread.getId())
+        if (indexThread != -1 && indexThread in timelineId){
+            timeline.remove(timeline[indexThread])
+            timeline.add(thread)
+        }
+    }
+
+    fun startChat(conversation: Chat){
+        chat.add(conversation)
+    }
+
+    fun newMessage(conversation: Conversation, idChat: Int){
+
+        val indexConversation = getChatIndex(idChat)
+        if(idChat == chat[indexConversation].getId())
+            chat[indexConversation].conversation.add(conversation.message)
+    }
+
+    fun getMyThreadId() = myThreadId
+    fun getTimelineThreadId() = timelineId
+
+    fun getChatIndex(idChat: Int): Int{
+        for(i in 0 until chat.size){
+            if(chat[i].getId() == idChat)
+                return i
+        }
+        return -1
+    }
+
+    private fun getMyThreadIndex(idThread: Int): Int {
+
+        if(idThread in myThreadId){
 
             for( i in 0 until myThread.size){
                 if(myThread[i].getId() == idThread)
@@ -40,76 +111,18 @@ class SocialProfile(){
         else
             return -1
     }
+    fun getTimelineThreadIndex(idThread: Int): Int {
 
-    fun getThreadById(idThread: Int): MainThread {
+        if(idThread in timelineId){
 
-        val nullThread= MainThread()
-        val indexThread= getThreadIndex(idThread)
-
-        return if (indexThread != -1)
-            myThread[indexThread]
-        else
-            nullThread
-    }
-
-    fun threadOperations(indexThread: Int, operation: Int, idUser: Int){ //1 -> LIKE; 2 -> DISLIKE
-
-        if (indexThread != -1){
-            when(operation){
-                -2-> myThread[indexThread].likeToDislike(idUser) //CHANGE FROM LIKED TO DISLIKED
-                -1-> myThread[indexThread].dislikeToLike(idUser) //CHANGE FROM DISLIKED TO LIKED
-                1-> myThread[indexThread].like(idUser)
-                2-> myThread[indexThread].dislike(idUser)
+            for( i in 0 until myThread.size){
+                if(myThread[i].getId() == idThread)
+                    return i
             }
+            return -1
         }
-    }
-
-    fun threadOperations(indexThread: Int, subThread: SubThread){
-
-        if (indexThread != -1 && subThread.getCreator() != -1)
-            myThread[indexThread].addSubThread(subThread)
-    }
-
-    fun subThreadOperations(indexThread: Int, idSubThread: Int, idCreator: Int){
-        if (myThread[indexThread].getSubThreadCreator(idSubThread) == idCreator)
-            myThread[indexThread].removeSubThread(idSubThread,idCreator)
-    }
-
-    // SUB METHODS
-    fun updateInbox(notification: Inbox){
-        inbox.add(notification)
-    }
-
-    fun addNewThread(new: MainThread){
-        myThread.add(new)
-        threadId.add(new.getId())
-    }
-
-    fun startChat(conversation: Chat){
-        chat.add(conversation)
-    }
-
-    fun removeThread (indexThread: Int){
-        if(indexThread != -1 && myThread.size > 0){
-            threadId.remove(myThread[indexThread].getId())
-            myThread.remove(myThread[indexThread])
-        }
-
-    }
-
-    fun updateChat(conversation: Conversation, idChat: Int){
-
-        val indexConversation = getChatIndex(idChat)
-        if(idChat == chat[indexConversation].getId())
-            chat[indexConversation].conversation.add(conversation.message)
-    }
-
-    fun getChatIndex(idChat: Int): Int{
-        for(i in 0 until chat.size){
-            if(chat[i].getId() == idChat)
-                return i
-        }
-        return -1
+        else
+            return -1
     }
     // SUB METHODS
 }

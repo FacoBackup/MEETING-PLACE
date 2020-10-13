@@ -1,3 +1,3 @@
-package br.meetingplace.data
+package br.meetingplace.data.user
 
 data class Follower(val external: Int){}

@@ -1,6 +1,6 @@
 package br.meetingplace.servicies.conversationThread
 
-import br.meetingplace.data.ThreadContent
+import br.meetingplace.data.threads.ThreadContent
 
 class MainThread(){
 

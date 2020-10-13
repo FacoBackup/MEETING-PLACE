@@ -1,8 +1,8 @@
 package br.meetingplace.servicies.management
 
-import br.meetingplace.data.Follower
-import br.meetingplace.data.Login
-import br.meetingplace.entities.grupos.Group
+import br.meetingplace.data.user.Follower
+import br.meetingplace.data.user.Login
+import br.meetingplace.entities.groups.Group
 import br.meetingplace.entities.user.User
 import br.meetingplace.servicies.conversationThread.MainThread
 import kotlin.random.Random
@@ -11,9 +11,11 @@ open class GeneralManagement {
 
     protected val groupList = mutableListOf<Group>()
     protected val userList = mutableListOf<User>()
+    protected val threadList = mutableListOf<MainThread>()
     private var logged = -1
     protected var cachedPass = ""
     //GETTERS
+    fun getThreads() = threadList
     fun getGroups() = groupList
     fun getUsers() = userList
     fun getLoggedUser() = logged
@@ -48,11 +50,11 @@ open class GeneralManagement {
         return id
     }
 
-    protected fun generateMainThreadId(ThreadList: List<Int>): Int{
+    protected fun generateMainThreadId(): Int{
         var id = Random.nextInt(1, 20000)
 
-        for (element in ThreadList){
-            while(id == element)
+        for (i in 0 until threadList.size){
+            while(threadList[i].getId() == id)
                 id = Random.nextInt(1, 20000)
         }
         return id
@@ -145,25 +147,18 @@ open class GeneralManagement {
         return ""
     }
 
-    protected fun getThreadIndex(threadId: Int, userId: Int): Int { // from other users
-
-        val indexUser = getUserIndex(userId)
-        return if(getLoggedUser() != -1 && indexUser != -1){
-            userList[indexUser].social.getThreadIndex(threadId)
-        }
-        else -1
-    }
-
     protected fun getThreadIndex(threadId: Int): Int {
         val indexUser = getUserIndex(getLoggedUser())
-        return if(getLoggedUser() != -1 && indexUser != -1){
 
-            userList[indexUser].social.getThreadIndex(threadId)
+        return if(getLoggedUser() != -1 && indexUser != -1){
+            for (i in 0 until threadList.size){
+                if(threadList[i].getId() == threadId )
+                    return i
+            }
+            -1
         }
         else -1
     }
-
-
 
     protected fun getGroupIndex(id: Int): Int {
         if(verifyGroup(id)){

@@ -1,7 +1,15 @@
 package br.meetingplace
 
 import br.meetingplace.data.*
-import br.meetingplace.entities.grupos.*
+import br.meetingplace.data.conversation.Conversation
+import br.meetingplace.data.conversation.GroupConversation
+import br.meetingplace.data.threads.SubThreadData
+import br.meetingplace.data.threads.ThreadContent
+import br.meetingplace.data.threads.ThreadOperations
+import br.meetingplace.data.user.Follower
+import br.meetingplace.data.user.Login
+import br.meetingplace.data.user.UserMember
+import br.meetingplace.entities.groups.Group
 import br.meetingplace.entities.user.User
 import br.meetingplace.entities.user.profiles.SocialProfile
 import br.meetingplace.servicies.management.UserManagement
@@ -100,7 +108,9 @@ fun main (){
                 val thread = call.receive<Operations>()
                 call.respond(SystemV.deleteThread(thread))
             }
-
+            get("/threads"){
+                call.respond(SystemV.getThreads())
+            }
             //Group related
             get("/group"){
                 call.respond(SystemV.getGroups())

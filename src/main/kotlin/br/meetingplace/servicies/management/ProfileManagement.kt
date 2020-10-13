@@ -1,8 +1,8 @@
 package br.meetingplace.servicies.management
 
-import br.meetingplace.data.Conversation
-import br.meetingplace.data.Follower
-import br.meetingplace.data.UserMember
+import br.meetingplace.data.conversation.Conversation
+import br.meetingplace.data.user.Follower
+import br.meetingplace.data.user.UserMember
 import br.meetingplace.entities.user.profiles.ProfessionalProfile
 import br.meetingplace.entities.user.profiles.SocialProfile
 import br.meetingplace.servicies.chat.Chat
@@ -19,11 +19,14 @@ open class ProfileManagement:GroupManagement() {
         }
     }
 
+/*
     fun createProfessionalProfile(user: ProfessionalProfile){ // NEEDS WORK
 
         if(getLoggedUser() != -1 && verifyUserSocialProfile(getLoggedUser()))
             createProfessionalProfile(user)
     }
+
+ */
 
     fun follow(data: Follower){
 
@@ -37,7 +40,6 @@ open class ProfileManagement:GroupManagement() {
                 userList[indexExternal].social.followers.add(getLoggedUser())
                 userList[indexCurrent].social.following.add(data.external)
             }
-
         }
     }
 
@@ -66,7 +68,7 @@ open class ProfileManagement:GroupManagement() {
             if(userList[indexReceiver].social.getChatIndex(chatId) != -1){ // The conversation already exists
                 val notification = Inbox("${userList[indexSender].social.userName} sent a new message.", "Message.")
                 chat.message+=" - "+userList[indexSender].social.userName
-                userList[indexReceiver].social.updateChat(chat, chatId)
+                userList[indexReceiver].social.newMessage(chat, chatId)
                 userList[indexReceiver].social.updateInbox(notification)
             }
             else { // The conversation doesn't exist
@@ -92,4 +94,6 @@ open class ProfileManagement:GroupManagement() {
                 removeMember(member)
         }
     }
+
+
 }

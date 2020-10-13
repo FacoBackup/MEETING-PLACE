@@ -1,6 +1,6 @@
-package br.meetingplace.entities.grupos
+package br.meetingplace.entities.groups
 
-import br.meetingplace.data.Member
+import br.meetingplace.data.user.Member
 import br.meetingplace.servicies.chat.Chat
 
 open class Group(){
