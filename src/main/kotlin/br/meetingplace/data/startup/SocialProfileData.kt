@@ -1,4 +1,3 @@
 package br.meetingplace.data.startup
 
-class SocialProfileData {
-}
+data class SocialProfileData(val ProfileName: String, val gender: String, val nationality: String, val about: String) {}

@@ -8,7 +8,7 @@ class SocialProfile(){
 
     var userName = ""
     var gender= ""
-    var nacionality= ""
+    var nationality= ""
     var about= ""
 
     //private var conversationThread = mutableListOf<>()

@@ -1,4 +1,3 @@
 package br.meetingplace.data.startup
 
-class LoginByEmail {
-}
+data class LoginByEmail(val email: String, val password: String) {}
