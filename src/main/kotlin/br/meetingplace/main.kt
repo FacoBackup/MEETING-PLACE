@@ -1,19 +1,19 @@
 package br.meetingplace
 
 import br.meetingplace.data.*
-import br.meetingplace.data.conversation.Conversation
-import br.meetingplace.data.conversation.GroupConversation
-import br.meetingplace.data.threads.SubThreadData
-import br.meetingplace.data.threads.SubThreadOperations
+import br.meetingplace.data.conversation.ChatContent
+import br.meetingplace.data.conversation.GroupChatContent
+import br.meetingplace.data.threads.SubThreadContent
+import br.meetingplace.data.threads.operations.SubThreadOperations
 import br.meetingplace.data.threads.ThreadContent
-import br.meetingplace.data.threads.ThreadOperations
-import br.meetingplace.data.user.Follower
-import br.meetingplace.data.user.Login
-import br.meetingplace.data.user.UserMember
+import br.meetingplace.data.threads.operations.ThreadOperations
+import br.meetingplace.data.entities.user.Follower
+import br.meetingplace.data.startup.LoginById
+import br.meetingplace.data.entities.group.UserMember
 import br.meetingplace.entities.groups.Group
 import br.meetingplace.entities.user.User
 import br.meetingplace.entities.user.profiles.SocialProfile
-import br.meetingplace.servicies.management.UserManagement
+import br.meetingplace.management.entities.UserManagement
 
 import io.ktor.application.*
 import io.ktor.features.*
@@ -55,7 +55,7 @@ fun main (){
             }
 
             post("/user/login"){
-                val user = call.receive<Login>()
+                val user = call.receive<LoginById>()
                 call.respond(SystemV.login(user))
             }
 
@@ -82,7 +82,7 @@ fun main (){
                 call.respond(SystemV.unfollow(follow))
             }
             post("/user/message"){
-                val chat = call.receive<Conversation>()
+                val chat = call.receive<ChatContent>()
                 call.respond(SystemV.messengerUser(chat))
             }
 
@@ -91,7 +91,7 @@ fun main (){
                 call.respond(SystemV.createMainThread(new))
             }
             post("/user/subthread"){
-                val content = call.receive<SubThreadData>()
+                val content = call.receive<SubThreadContent>()
                 call.respond(SystemV.createSubThread(content))
             }
             get("/user/see/threads"){
@@ -147,7 +147,7 @@ fun main (){
                 call.respond(SystemV.removeMember(member))
             }
             post("/group/message"){
-                val chatGroup = call.receive<GroupConversation>()
+                val chatGroup = call.receive<GroupChatContent>()
                 call.respond(SystemV.messengerGroup(chatGroup))
             }
             //Group related

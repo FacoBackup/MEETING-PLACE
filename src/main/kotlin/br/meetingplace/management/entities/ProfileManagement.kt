@@ -1,14 +1,13 @@
-package br.meetingplace.servicies.management
+package br.meetingplace.management.entities
 
-import br.meetingplace.data.conversation.Conversation
-import br.meetingplace.data.user.Follower
-import br.meetingplace.data.user.UserMember
-import br.meetingplace.entities.user.profiles.ProfessionalProfile
+import br.meetingplace.data.conversation.operations.ChatOperations
+import br.meetingplace.data.conversation.ChatContent
+import br.meetingplace.data.entities.user.Follower
+import br.meetingplace.data.entities.group.UserMember
 import br.meetingplace.entities.user.profiles.SocialProfile
-import br.meetingplace.servicies.chat.Chat
 import br.meetingplace.servicies.notification.Inbox
 
-open class ProfileManagement:GroupManagement() {
+open class ProfileManagement: GroupManagement() {
 
     fun createSocialProfile(user: SocialProfile){
 
@@ -57,8 +56,8 @@ open class ProfileManagement:GroupManagement() {
             }
         }
     }
-
-    fun messengerUser(chat: Conversation){
+/*
+    fun messengerUser(chat: ChatContent){
 
         val indexReceiver = getUserIndex(chat.receiver)
         val logged = getLoggedUser()
@@ -82,6 +81,21 @@ open class ProfileManagement:GroupManagement() {
                 userList[indexSender].social.startChat(newChat)
             }
         }
+    }
+
+ */
+    fun sendMessage(message: ChatContent){
+
+        val indexReceiver = getUserIndex(message.receiver)
+
+    }
+
+
+    fun deleteMessage(message: ChatOperations){
+
+        val indexReceiver = getUserIndex(chat.receiver)
+
+
     }
 
     fun leaveGroup(member: UserMember){

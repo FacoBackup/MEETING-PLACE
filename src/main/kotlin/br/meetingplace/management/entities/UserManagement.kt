@@ -1,7 +1,7 @@
-package br.meetingplace.servicies.management
+package br.meetingplace.management.entities
 
 import br.meetingplace.data.PasswordOperations
-import br.meetingplace.data.user.UserMember
+import br.meetingplace.data.entities.group.UserMember
 import br.meetingplace.entities.user.User
 
 class UserManagement: ProfileManagement() {
@@ -17,7 +17,6 @@ class UserManagement: ProfileManagement() {
 
     fun deleteUser(operation: PasswordOperations){
 
-
         if(getLoggedUser() != -1 && operation.pass == cachedPass){
 
             val indexUser = getUserIndex(getLoggedUser())
@@ -27,8 +26,6 @@ class UserManagement: ProfileManagement() {
                 val indexFollower = getUserIndex(userList[indexUser].social.followers[i])
                 if(indexFollower != -1)
                     userList[indexFollower].social.following.remove(getLoggedUser())
-
-
             }
 
             for(i in 0 until userList[indexUser].social.following.size){

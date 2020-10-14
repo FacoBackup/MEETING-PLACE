@@ -1,11 +1,12 @@
-package br.meetingplace.servicies.management
+package br.meetingplace.management.entities
 
-import br.meetingplace.data.conversation.GroupConversation
-import br.meetingplace.data.user.Member
-import br.meetingplace.data.user.UserMember
+import br.meetingplace.data.conversation.GroupChatContent
+import br.meetingplace.data.entities.group.Member
+import br.meetingplace.data.entities.group.UserMember
 import br.meetingplace.entities.groups.Group
+import br.meetingplace.management.servicies.ThreadManagement
 
-open class GroupManagement:ThreadManagement() {
+open class GroupManagement: ThreadManagement() {
 
     fun createGroup(group: Group){
 
@@ -32,7 +33,7 @@ open class GroupManagement:ThreadManagement() {
         }
     }
 
-    fun messengerGroup(conversation: GroupConversation){
+    fun messengerGroup(conversation: GroupChatContent){
 
         val logged = getLoggedUser()
         val indexGroup = getGroupIndex(conversation.group)

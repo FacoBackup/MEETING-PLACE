@@ -1,7 +1,7 @@
-package br.meetingplace.servicies.management
+package br.meetingplace.management
 
-import br.meetingplace.data.user.Follower
-import br.meetingplace.data.user.Login
+import br.meetingplace.data.entities.user.Follower
+import br.meetingplace.data.startup.LoginById
 import br.meetingplace.entities.groups.Group
 import br.meetingplace.entities.user.User
 import br.meetingplace.servicies.conversationThread.MainThread
@@ -27,7 +27,7 @@ open class GeneralManagement {
     //GETTERS
 
     //AUTHENTICATION SYSTEM
-    fun login(log: Login){
+    fun login(log: LoginById){
 
         val indexUser = getUserIndex(log.user)
         if(verifyUser(log.user) && userList[indexUser].getPass() == log.pass && logged == -1) {

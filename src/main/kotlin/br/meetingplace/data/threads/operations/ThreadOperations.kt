@@ -1,3 +1,3 @@
-package br.meetingplace.data.threads
+package br.meetingplace.data.threads.operations
 
 data class ThreadOperations(val idThread: Int) {}

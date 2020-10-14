@@ -1,21 +1,20 @@
-package br.meetingplace.servicies.management
+package br.meetingplace.management.servicies
 
-import br.meetingplace.data.PasswordOperations
-import br.meetingplace.data.threads.SubThreadData
-import br.meetingplace.data.threads.SubThreadOperations
+import br.meetingplace.data.threads.SubThreadContent
+import br.meetingplace.data.threads.operations.SubThreadOperations
 import br.meetingplace.data.threads.ThreadContent
-import br.meetingplace.data.threads.ThreadOperations
+import br.meetingplace.data.threads.operations.ThreadOperations
 import br.meetingplace.servicies.conversationThread.MainThread
 import br.meetingplace.servicies.conversationThread.SubThread
 import br.meetingplace.servicies.notification.Inbox
 
 
-open class ThreadManagement:GeneralManagement() {
+open class ThreadManagement: ChatManagement() {
 
     protected fun deleteAllThreadsFromUserId(){
         for(i in 0 until threadList.size){
             if(threadList[i].getCreator() == getLoggedUser()){
-                var operations = ThreadOperations(threadList[i].getId())
+                val operations = ThreadOperations(threadList[i].getId())
                 deleteThread(operations)
             }
         }
@@ -43,7 +42,7 @@ open class ThreadManagement:GeneralManagement() {
         }
     }
 
-    fun createSubThread(operations: SubThreadData){
+    fun createSubThread(operations: SubThreadContent){
 
         if(getLoggedUser() != -1 && verifyUserSocialProfile(getLoggedUser())){
 

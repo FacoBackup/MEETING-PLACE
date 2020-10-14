@@ -1,8 +1,7 @@
 package br.meetingplace.entities.user.profiles
 
-import br.meetingplace.data.conversation.Conversation
+import br.meetingplace.data.conversation.ChatContent
 import br.meetingplace.servicies.chat.Chat
-import br.meetingplace.servicies.conversationThread.MainThread
 import br.meetingplace.servicies.notification.Inbox
 
 class SocialProfile(){
@@ -29,7 +28,7 @@ class SocialProfile(){
         chat.add(conversation)
     }
 
-    fun newMessage(conversation: Conversation, idChat: Int){
+    fun newMessage(conversation: ChatContent, idChat: Int){
 
         val indexConversation = getChatIndex(idChat)
         if(idChat == chat[indexConversation].getId())
