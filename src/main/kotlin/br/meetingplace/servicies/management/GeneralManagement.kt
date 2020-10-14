@@ -9,15 +9,20 @@ import kotlin.random.Random
 
 open class GeneralManagement {
 
-    protected val groupList = mutableListOf<Group>()
+
     protected val userList = mutableListOf<User>()
+    protected val emailList = mutableListOf<String>()
+    protected val nameList = mutableListOf<String>()
     protected val threadList = mutableListOf<MainThread>()
+    protected val groupList = mutableListOf<Group>()
     private var logged = -1
     protected var cachedPass = ""
     //GETTERS
     fun getThreads() = threadList
     fun getGroups() = groupList
     fun getUsers() = userList
+    fun getUserNameList() = nameList
+    fun getEmails() = emailList
     fun getLoggedUser() = logged
     //GETTERS
 
@@ -85,15 +90,8 @@ open class GeneralManagement {
     //GENERATORS
 
     //VERIFIERS
-    protected fun verifyUserName(name: String): Boolean {
-        for(i in 0 until userList.size){
-            if(userList[i].social.userName == name)
-                return false
-        }
-        return true
-    }
 
-    protected fun verifyUser(id: Int): Boolean {
+    private fun verifyUser(id: Int): Boolean {
 
         for(i in 0 until userList.size){
             if(userList[i].getId() == id)
@@ -116,7 +114,7 @@ open class GeneralManagement {
         return true
     }
 
-    protected fun verifyGroup(id: Int): Boolean {
+    private fun verifyGroup(id: Int): Boolean {
 
         for(i in 0 until groupList.size){
             if(groupList[i].getId() == id)
@@ -138,7 +136,6 @@ open class GeneralManagement {
     //VERIFIERS
 
     //FINDERS
-
     protected fun getSocialNameById(id: Int): String{
         if(verifyUser(id)){
             val index = getUserIndex(id)

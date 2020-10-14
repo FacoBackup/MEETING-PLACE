@@ -1,7 +1,8 @@
 package br.meetingplace.servicies.management
 
-import br.meetingplace.data.Operations
+import br.meetingplace.data.PasswordOperations
 import br.meetingplace.data.threads.SubThreadData
+import br.meetingplace.data.threads.SubThreadOperations
 import br.meetingplace.data.threads.ThreadContent
 import br.meetingplace.data.threads.ThreadOperations
 import br.meetingplace.servicies.conversationThread.MainThread
@@ -11,6 +12,15 @@ import br.meetingplace.servicies.notification.Inbox
 
 open class ThreadManagement:GeneralManagement() {
 
+    protected fun deleteAllThreadsFromUserId(){
+        for(i in 0 until threadList.size){
+            if(threadList[i].getCreator() == getLoggedUser()){
+                var operations = ThreadOperations(threadList[i].getId())
+                deleteThread(operations)
+            }
+        }
+    }
+
     fun createMainThread(content: ThreadContent){
 
         if(getLoggedUser() != -1 && verifyUserSocialProfile(getLoggedUser())){
@@ -19,17 +29,17 @@ open class ThreadManagement:GeneralManagement() {
 
             thread.startThread(content,generateMainThreadId(), userList[indexUser].social.userName, getLoggedUser())
             threadList.add(thread)
-            val indexThread = getThreadIndex(thread.getId())
-            addThread(indexThread)
+            userList[indexUser].social.updateMyThreadsQuantity(true)
         }
     }
 
-    fun deleteThread(operations: Operations){
+    fun deleteThread(operations: ThreadOperations){
 
-        val indexThread = getThreadIndex(operations.id)
-        if(getLoggedUser() != -1 && operations.pass == cachedPass && verifyUserSocialProfile(getLoggedUser()) && indexThread != -1 && threadList[indexThread].getCreator() == getLoggedUser()){
-                threadList.remove(threadList[indexThread])
-                removeThread(indexThread)
+        val indexThread = getThreadIndex(operations.idThread)
+        val indexUser = getUserIndex(getLoggedUser())
+        if(getLoggedUser() != -1 && verifyUserSocialProfile(getLoggedUser()) && indexThread != -1 && threadList[indexThread].getCreator() == getLoggedUser()){
+            threadList.remove(threadList[indexThread])
+            userList[indexUser].social.updateMyThreadsQuantity(false)
         }
     }
 
@@ -48,19 +58,20 @@ open class ThreadManagement:GeneralManagement() {
 
                 subThread.startThread(threadContent, idSubThread, userList[indexSubThreadCreator].social.userName, getLoggedUser())
                 threadList[indexThread].addSubThread(subThread)
-                updateThread(indexThread)
+
             }
         }
     }
 
-    fun deleteSubThread(operations: SubThreadData){
+    fun deleteSubThread(operations: SubThreadOperations){
 
-        val indexThread = getThreadIndex(operations.idThread)
-
-        if(getLoggedUser() != -1 && verifyUserSocialProfile(getLoggedUser()) && indexThread != -1){
-            threadList[indexThread].removeSubThread(operations.idSubThread, operations.idCreator)
-            updateThread(indexThread)
+        val indexMainThread = getThreadIndex(operations.idMainThread)
+        println(threadList[indexMainThread].getSubThreadCreator(operations.idSubThread) )
+        if(getLoggedUser() != -1 && verifyUserSocialProfile(getLoggedUser()) && indexMainThread != -1 && threadList[indexMainThread].getSubThreadCreator(operations.idSubThread) == getLoggedUser()){
+            println("REMOVE SUB THREAD")
+            threadList[indexMainThread].removeSubThread(operations.idSubThread, getLoggedUser())
         }
+
 
     }
 
@@ -68,23 +79,48 @@ open class ThreadManagement:GeneralManagement() {
     fun likeThread(like: ThreadOperations){
 
         val indexThread = getThreadIndex(like.idThread)
-        val indexUser = getUserIndex(like.idUser)
-        if(getLoggedUser() != -1 && indexThread != -1 && indexUser != -1 && verifyUserSocialProfile(getLoggedUser())){
+        val indexCreator = getUserIndex(threadList[indexThread].getCreator())
+        val userName = getSocialNameById(getLoggedUser())
+        if(getLoggedUser() != -1 && indexThread != -1 && indexCreator != -1 && verifyUserSocialProfile(getLoggedUser())){
 
-            val notification = Inbox("${userList[indexUser].social.userName} liked your thread.", "Thread.")
+            val notification = Inbox("$userName liked your thread.", "Thread.")
             when (checkLikeDislike(threadList[indexThread])) {
                 // 0 -> ALREADY LIKED so do nothing
                 1-> {// DISLIKED to LIKED
-                    if(like.idUser != getLoggedUser())
-                        userList[indexUser].social.updateInbox(notification)
+                    if(threadList[indexThread].getCreator() != getLoggedUser())
+                        userList[indexCreator].social.updateInbox(notification)
                     threadList[indexThread].dislikeToLike(getLoggedUser())
-                    updateThread(indexThread)
                 }
                 2 -> {// 2 hasn't liked yet
-                    if(like.idUser != getLoggedUser())
-                        userList[indexUser].social.updateInbox(notification)
+                    if(threadList[indexThread].getCreator() != getLoggedUser())
+                        userList[indexCreator].social.updateInbox(notification)
                     threadList[indexThread].like(getLoggedUser())
-                    updateThread(indexThread)
+                }
+            }
+        }
+    }
+
+    fun likeSubThread(like: SubThreadOperations){
+
+        val indexMainThread = getThreadIndex(like.idMainThread)
+
+        if(getLoggedUser() != -1 && indexMainThread != -1 && verifyUserSocialProfile(getLoggedUser())){
+
+            val indexCreator = getUserIndex(threadList[indexMainThread].getSubThreadCreator(like.idSubThread))
+            val userName = getSocialNameById(getLoggedUser())
+            val notification = Inbox("$userName liked your reply.", "Thread.")
+
+            when (checkLikeDislike(threadList[indexMainThread].getSubThreadById(like.idSubThread))) {
+                // 0 -> ALREADY LIKED so do nothing
+                1-> {// DISLIKED to LIKED
+                    if(threadList[indexMainThread].getSubThreadCreator(like.idSubThread) != getLoggedUser())
+                        userList[indexCreator].social.updateInbox(notification)
+                    threadList[indexMainThread].dislikeToLikeSubThread(getLoggedUser(),like.idSubThread)
+                }
+                2 -> {// 2 hasn't liked yet
+                    if(threadList[indexMainThread].getSubThreadCreator(like.idSubThread) != getLoggedUser())
+                        userList[indexCreator].social.updateInbox(notification)
+                    threadList[indexMainThread].likeSubThread(getLoggedUser(),like.idSubThread)
                 }
             }
         }
@@ -92,68 +128,48 @@ open class ThreadManagement:GeneralManagement() {
     // 1 -> LIKE; 2 -> DISLIKE
     fun dislikeThread(dislike: ThreadOperations) {
 
-        val indexUser = getUserIndex(dislike.idUser)
         val indexThread = getThreadIndex(dislike.idThread)
-        if(getLoggedUser() != -1 && indexThread != -1 && indexUser != -1 && verifyUserSocialProfile(getLoggedUser())){
+        if(getLoggedUser() != -1 && indexThread != -1 && verifyUserSocialProfile(getLoggedUser())){
 
             when (checkLikeDislike(threadList[indexThread])) {
-                0 ->{
-                    threadList[indexThread].likeToDislike(getLoggedUser()) // like to dislike
-                    updateThread(indexThread)
-                }
-                2 -> {
-                    threadList[indexThread].dislike(getLoggedUser())
-                    updateThread(indexThread)
-                } // hasn't DISLIKED yet
+                0 -> threadList[indexThread].likeToDislike(getLoggedUser()) // like to dislike
+                2 -> threadList[indexThread].dislike(getLoggedUser()) // hasn't DISLIKED yet
+            }
+        }
+    }
+    fun dislikeSubThread(dislike: SubThreadOperations) {
+
+        val indexMainThread = getThreadIndex(dislike.idMainThread)
+        if(getLoggedUser() != -1 && indexMainThread != -1 && verifyUserSocialProfile(getLoggedUser())){
+
+            when (checkLikeDislike(threadList[indexMainThread].getSubThreadById(dislike.idSubThread))) {
+                0 -> threadList[indexMainThread].likeToDislikeSubThread(getLoggedUser(),dislike.idSubThread) // like to dislike
+                2 -> threadList[indexMainThread].dislikeSubThread(getLoggedUser(),dislike.idSubThread) // hasn't DISLIKED yet
             }
         }
     }
 
+    fun getMyThreads(): MutableList<MainThread> {
 
-    private fun addThread(indexThread: Int){
-        println(indexThread)
+        val myThreads = mutableListOf<MainThread>()
 
-        val indexUser = getUserIndex(getLoggedUser())
-        val userFollowers = userList[indexUser].social.followers
-        println(indexUser)
-
-        if(indexUser != -1 && indexThread != -1){
-            if(userFollowers.size > 0)
-                for(i in 0 until userFollowers.size)
-                    userList[userFollowers[i]].social.addTimelineThread(threadList[indexThread])
-
-            userList[indexUser].social.addMyThread(threadList[indexThread])
+        for (i in 0 until threadList.size){
+            if (threadList[i].getCreator() == getLoggedUser())
+                myThreads.add(threadList[i])
         }
-
+        return myThreads
     }
 
-    private fun removeThread(indexThread: Int){
+    fun getMyTimeline(): MutableList<MainThread> {
 
         val indexUser = getUserIndex(getLoggedUser())
-        val userFollowers = userList[indexUser].social.followers
-
-        if(indexUser != -1 && indexThread != -1) {
-            if(userFollowers.size > 0)
-                for (i in 0 until userFollowers.size)
-                    userList[userFollowers[i]].social.removeTimelineThread(threadList[indexThread])
-
-            userList[indexUser].social.removeMyThread(threadList[indexThread])
+        val followingIds = userList[indexUser].social.following
+        val myTimeline = mutableListOf<MainThread>()
+        for (i in 0 until threadList.size){
+            if (threadList[i].getCreator() in followingIds)
+                myTimeline.add(threadList[i])
         }
-    }
-
-    private fun updateThread(indexThread: Int){
-
-        val indexUser = getUserIndex(threadList[indexThread].getCreator())
-        val userFollowers = userList[indexUser].social.followers
-
-        if(indexUser != -1 && indexThread != -1) {
-            if(userFollowers.size > 0)
-                for(i in 0 until userFollowers.size)
-                    userList[userFollowers[i]].social.updateTimeline(threadList[indexThread])
-
-            userList[indexUser].social.updateMyThreads(threadList[indexThread])
-        }
-
+        return myTimeline
     }
 
     private fun checkLikeDislike(thread: MainThread): Int {// IF TRUE THE USER ALREADY LIKED OR DISLIKED THE THREAD
@@ -165,5 +181,18 @@ open class ThreadManagement:GeneralManagement() {
             -> 1
             else -> 2 // 2 hasn't DISLIKED or liked yet
         }
+    }
+
+    private fun checkLikeDislike(thread: SubThread): Int {// IF TRUE THE USER ALREADY LIKED OR DISLIKED THE THREAD
+        return if(thread.getId() != -1){
+            when {
+                getLoggedUser() in thread.getLikes() // 0 ALREADY LIKED
+                -> 0
+                getLoggedUser() in thread.getDislikes() // 1 ALREADY DISLIKED
+                -> 1
+                else -> 2 // 2 hasn't DISLIKED or liked yet
+            }
+        }
+        else 3 // SubThread Doesn't exist
     }
 }

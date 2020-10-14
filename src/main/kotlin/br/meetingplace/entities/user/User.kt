@@ -5,11 +5,12 @@ import br.meetingplace.entities.user.profiles.SocialProfile
 
 open class User(){
 
-
+    private var realName = ""
     private var age= -1 // only can create a professional profile if age > 18 and social if age > 16
     private var id = -1
     private var userEmail= ""
     private var pass = ""
+
     val social = SocialProfile()
     val professional = ProfessionalProfile()
 

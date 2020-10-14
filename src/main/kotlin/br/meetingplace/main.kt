@@ -4,6 +4,7 @@ import br.meetingplace.data.*
 import br.meetingplace.data.conversation.Conversation
 import br.meetingplace.data.conversation.GroupConversation
 import br.meetingplace.data.threads.SubThreadData
+import br.meetingplace.data.threads.SubThreadOperations
 import br.meetingplace.data.threads.ThreadContent
 import br.meetingplace.data.threads.ThreadOperations
 import br.meetingplace.data.user.Follower
@@ -47,8 +48,9 @@ fun main (){
                 val user = call.receive<User>()
                 call.respond(SystemV.createUser(user))
             }
+
             post("/user/delete"){
-                val user = call.receive<Operations>()
+                val user = call.receive<PasswordOperations>()
                 call.respond(SystemV.deleteUser(user))
             }
 
@@ -92,20 +94,37 @@ fun main (){
                 val content = call.receive<SubThreadData>()
                 call.respond(SystemV.createSubThread(content))
             }
+            get("/user/see/threads"){
+                call.respond(SystemV.getMyThreads())
+            }
+            get("/user/see/timeline"){
+                call.respond(SystemV.getMyTimeline())
+            }
             post("/user/delete/subthread"){
-                val content = call.receive<SubThreadData>()
+                val content = call.receive<SubThreadOperations>()
                 call.respond(SystemV.deleteSubThread(content))
             }
             post("/user/like"){
                 val post = call.receive<ThreadOperations>()
                 call.respond(SystemV.likeThread(post))
             }
+
+
             post("/user/dislike"){
                 val post = call.receive<ThreadOperations>()
                 call.respond(SystemV.dislikeThread(post))
             }
+
+            post("/user/like/sub"){
+                val post = call.receive<SubThreadOperations>()
+                call.respond(SystemV.likeSubThread(post))
+            }
+            post("/user/dislike/sub"){
+                val post = call.receive<SubThreadOperations>()
+                call.respond(SystemV.dislikeSubThread(post))
+            }
             post("/user/delete/thread"){
-                val thread = call.receive<Operations>()
+                val thread = call.receive<ThreadOperations>()
                 call.respond(SystemV.deleteThread(thread))
             }
             get("/threads"){

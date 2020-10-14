@@ -12,10 +12,11 @@ open class ProfileManagement:GroupManagement() {
 
     fun createSocialProfile(user: SocialProfile){
 
-        if(getLoggedUser() != -1){
+        if(getLoggedUser() != -1 && user.userName !in nameList){
 
             val indexUser = getUserIndex(getLoggedUser())
             userList[indexUser].socialProfile(user)
+            nameList.add(userList[indexUser].social.userName)
         }
     }
 

@@ -2,27 +2,14 @@ package br.meetingplace.servicies.conversationThread
 
 import br.meetingplace.data.threads.ThreadContent
 
-class SubThread{
+class SubThread: MainThread(){
 
-    private var creator = -1
-    private var header = ""
-    private var body = ""
-    private var footer = "" // Receives the name of the logged user
-    private var id = -1
-
-    //SETTERS
-    fun startThread(content: ThreadContent, id: Int, userName: String, userId: Int){ // Updates the creator to the logged user
-        creator = userId
-        footer = userName
-        header = content.title
-        body = content.body
-        this.id = id
-    }
-    //SETTERS
-
-    //GETTERS
-    fun getId() = id
-    fun getCreator() = creator
-    //GETTERS
-
+    //Only accessible via the MainThread
+    override fun removeSubThread(idSubThread: Int, idCreator: Int){}
+    override fun addSubThread(sub: SubThread){}
+    override fun likeSubThread(idUser: Int, idSubThread: Int){}
+    override fun dislikeSubThread(idUser: Int, idSubThread: Int){}
+    override fun likeToDislikeSubThread(idUser: Int, idSubThread: Int){}
+    override fun dislikeToLikeSubThread(idUser: Int, idSubThread: Int) {}
+    //Only accessible via the MainThread
 }
