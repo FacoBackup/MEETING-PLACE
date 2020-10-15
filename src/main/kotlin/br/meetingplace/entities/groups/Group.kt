@@ -17,7 +17,7 @@ open class Group(){
 
     fun getNameGroup() = name
 
-    fun getConversation() = chat.conversation
+//    fun getConversation() = chat.conversation
 
     fun getAbout() = about
 
@@ -30,19 +30,12 @@ open class Group(){
         name = new
     }
 
-    fun startGroup (new: Int){ // updates the ID
-        if(id == -1)
-            id = new
-    }
+    fun startGroup (newId: Int, newCreator: Int){ // updates the ID
+        if(id == -1 && creator == -1){
+            id = newId
+            creator = newCreator
+        }
 
-    fun updateCreator (new: Int){ // Needs work here
-        if(creator == -1)
-            creator = new
-    }
-
-    fun sendMsg(message: String, sender: Int){
-        if(verifyMember(sender))
-            chat.conversation.add(message)
     }
 
     private fun verifyMember(idMember: Int): Boolean{

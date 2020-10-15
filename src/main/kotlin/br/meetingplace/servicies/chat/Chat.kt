@@ -2,6 +2,7 @@ package br.meetingplace.servicies.chat
 
 import br.meetingplace.data.conversation.operations.ChatOperations
 import br.meetingplace.data.conversation.ChatContent
+import br.meetingplace.data.conversation.ChatFullContent
 
 class Chat(
     private var conversationId: Int//the id of the conversation is the sum of the users id's
@@ -18,31 +19,32 @@ class Chat(
         }
     }
 
-    fun deleteMessage(message: ChatOperations, loggedUser: Int){
-        if(message.idMessage in idMessages && message.receiver + loggedUser == conversationId){
+    fun deleteMessage(message: ChatOperations){
+        if(message.idMessage in idMessages){
             val indexMessage = getMessageIndex(message.idMessage)
             conversation.remove(conversation[indexMessage])
             idMessages.remove(message.idMessage)
             if(message.idMessage in favoriteMessagesIds)
-                unFavoriteMessage(message, loggedUser)
+                unFavoriteMessage(message)
         }
     }
 
-    fun favoriteMessage(message: ChatOperations, loggedUser: Int){
-        if(message.idMessage in idMessages && message.receiver + loggedUser == conversationId)
+    fun favoriteMessage(message: ChatOperations){
+        if(message.idMessage in idMessages )
             favoriteMessagesIds.add(message.idMessage)
     }
 
-    fun unFavoriteMessage(message: ChatOperations, loggedUser: Int){
-        if(message.idMessage in idMessages && message.receiver + loggedUser == conversationId)
+    fun unFavoriteMessage(message: ChatOperations){
+        if(message.idMessage in idMessages)
             favoriteMessagesIds.remove(message.idMessage)
     }
 
-    fun quoteMessage(message: Message, operations: ChatOperations){
-        val indexMessage = getMessageIndex(operations.idMessage)
+    fun quoteMessage(message: ChatFullContent){
+        val indexMessage = getMessageIndex(message.idMessage)
         if(message.idMessage !in idMessages && indexMessage != -1){
             message.message = "|Quoting ${conversation[indexMessage].message}\n"+ message.message
-            addMessage(message)
+            val newMessage = Message(message.message, message.idMessage,true)
+            addMessage(newMessage)
         }
     }
 

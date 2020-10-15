@@ -58,55 +58,6 @@ open class ProfileManagement: GroupManagement() {
             }
         }
     }
-/*
-    fun messengerUser(chat: ChatContent){
-
-        val indexReceiver = getUserIndex(chat.receiver)
-        val logged = getLoggedUser()
-        if(logged != -1 && indexReceiver != -1 && chat.receiver != logged && verifyUserSocialProfile(logged)){
-            val indexSender = getUserIndex(logged)
-            val chatId = userList[indexReceiver].getId() + userList[indexSender].getId()
-
-            if(userList[indexReceiver].social.getChatIndex(chatId) != -1){ // The conversation already exists
-                val notification = Inbox("${userList[indexSender].social.userName} sent a new message.", "Message.")
-                chat.message+=" - "+userList[indexSender].social.userName
-                userList[indexReceiver].social.newMessage(chat, chatId)
-                userList[indexReceiver].social.updateInbox(notification)
-            }
-            else { // The conversation doesn't exist
-                val notification = Inbox("${userList[indexSender].social.userName} started a conversation with you.", "Message.")
-                val newChat = Chat(chatId)
-                newChat.conversation.add(chat.message+" - "+userList[indexSender].social.userName)
-
-                userList[indexReceiver].social.startChat(newChat)
-                userList[indexReceiver].social.updateInbox(notification)
-                userList[indexSender].social.startChat(newChat)
-            }
-        }
-    }
-
- */
-    fun sendMessage(message: ChatContent){
-        val indexReceiver = getUserIndex(message.receiver)
-        val indexUser = getUserIndex(getLoggedUser())
-        val chatId = getLoggedUser() + message.receiver
-
-        if(getLoggedUser() != -1 && indexReceiver != -1){
-
-        }
-    }
-
-
-    fun deleteMessage(message: ChatOperations){
-
-        val indexReceiver = getUserIndex(message.receiver)
-        val indexUser = getUserIndex(getLoggedUser())
-        val chatId = getLoggedUser() + message.receiver
-
-        if(getLoggedUser() != -1 && indexReceiver != -1){
-
-        }
-    }
 
     fun leaveGroup(member: UserMember){
 

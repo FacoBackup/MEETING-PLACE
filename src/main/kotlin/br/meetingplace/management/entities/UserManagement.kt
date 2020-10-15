@@ -45,9 +45,12 @@ class UserManagement: ProfileManagement() {
             deleteAllThreadsFromUserId()
 
             emailList.remove(userList[indexUser].getEmail())
-            if(userList[indexUser].social.userName != "")
-                nameList.remove(userList[indexUser].social.userName)
+
+            if(userList[indexUser].social.getUserName() != "")
+                nameList.remove(userList[indexUser].social.getUserName())
+
             userList.remove(userList[indexUser])
+
             logoff()
         }
     }

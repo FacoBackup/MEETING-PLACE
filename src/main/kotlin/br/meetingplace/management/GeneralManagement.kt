@@ -1,9 +1,11 @@
 package br.meetingplace.management
 
 import br.meetingplace.data.entities.user.Follower
+import br.meetingplace.data.startup.LoginByEmail
 import br.meetingplace.data.startup.LoginById
 import br.meetingplace.entities.groups.Group
 import br.meetingplace.entities.user.User
+import br.meetingplace.servicies.chat.Chat
 import br.meetingplace.servicies.conversationThread.MainThread
 import kotlin.random.Random
 
@@ -15,6 +17,7 @@ open class GeneralManagement {
     protected val nameList = mutableListOf<String>()
     protected val threadList = mutableListOf<MainThread>()
     protected val groupList = mutableListOf<Group>()
+
     private var logged = -1
     protected var cachedPass = ""
     //GETTERS
@@ -27,14 +30,23 @@ open class GeneralManagement {
     //GETTERS
 
     //AUTHENTICATION SYSTEM
-    fun login(log: LoginById){
+    fun loginId(log: LoginById){
 
         val indexUser = getUserIndex(log.user)
-        if(verifyUser(log.user) && userList[indexUser].getPass() == log.pass && logged == -1) {
+        if(verifyUser(log.user) && userList[indexUser].getPassword() == log.password && logged == -1) {
             logged = log.user
-            cachedPass = log.pass
+            cachedPass = log.password
         }
     }
+    fun loginEmail(log: LoginByEmail){
+
+        val indexUser = getUserIndexByEmail(log.email)
+        if(logged == -1 && log.email in emailList && userList[indexUser].getPassword() == log.password ) {
+            logged = userList[indexUser].getId()
+            cachedPass = log.password
+        }
+    }
+
     fun logoff(){
 
         if(logged != -1){
@@ -87,6 +99,15 @@ open class GeneralManagement {
         }
         return id
     }
+
+    protected fun generateMessageId(chat: Chat): Int {
+        var id = Random.nextInt(1, 20000)
+
+        while (id in chat.getMessageIds())
+            id = Random.nextInt(1, 20000)
+
+        return id
+    }
     //GENERATORS
 
     //VERIFIERS
@@ -103,7 +124,7 @@ open class GeneralManagement {
     protected fun verifyUserSocialProfile(id: Int): Boolean {
 
         val indexUser = getUserIndex(id)
-        return userList[indexUser].social.userName != ""
+        return userList[indexUser].social.getUserName() != ""
     }
 
     protected fun verifyGroupName(name: String): Boolean {
@@ -139,7 +160,7 @@ open class GeneralManagement {
     protected fun getSocialNameById(id: Int): String{
         if(verifyUser(id)){
             val index = getUserIndex(id)
-            return userList[index].social.userName
+            return userList[index].social.getUserName()
         }
         return ""
     }
@@ -179,6 +200,16 @@ open class GeneralManagement {
         else return -1
     }
 
+    protected fun getUserIndexByEmail(email: String): Int {
+        if(email in emailList) {
+            for (i in 0 until emailList.size) {
+                if (emailList[i] == email)
+                    return i
+            }
+            return -1
+        }
+        else return -1
+    }
     protected fun getMemberIndex(id: Int, idGroup: Int): Int {
         val indexGroup = getGroupIndex(idGroup)
 
