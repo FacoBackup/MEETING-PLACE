@@ -21,7 +21,7 @@ open class User(
     }
 
     fun createSocialProfile(profile: SocialProfile){ // overrides the null profile
-        if(age >= 16 && id != -1)
+        if(age >= 16 && id != -1 && social.getUserName() == "")
             social = profile
     }
 

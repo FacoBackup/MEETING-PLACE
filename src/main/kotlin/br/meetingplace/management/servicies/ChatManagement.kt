@@ -17,12 +17,14 @@ open class ChatManagement: GeneralManagement() {
         val indexReceiver = getUserIndex(message.receiver)
         val idChat = getLoggedUser() + message.receiver
 
-        if(getLoggedUser() != -1 && verifyUserSocialProfile(getLoggedUser()) && indexReceiver != -1 ) {
+        if(getLoggedUser() != -1 && verifyUserSocialProfile(getLoggedUser()) && indexReceiver != -1 && message.receiver != getLoggedUser() ) {
             if (userList[indexUser].social.getChatIndex(idChat) == -1) { // the conversation doesn't exist
                 val notification = Inbox("${userList[indexUser].social.getUserName()} started a conversation with you.", "Message.")
                 val newChat = Chat(idChat)
                 val content = Message(message.message, generateMessageId(userList[indexUser].social.getChatById(idChat)), message.static)
                 newChat.addMessage(content)
+                message.message = message.message + userList[indexUser].social.getUserName()
+
                 userList[indexReceiver].social.startChat(newChat)
                 userList[indexUser].social.startChat(newChat)
                 userList[indexReceiver].social.updateInbox(notification)
@@ -31,9 +33,9 @@ open class ChatManagement: GeneralManagement() {
 
                 val content = Message(message.message, generateMessageId(userList[indexUser].social.getChatById(idChat)), message.static)
                 val notification = Inbox("${userList[indexUser].social.getUserName()} sent a new message.", "Message.")
-                message.message = userList[indexUser].social.getUserName() + message.message
+                message.message = message.message + userList[indexUser].social.getUserName()
 
-                userList[indexReceiver].social.newMessage(content, getLoggedUser())
+                userList[indexReceiver].social.newMessage(content, idChat)
                 userList[indexReceiver].social.updateInbox(notification)
             }
         }
@@ -41,17 +43,18 @@ open class ChatManagement: GeneralManagement() {
 
     fun deleteMessage(message: ChatOperations){
 
-        if(getLoggedUser() != -1 && verifyUserSocialProfile(getLoggedUser())){
+        if(getLoggedUser() != -1 && verifyUserSocialProfile(getLoggedUser()) && message.receiver != getLoggedUser()){
 
             val indexUser = getUserIndex(getLoggedUser())
             val idChat = getLoggedUser() + message.receiver
+
 
             userList[indexUser].social.deleteMessage(message, idChat)
         }
     }
 
     fun favoriteMessage(message: ChatOperations){
-        if(getLoggedUser() != -1 && verifyUserSocialProfile(getLoggedUser())){
+        if(getLoggedUser() != -1 && verifyUserSocialProfile(getLoggedUser()) && message.receiver != getLoggedUser()){
             val indexUser = getUserIndex(getLoggedUser())
             val idChat = getLoggedUser() + message.receiver
 
@@ -60,7 +63,7 @@ open class ChatManagement: GeneralManagement() {
     }
 
     fun unFavoriteMessage(message: ChatOperations){
-        if(getLoggedUser() != -1 && verifyUserSocialProfile(getLoggedUser())){
+        if(getLoggedUser() != -1 && verifyUserSocialProfile(getLoggedUser()) && message.receiver != getLoggedUser()){
             val indexUser = getUserIndex(getLoggedUser())
             val idChat = getLoggedUser() + message.receiver
 
@@ -69,23 +72,27 @@ open class ChatManagement: GeneralManagement() {
     }
 
     fun quoteMessage(message: ChatFullContent){
-        if(getLoggedUser() != -1 && verifyUserSocialProfile(getLoggedUser())){
+        if(getLoggedUser() != -1 && verifyUserSocialProfile(getLoggedUser()) && message.receiver!= getLoggedUser()){
             val indexUser = getUserIndex(getLoggedUser())
             val idChat = getLoggedUser() + message.receiver
-
+            val newId = generateMessageId(userList[indexUser].social.getChatById(idChat))
+            message.idNewMessage = newId
+            println("LEVEL 1")
             userList[indexUser].social.quoteMessage(message, idChat)
         }
     }
 
-    fun shareMessage(operations: ChatOperations){ //NEEDS WORK
-        if(getLoggedUser() != -1 && verifyUserSocialProfile(getLoggedUser())){
-            val indexUser = getUserIndex(getLoggedUser())
-            val idChat = getLoggedUser() + operations.receiver
+    fun shareMessage(content: ChatFullContent){ //NEEDS WORK
 
-            val message = userList[indexUser].social.shareMessage(operations, idChat)
+        if(getLoggedUser() != -1 && verifyUserSocialProfile(getLoggedUser()) && content.receiver!= getLoggedUser()){
+            val indexUser = getUserIndex(getLoggedUser())
+            val idChat = getLoggedUser() + content.receiver
+            val operation = ChatOperations(content.idMessage, content.receiver)
+            val message = userList[indexUser].social.shareMessage(operation, idChat)
 
             if(message != ""){
-                sendMessage()
+                val sharedMessage = ChatContent(content.message, content.receiver,true)
+                sendMessage(sharedMessage)
             }
         }
     }

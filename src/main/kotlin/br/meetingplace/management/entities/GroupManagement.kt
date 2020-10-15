@@ -10,11 +10,11 @@ open class GroupManagement: ThreadManagement() {
 
     fun createGroup(group: Group){
 
-        group.updateCreator(getLoggedUser())
+
         val indexCreator = getUserIndex(getLoggedUser())
 
         if(getLoggedUser() != -1 && group.getId() == -1 && verifyGroupName(group.getNameGroup()) && verifyUserSocialProfile(getLoggedUser())){
-            group.startGroup(generateGroupId())
+            group.startGroup(generateGroupId(), getLoggedUser())
             userList[indexCreator].social.groups.add(group.getId())
             groupList.add(group)
         }
@@ -32,7 +32,7 @@ open class GroupManagement: ThreadManagement() {
             groupList.remove(groupList[indexGroup])
         }
     }
-
+    /*
     fun messengerGroup(conversation: GroupChatContent){
 
         val logged = getLoggedUser()
@@ -43,6 +43,8 @@ open class GroupManagement: ThreadManagement() {
         }
 
     }
+
+     */
 
     fun addMember(member: UserMember){
 

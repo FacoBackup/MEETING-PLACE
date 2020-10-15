@@ -36,6 +36,7 @@ class SocialProfile(
 
     fun startChat(conversation: Chat){
         chat.add(conversation)
+        chatIds.add(conversation.getConversationId())
     }
 
     fun newMessage(message: Message, conversationId: Int){
@@ -46,8 +47,11 @@ class SocialProfile(
     }
 
     fun deleteMessage(message: ChatOperations, conversationId: Int){
-        if(conversationId in chatIds)
+        if(conversationId in chatIds){
+
             chat[getChatIndex(conversationId)].deleteMessage(message)
+        }
+
     }
 
     fun favoriteMessage(message: ChatOperations, conversationId: Int){
@@ -61,8 +65,11 @@ class SocialProfile(
     }
 
     fun quoteMessage(content: ChatFullContent, conversationId: Int){
-        if(conversationId in chatIds)
+        if(conversationId in chatIds){
+            println("LEVEL 2")
             chat[getChatIndex(conversationId)].quoteMessage(content)
+        }
+
     }
 
     fun shareMessage(operations: ChatOperations, conversationId: Int): String {
@@ -73,8 +80,8 @@ class SocialProfile(
     }
 
     fun getChatIndex(idChat: Int): Int{
-        for(i in 0 until chatIds.size){
-            if(chatIds[i] == idChat)
+        for(i in 0 until chat.size){
+            if(chat[i].getConversationId() == idChat)
                 return i
         }
         return -1
@@ -90,8 +97,6 @@ class SocialProfile(
         }
         else nullChat
     }
-
-
 
     fun getMyThreadsQuantity () = myThreads
     fun updateMyThreadsQuantity (status: Boolean) {

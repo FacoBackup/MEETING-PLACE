@@ -49,7 +49,7 @@ open class ThreadManagement: ChatManagement() {
 
             val indexUser = getUserIndex(getLoggedUser())
             val idSubThread = generateSubThreadId(threadList[indexThread])
-            val subThread = SubThread(mutableListOf(),mutableListOf(), subThreadData.idCreator, subThreadData.title, subThreadData.body, userList[indexUser].social.getUserName(), idSubThread)
+            val subThread = SubThread(mutableListOf(),mutableListOf(), getLoggedUser(), subThreadData.title, subThreadData.body, userList[indexUser].social.getUserName(), idSubThread)
 
             threadList[indexThread].addSubThread(subThread)
         }
@@ -93,23 +93,26 @@ open class ThreadManagement: ChatManagement() {
         val subThread = threadList[indexMainThread].getSubThreadById(like.idSubThread)
         if(getLoggedUser() != -1 && indexMainThread != -1 && verifyUserSocialProfile(getLoggedUser()) && subThread.creator != -1){
 
-            val indexCreator = getUserIndex(threadList[indexMainThread].getSubThreadCreator(like.idSubThread))
+            val indexCreator = getUserIndex(subThread.creator)
             val userName = getSocialNameById(getLoggedUser())
             val notification = Inbox("$userName liked your reply.", "Thread.")
 
-            when (checkLikeDislike(subThread)) {
-                // 0 -> ALREADY LIKED so do nothing
-                1-> {// DISLIKED to LIKED
-                    if(threadList[indexMainThread].getSubThreadCreator(like.idSubThread) != getLoggedUser())
-                        userList[indexCreator].social.updateInbox(notification)
-                    threadList[indexMainThread].dislikeToLikeSubThread(getLoggedUser(),like.idSubThread)
-                }
-                2 -> {// 2 hasn't liked yet
-                    if(threadList[indexMainThread].getSubThreadCreator(like.idSubThread) != getLoggedUser())
-                        userList[indexCreator].social.updateInbox(notification)
-                    threadList[indexMainThread].likeSubThread(getLoggedUser(),like.idSubThread)
+            if(indexCreator != -1){
+                when (checkLikeDislike(subThread)) {
+                    // 0 -> ALREADY LIKED so do nothing
+                    1-> {// DISLIKED to LIKED
+                        if(threadList[indexMainThread].getSubThreadCreator(like.idSubThread) != getLoggedUser())
+                            userList[indexCreator].social.updateInbox(notification)
+                        threadList[indexMainThread].dislikeToLikeSubThread(getLoggedUser(),like.idSubThread)
+                    }
+                    2 -> {// 2 hasn't liked yet
+                        if(threadList[indexMainThread].getSubThreadCreator(like.idSubThread) != getLoggedUser())
+                            userList[indexCreator].social.updateInbox(notification)
+                        threadList[indexMainThread].likeSubThread(getLoggedUser(),like.idSubThread)
+                    }
                 }
             }
+
         }
     }
     // 1 -> LIKE; 2 -> DISLIKE

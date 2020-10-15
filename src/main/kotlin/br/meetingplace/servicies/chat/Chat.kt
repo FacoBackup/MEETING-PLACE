@@ -20,10 +20,12 @@ class Chat(
     }
 
     fun deleteMessage(message: ChatOperations){
+
         if(message.idMessage in idMessages){
             val indexMessage = getMessageIndex(message.idMessage)
             conversation.remove(conversation[indexMessage])
             idMessages.remove(message.idMessage)
+
             if(message.idMessage in favoriteMessagesIds)
                 unFavoriteMessage(message)
         }
@@ -41,9 +43,10 @@ class Chat(
 
     fun quoteMessage(message: ChatFullContent){
         val indexMessage = getMessageIndex(message.idMessage)
-        if(message.idMessage !in idMessages && indexMessage != -1){
-            message.message = "|Quoting ${conversation[indexMessage].message}\n"+ message.message
-            val newMessage = Message(message.message, message.idMessage,true)
+        if(message.idNewMessage !in idMessages && indexMessage != -1 && message.idMessage in idMessages){
+            message.message = "|${conversation[indexMessage].message}|  "+ message.message
+            val newMessage = Message(message.message, message.idNewMessage,true)
+            println("LEVEL 3")
             addMessage(newMessage)
         }
     }

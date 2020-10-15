@@ -119,7 +119,6 @@ open class MainThread(){
     }
 
     fun getSubThreadCreator(idSubThread: Int): Int {
-
         val indexSubThread = getSubThreadIndex(idSubThread)
         return if(indexSubThread != -1)
             subThread[indexSubThread].creator
