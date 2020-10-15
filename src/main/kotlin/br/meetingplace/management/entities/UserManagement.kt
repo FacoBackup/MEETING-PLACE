@@ -2,16 +2,19 @@ package br.meetingplace.management.entities
 
 import br.meetingplace.data.PasswordOperations
 import br.meetingplace.data.entities.group.UserMember
+import br.meetingplace.data.startup.UserData
 import br.meetingplace.entities.user.User
 
 class UserManagement: ProfileManagement() {
 
-    fun createUser(user: User){
+    fun createUser(newUser: UserData){
+
+        val user = User(newUser.realName, newUser.age, newUser.email, newUser.password)
+
         if(user.getId() == -1 && getLoggedUser() == -1 && user.getEmail() !in emailList && user.getEmail() != ""){
             user.startUser(generateUserId())
             userList.add(user)
             emailList.add(user.getEmail())
-
         }
     }
 

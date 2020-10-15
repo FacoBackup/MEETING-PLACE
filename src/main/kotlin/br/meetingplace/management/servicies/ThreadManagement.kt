@@ -26,7 +26,7 @@ open class ThreadManagement: ChatManagement() {
             val thread = MainThread()
             val indexUser = getUserIndex(getLoggedUser())
 
-            thread.startThread(content,generateMainThreadId(), userList[indexUser].social.userName, getLoggedUser())
+            thread.startThread(content,generateMainThreadId(), userList[indexUser].social.getUserName(), getLoggedUser())
             threadList.add(thread)
             userList[indexUser].social.updateMyThreadsQuantity(true)
         }
@@ -42,36 +42,24 @@ open class ThreadManagement: ChatManagement() {
         }
     }
 
-    fun createSubThread(operations: SubThreadContent){
+    fun createSubThread(subThreadData: SubThreadContent){
 
-        if(getLoggedUser() != -1 && verifyUserSocialProfile(getLoggedUser())){
+        val indexThread = getThreadIndex(subThreadData.idThread)
+        if(getLoggedUser() != -1 && verifyUserSocialProfile(getLoggedUser()) && indexThread != -1){
 
-            //val indexMainThreadCreator = getUserIndex(operations.idCreator)
-            val indexSubThreadCreator = getUserIndex(getLoggedUser())
-            val indexThread = getThreadIndex(operations.idThread)
-            val subThread = SubThread()
+            val indexUser = getUserIndex(getLoggedUser())
+            val idSubThread = generateSubThreadId(threadList[indexThread])
+            val subThread = SubThread(mutableListOf(),mutableListOf(), subThreadData.idCreator, subThreadData.title, subThreadData.body, userList[indexUser].social.getUserName(), idSubThread)
 
-            if(indexThread != -1){
-                val idSubThread = generateSubThreadId(threadList[indexThread])
-                val threadContent = ThreadContent(operations.title, operations.body)
-
-                subThread.startThread(threadContent, idSubThread, userList[indexSubThreadCreator].social.userName, getLoggedUser())
-                threadList[indexThread].addSubThread(subThread)
-
-            }
+            threadList[indexThread].addSubThread(subThread)
         }
     }
 
     fun deleteSubThread(operations: SubThreadOperations){
 
         val indexMainThread = getThreadIndex(operations.idMainThread)
-        println(threadList[indexMainThread].getSubThreadCreator(operations.idSubThread) )
-        if(getLoggedUser() != -1 && verifyUserSocialProfile(getLoggedUser()) && indexMainThread != -1 && threadList[indexMainThread].getSubThreadCreator(operations.idSubThread) == getLoggedUser()){
-            println("REMOVE SUB THREAD")
+        if(getLoggedUser() != -1 && verifyUserSocialProfile(getLoggedUser()) && indexMainThread != -1 && threadList[indexMainThread].getSubThreadCreator(operations.idSubThread) == getLoggedUser())
             threadList[indexMainThread].removeSubThread(operations.idSubThread, getLoggedUser())
-        }
-
-
     }
 
     // 1 -> LIKE; 2 -> DISLIKE
@@ -102,14 +90,14 @@ open class ThreadManagement: ChatManagement() {
     fun likeSubThread(like: SubThreadOperations){
 
         val indexMainThread = getThreadIndex(like.idMainThread)
-
-        if(getLoggedUser() != -1 && indexMainThread != -1 && verifyUserSocialProfile(getLoggedUser())){
+        val subThread = threadList[indexMainThread].getSubThreadById(like.idSubThread)
+        if(getLoggedUser() != -1 && indexMainThread != -1 && verifyUserSocialProfile(getLoggedUser()) && subThread.creator != -1){
 
             val indexCreator = getUserIndex(threadList[indexMainThread].getSubThreadCreator(like.idSubThread))
             val userName = getSocialNameById(getLoggedUser())
             val notification = Inbox("$userName liked your reply.", "Thread.")
 
-            when (checkLikeDislike(threadList[indexMainThread].getSubThreadById(like.idSubThread))) {
+            when (checkLikeDislike(subThread)) {
                 // 0 -> ALREADY LIKED so do nothing
                 1-> {// DISLIKED to LIKED
                     if(threadList[indexMainThread].getSubThreadCreator(like.idSubThread) != getLoggedUser())
@@ -139,9 +127,11 @@ open class ThreadManagement: ChatManagement() {
     fun dislikeSubThread(dislike: SubThreadOperations) {
 
         val indexMainThread = getThreadIndex(dislike.idMainThread)
-        if(getLoggedUser() != -1 && indexMainThread != -1 && verifyUserSocialProfile(getLoggedUser())){
+        val subThread = threadList[indexMainThread].getSubThreadById(dislike.idSubThread)
 
-            when (checkLikeDislike(threadList[indexMainThread].getSubThreadById(dislike.idSubThread))) {
+        if(getLoggedUser() != -1 && indexMainThread != -1 && verifyUserSocialProfile(getLoggedUser()) && subThread.creator != -1){
+
+            when (checkLikeDislike(subThread)) {
                 0 -> threadList[indexMainThread].likeToDislikeSubThread(getLoggedUser(),dislike.idSubThread) // like to dislike
                 2 -> threadList[indexMainThread].dislikeSubThread(getLoggedUser(),dislike.idSubThread) // hasn't DISLIKED yet
             }
@@ -183,11 +173,11 @@ open class ThreadManagement: ChatManagement() {
     }
 
     private fun checkLikeDislike(thread: SubThread): Int {// IF TRUE THE USER ALREADY LIKED OR DISLIKED THE THREAD
-        return if(thread.getId() != -1){
+        return if(thread.id != -1){
             when {
-                getLoggedUser() in thread.getLikes() // 0 ALREADY LIKED
+                getLoggedUser() in thread.likes // 0 ALREADY LIKED
                 -> 0
-                getLoggedUser() in thread.getDislikes() // 1 ALREADY DISLIKED
+                getLoggedUser() in thread.dislikes// 1 ALREADY DISLIKED
                 -> 1
                 else -> 2 // 2 hasn't DISLIKED or liked yet
             }

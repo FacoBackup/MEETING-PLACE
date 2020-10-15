@@ -4,18 +4,20 @@ import br.meetingplace.data.conversation.operations.ChatOperations
 import br.meetingplace.data.conversation.ChatContent
 import br.meetingplace.data.entities.user.Follower
 import br.meetingplace.data.entities.group.UserMember
+import br.meetingplace.data.startup.SocialProfileData
 import br.meetingplace.entities.user.profiles.SocialProfile
 import br.meetingplace.servicies.notification.Inbox
 
 open class ProfileManagement: GroupManagement() {
 
-    fun createSocialProfile(user: SocialProfile){
+    fun createSocialProfile(newProfile: SocialProfileData){
 
-        if(getLoggedUser() != -1 && user.userName !in nameList){
-
+        if(getLoggedUser() != -1 && newProfile.ProfileName !in nameList){
+            val social = SocialProfile(newProfile.ProfileName, newProfile.gender, newProfile.nationality, newProfile.about)
             val indexUser = getUserIndex(getLoggedUser())
-            userList[indexUser].socialProfile(user)
-            nameList.add(userList[indexUser].social.userName)
+
+            userList[indexUser].createSocialProfile(social)
+            nameList.add(userList[indexUser].social.getUserName())
         }
     }
 
@@ -33,7 +35,7 @@ open class ProfileManagement: GroupManagement() {
         if(getLoggedUser() != -1){
             val indexExternal = getUserIndex(data.external)
             val indexCurrent = getUserIndex(getLoggedUser())
-            val notification = Inbox("${userList[indexCurrent].social.userName} is now following you.", "New follower.")
+            val notification = Inbox("${userList[indexCurrent].social.getUserName()} is now following you.", "New follower.")
 
             if(indexExternal != -1 && verifyFollower(data) == 0){ // verifies if the user you want to follow exists
                 userList[indexExternal].social.updateInbox(notification)
@@ -85,17 +87,25 @@ open class ProfileManagement: GroupManagement() {
 
  */
     fun sendMessage(message: ChatContent){
-
         val indexReceiver = getUserIndex(message.receiver)
+        val indexUser = getUserIndex(getLoggedUser())
+        val chatId = getLoggedUser() + message.receiver
 
+        if(getLoggedUser() != -1 && indexReceiver != -1){
+
+        }
     }
 
 
     fun deleteMessage(message: ChatOperations){
 
-        val indexReceiver = getUserIndex(chat.receiver)
+        val indexReceiver = getUserIndex(message.receiver)
+        val indexUser = getUserIndex(getLoggedUser())
+        val chatId = getLoggedUser() + message.receiver
 
+        if(getLoggedUser() != -1 && indexReceiver != -1){
 
+        }
     }
 
     fun leaveGroup(member: UserMember){

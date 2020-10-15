@@ -3,15 +3,15 @@ package br.meetingplace.entities.user
 import br.meetingplace.entities.user.profiles.ProfessionalProfile
 import br.meetingplace.entities.user.profiles.SocialProfile
 
-open class User(){
+open class User(
+    private var realName: String, // only can create a professional profile if age > 18 and social if age > 16
+    private var age: Int,
+    private var email: String,
+    private var password: String){
 
-    private var realName = ""
-    private var age= -1 // only can create a professional profile if age > 18 and social if age > 16
     private var id = -1
-    private var userEmail= ""
-    private var pass = ""
 
-    val social = SocialProfile()
+    var social =  SocialProfile("", "", "", "") //initializes as a null profile
     val professional = ProfessionalProfile()
 
     //Setters
@@ -20,13 +20,9 @@ open class User(){
             id = new
     }
 
-    fun socialProfile(profile: SocialProfile){
-        if(age >= 16 && id != -1){
-            social.userName = profile.userName
-            social.about = profile.about
-            social.gender = profile.gender
-            social.nacionality = profile.nacionality
-        }
+    fun createSocialProfile(profile: SocialProfile){ // overrides the null profile
+        if(age >= 16 && id != -1)
+            social = profile
     }
 
     fun professionalProfile(profile: ProfessionalProfile){
@@ -43,20 +39,20 @@ open class User(){
 
     //Update
     fun changeEmail(new: String) {//NEEDS WORK HERE
-        userEmail = new
+        email = new
     }
 
     fun changePass(oldPass: String, newPass: String){ //NEEDS WORK HERE
-        if(oldPass == pass)
-            pass = newPass
+        if(oldPass == password && newPass != password)
+            password = newPass
     }
     //Update
 
     //Getters
     fun getId() = id
 
-    fun getPass() = pass
+    fun getPassword() = password
 
-    fun getEmail() = userEmail
+    fun getEmail() = email
     //Getters
 }

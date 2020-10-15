@@ -4,20 +4,27 @@ import br.meetingplace.data.conversation.ChatContent
 import br.meetingplace.servicies.chat.Chat
 import br.meetingplace.servicies.notification.Inbox
 
-class SocialProfile(){
-
-    var userName = ""
-    var gender= ""
-    var nationality= ""
-    var about= ""
+class SocialProfile(
+    private var userName: String,
+    private var gender: String,
+    private var nationality: String,
+    private var about: String){
 
     //private var conversationThread = mutableListOf<>()
     private var myThreads = 0
     private var chat = mutableListOf<Chat>()
+    private var chatIds = mutableListOf<Int>()
     var followers = mutableListOf<Int>()
     var following = mutableListOf<Int>()
     var groups = mutableListOf<Int>()
     private var inbox = mutableListOf<Inbox>()
+
+
+    fun getUserName() = userName
+    fun updateAbout(newAbout: String){
+        about = newAbout
+    }
+
     // SUB METHODS
 
     fun updateInbox(notification: Inbox){
@@ -27,21 +34,7 @@ class SocialProfile(){
     fun startChat(conversation: Chat){
         chat.add(conversation)
     }
-
-    fun newMessage(conversation: ChatContent, idChat: Int){
-
-        val indexConversation = getChatIndex(idChat)
-        if(idChat == chat[indexConversation].getId())
-            chat[indexConversation].conversation.add(conversation.message)
-    }
-
-    fun getChatIndex(idChat: Int): Int{
-        for(i in 0 until chat.size){
-            if(chat[i].getId() == idChat)
-                return i
-        }
-        return -1
-    }
+    
     fun getMyThreadsQuantity () = myThreads
     fun updateMyThreadsQuantity (status: Boolean) {
         when(status){
