@@ -8,8 +8,8 @@ class Chat(
 ){
 
     private var conversation = mutableListOf<Message>()
-    private var idMessages= mutableListOf<Int>()
-    private var favoriteMessagesIds= mutableListOf<Int>()
+    private var idMessages= mutableListOf<String>()
+    private var favoriteMessagesIds= mutableListOf<String>()
 
     fun addMessage(message: Message){
         if(message.idMessage !in idMessages){

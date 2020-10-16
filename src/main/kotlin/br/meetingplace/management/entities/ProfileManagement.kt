@@ -10,7 +10,7 @@ import br.meetingplace.management.operations.verifiers.UserVerifiers
 import br.meetingplace.servicies.notification.Inbox
 import java.io.File
 
-open class ProfileManagement: GroupManagement(){
+open class ProfileManagement private constructor(): GroupManagement(){
 
     private val verifier = UserVerifiers.getUserVerifier()
     private val rw = ReadWrite.getRW()

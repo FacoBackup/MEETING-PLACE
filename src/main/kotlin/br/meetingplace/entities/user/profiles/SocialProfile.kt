@@ -15,7 +15,7 @@ class SocialProfile(
     //private var conversationThread = mutableListOf<>()
     private var myThreads = 0
     private var chat = mutableListOf<Chat>()
-    private var chatIds = mutableListOf<Int>()
+    private var chatIds = mutableListOf<String>()
     var followers = mutableListOf<String>()
     var following = mutableListOf<String>()
     var groups = mutableListOf<String>()
@@ -38,14 +38,14 @@ class SocialProfile(
         chatIds.add(conversation.getConversationId())
     }
 
-    fun newMessage(message: Message, conversationId: Int){
+    fun newMessage(message: Message, conversationId: String){
         if(conversationId in chatIds){
             chat[getChatIndex(conversationId)].addMessage(message)
             chatIds.add(message.idMessage)
         }
     }
 
-    fun deleteMessage(message: ChatOperations, conversationId: Int){
+    fun deleteMessage(message: ChatOperations, conversationId: String){
         if(conversationId in chatIds){
 
             chat[getChatIndex(conversationId)].deleteMessage(message)
@@ -53,17 +53,17 @@ class SocialProfile(
 
     }
 
-    fun favoriteMessage(message: ChatOperations, conversationId: Int){
+    fun favoriteMessage(message: ChatOperations, conversationId: String){
         if(conversationId in chatIds)
             chat[getChatIndex(conversationId)].favoriteMessage(message)
     }
 
-    fun unFavoriteMessage(message: ChatOperations, conversationId: Int){
+    fun unFavoriteMessage(message: ChatOperations, conversationId: String){
         if(conversationId in chatIds)
             chat[getChatIndex(conversationId)].unFavoriteMessage(message)
     }
 
-    fun quoteMessage(content: ChatFullContent, conversationId: Int){
+    fun quoteMessage(content: ChatFullContent, conversationId: String){
         if(conversationId in chatIds){
             println("LEVEL 2")
             chat[getChatIndex(conversationId)].quoteMessage(content)
@@ -71,7 +71,7 @@ class SocialProfile(
 
     }
 
-    fun shareMessage(operations: ChatOperations, conversationId: Int): String {
+    fun shareMessage(operations: ChatOperations, conversationId: String): String {
         return if(conversationId in chatIds){
             chat[getChatIndex(conversationId)].shareMessage(operations)
         }
@@ -86,10 +86,10 @@ class SocialProfile(
         return -1
     }
 
-    fun getChatById(idChat: Int): Chat {
+    fun getChatById(idChat: String): Chat {
 
         val indexChat = getChatIndex(idChat)
-        val nullChat = Chat(-1)
+        val nullChat = Chat("")
 
         return if(indexChat != -1){
             chat[indexChat]

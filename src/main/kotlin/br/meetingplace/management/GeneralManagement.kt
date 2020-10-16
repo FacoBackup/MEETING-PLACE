@@ -9,7 +9,7 @@ import br.meetingplace.management.operations.verifiers.UserVerifiers
 import java.io.File
 
 // CHANGE TO INTERFACE
-open class GeneralManagement : Generator{
+open class GeneralManagement private constructor(): Generator{
 
     private val rw = ReadWrite.getRW()
     private var logged = ""

@@ -1,3 +1,3 @@
 package br.meetingplace.data.conversation.operations
 
-data class ChatOperations (var idMessage: Int, val receiverId: String){}
+data class ChatOperations (var idMessage: String, val receiverId: String){}
