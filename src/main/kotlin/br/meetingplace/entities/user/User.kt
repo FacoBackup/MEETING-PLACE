@@ -9,24 +9,24 @@ open class User(
     private var email: String,
     private var password: String){
 
-    private var id = -1
+    private var id = ""
 
     var social =  SocialProfile("", "", "", "") //initializes as a null profile
     val professional = ProfessionalProfile()
 
     //Setters
-    fun startUser (new: Int){
-        if(id == -1)
+    fun startUser (new: String){
+        if(id == "")
             id = new
     }
 
     fun createSocialProfile(profile: SocialProfile){ // overrides the null profile
-        if(age >= 16 && id != -1 && social.getUserName() == "")
+        if(age >= 16 && id != "" && social.getUserName() == "")
             social = profile
     }
 
     fun professionalProfile(profile: ProfessionalProfile){
-        if(age >= 18 && id != -1){
+        if(age >= 18 && id != ""){
             /*
             professional.userName = profile.userName
             professional.about = profile.about

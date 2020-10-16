@@ -1,3 +1,3 @@
 package br.meetingplace.data.conversation
 
-data class ChatContent(var message: String, val receiver: Int, val static: Boolean){}
+data class ChatContent(var message: String, val receiverId: String, val static: Boolean){}

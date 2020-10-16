@@ -4,15 +4,16 @@ import br.meetingplace.data.PasswordOperations
 import br.meetingplace.data.entities.group.UserMember
 import br.meetingplace.data.startup.UserData
 import br.meetingplace.entities.user.User
+import br.meetingplace.management.interfaces.Generator
 
-class UserManagement: ProfileManagement() {
+class UserManagement: ProfileManagement(), Generator {
 
     fun createUser(newUser: UserData){
 
         val user = User(newUser.realName, newUser.age, newUser.email, newUser.password)
 
-        if(user.getId() == -1 && getLoggedUser() == -1 && user.getEmail() !in emailList && user.getEmail() != ""){
-            user.startUser(generateUserId())
+        if(user.getId() == "" && getLoggedUser() == "" && user.getEmail() !in emailList && user.getEmail() != ""){
+            user.startUser(generateId())
             userList.add(user)
             emailList.add(user.getEmail())
         }
@@ -20,7 +21,7 @@ class UserManagement: ProfileManagement() {
 
     fun deleteUser(operation: PasswordOperations){
 
-        if(getLoggedUser() != -1 && operation.pass == cachedPass){
+        if(getLoggedUser() !=  "" && operation.pass == cachedPass){
 
             val indexUser = getUserIndex(getLoggedUser())
             var member: UserMember

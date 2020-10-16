@@ -1,3 +1,3 @@
 package br.meetingplace.data.conversation
 
-data class GroupChatContent(var message: String, val group: Int){}
+data class GroupChatContent(var message: String, val groupId: String){}

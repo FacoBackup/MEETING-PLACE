@@ -17,9 +17,9 @@ class SocialProfile(
     private var myThreads = 0
     private var chat = mutableListOf<Chat>()
     private var chatIds = mutableListOf<Int>()
-    var followers = mutableListOf<Int>()
-    var following = mutableListOf<Int>()
-    var groups = mutableListOf<Int>()
+    var followers = mutableListOf<String>()
+    var following = mutableListOf<String>()
+    var groups = mutableListOf<String>()
     private var inbox = mutableListOf<Inbox>()
 
 
