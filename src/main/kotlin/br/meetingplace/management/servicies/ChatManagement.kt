@@ -4,20 +4,25 @@ import br.meetingplace.data.conversation.ChatContent
 import br.meetingplace.data.conversation.ChatFullContent
 import br.meetingplace.data.conversation.operations.ChatOperations
 import br.meetingplace.management.GeneralManagement
+import br.meetingplace.management.operations.finders.UserFinders
+import br.meetingplace.management.operations.verifiers.UserVerifiers
 import br.meetingplace.servicies.chat.Chat
 import br.meetingplace.servicies.chat.Message
 import br.meetingplace.servicies.notification.Inbox
 import io.ktor.utils.io.*
 
-open class ChatManagement: GeneralManagement() {
-
+open class ChatManagement{
+    private val management = GeneralManagement.getLoggedUser()
+    /*
     fun sendMessage(message: ChatContent){
 
-        val indexUser = getUserIndex(getLoggedUser())
-        val indexReceiver = getUserIndex(message.receiver)
-        val idChat = getLoggedUser() + message.receiver
+        val finder = UserFinders.getUserFinder()
+        val verifier = UserVerifiers.getUserVerifier()
+        val indexUser = finder.getUserIndex(management)
+        val indexReceiver = finder.getUserIndex(message.receiverId)
+        val idChat = management + message.receiverId
 
-        if(getLoggedUser() != -1 && verifyUserSocialProfile(getLoggedUser()) && indexReceiver != -1 && message.receiver != getLoggedUser() ) {
+        if(management != "" && verifier.verifyUser(management) && indexReceiver != -1 && message.receiverId != management ) {
             if (userList[indexUser].social.getChatIndex(idChat) == -1) { // the conversation doesn't exist
                 val notification = Inbox("${userList[indexUser].social.getUserName()} started a conversation with you.", "Message.")
                 val newChat = Chat(idChat)
@@ -96,4 +101,6 @@ open class ChatManagement: GeneralManagement() {
             }
         }
     }
+
+     */
 }

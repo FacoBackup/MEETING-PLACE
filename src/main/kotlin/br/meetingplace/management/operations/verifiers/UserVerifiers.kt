@@ -21,9 +21,8 @@ class UserVerifiers private constructor(){
             //READING
             val rw = ReadWrite.getRW()
             val userList = mutableListOf<User>()
-            repeat(userList.size) {
-                rw.readUser()
-            }
+            rw.readUser()?.let { userList.add(it) }
+
             //READING
             for(i in 0 until userList.size){
                 if(userList[i].getId() == id)
@@ -44,10 +43,7 @@ class UserVerifiers private constructor(){
             val indexUser = finder.getUserIndex(id)
             val rw = ReadWrite.getRW()
             val userList = mutableListOf<User>()
-
-            repeat(userList.size) {
-                rw.readUser()
-            }
+            rw.readUser()?.let { userList.add(it) }
             //READING
 
             userList[indexUser].social.getUserName() != ""
@@ -60,9 +56,7 @@ class UserVerifiers private constructor(){
             //READING
             val rw = ReadWrite.getRW()
             val userList = mutableListOf<User>()
-            repeat(userList.size) {
-                rw.readUser()
-            }
+            rw.readUser()?.let { userList.add(it) }
             //READING
 
             for(i in 0 until userList.size){
@@ -84,10 +78,7 @@ class UserVerifiers private constructor(){
             //READING
             val rw = ReadWrite.getRW()
             val userList = mutableListOf<User>()
-
-            repeat(userList.size) {
-                rw.readUser()
-            }
+            rw.readUser()?.let { userList.add(it) }
             //READING
 
             for(i in 0 until userList[indexExternalUser].social.followers.size){

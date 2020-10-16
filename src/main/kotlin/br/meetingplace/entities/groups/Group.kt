@@ -26,6 +26,7 @@ open class Group(){
     fun getId() = id
     //GETTERS
 
+    /*
     fun changeName(new: String){ // Needs work here
         name = new
     }
@@ -48,5 +49,5 @@ open class Group(){
         }
         else return true
     }
-
+    */
 }

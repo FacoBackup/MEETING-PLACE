@@ -14,11 +14,12 @@ import br.meetingplace.servicies.conversationThread.MainThread
 open class GeneralManagement : Generator{
 
     private var logged = ""
-    protected var cachedPass = ""
+    private var cachedPass = ""
 
     companion object{
         private val management = GeneralManagement()
         fun getLoggedUser() = management.logged
+        fun getCachedPassword() = management.cachedPass
     }
 
     //AUTHENTICATION SYSTEM
@@ -30,10 +31,7 @@ open class GeneralManagement : Generator{
         //READING
         val rw = ReadWrite.getRW()
         val userList = mutableListOf<User>()
-
-        repeat(userList.size) {
-            rw.readUser()
-        }
+        rw.readUser()
         //READING
 
         if(verifier.verifyUser(log.user) && userList[finder.getUserIndex(log.user)].getPassword() == log.password && logged == "") {
@@ -50,10 +48,7 @@ open class GeneralManagement : Generator{
         //READING
         val rw = ReadWrite.getRW()
         val userList = mutableListOf<User>()
-
-        repeat(userList.size) {
-            rw.readUser()
-        }
+        rw.readUser()
         //READING
 
 

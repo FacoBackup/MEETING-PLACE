@@ -22,9 +22,8 @@ class UserFinders {
             //READING
             val rw = ReadWrite.getRW()
             val userList = mutableListOf<User>()
-            repeat(userList.size) {
-                rw.readUser()
-            }
+            rw.readUser()?.let { userList.add(it) }
+
             //READING
 
             for (i in 0 until userList.size) {
@@ -42,9 +41,7 @@ class UserFinders {
             //READING
             val rw = ReadWrite.getRW()
             val userList = mutableListOf<User>()
-            repeat(userList.size) {
-                rw.readUser()
-            }
+            rw.readUser()?.let { userList.add(it) }
             //READING
 
             for (i in 0 until userList.size) {

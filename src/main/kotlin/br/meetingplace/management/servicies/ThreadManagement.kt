@@ -4,16 +4,27 @@ import br.meetingplace.data.threads.SubThreadContent
 import br.meetingplace.data.threads.operations.SubThreadOperations
 import br.meetingplace.data.threads.ThreadContent
 import br.meetingplace.data.threads.operations.ThreadOperations
+import br.meetingplace.entities.user.User
+import br.meetingplace.management.GeneralManagement
+import br.meetingplace.management.operations.ReadWrite.ReadWrite
 import br.meetingplace.servicies.conversationThread.MainThread
 import br.meetingplace.servicies.conversationThread.SubThread
 import br.meetingplace.servicies.notification.Inbox
+import com.sun.tools.javac.Main
 
 
-open class ThreadManagement: ChatManagement() {
+open class ThreadManagement{
+
+    private val management = GeneralManagement.getLoggedUser()
 
     protected fun deleteAllThreadsFromUserId(){
+        //READING
+        val threadList = mutableListOf<MainThread>()
+        val rw = ReadWrite.getRW()
+        rw.readThread()?.let { threadList.add(it) }
+        //READING
         for(i in 0 until threadList.size){
-            if(threadList[i].getCreator() == getLoggedUser()){
+            if(threadList[i].getCreator() == management){
                 val operations = ThreadOperations(threadList[i].getId())
                 deleteThread(operations)
             }
@@ -21,12 +32,17 @@ open class ThreadManagement: ChatManagement() {
     }
 
     fun createMainThread(content: ThreadContent){
+        //READING
+        val threadList = mutableListOf<MainThread>()
+        val rw = ReadWrite.getRW()
+        rw.readThread()?.let { threadList.add(it) }
+        //READING
 
-        if(getLoggedUser() != -1 && verifyUserSocialProfile(getLoggedUser())){
+        if(management != "" && verifyUserSocialProfile(management)){
             val thread = MainThread()
-            val indexUser = getUserIndex(getLoggedUser())
+            val indexUser = getUserIndex(management)
 
-            thread.startThread(content,generateMainThreadId(), userList[indexUser].social.getUserName(), getLoggedUser())
+            thread.startThread(content,generateMainThreadId(), userList[indexUser].social.getUserName(), management)
             threadList.add(thread)
             userList[indexUser].social.updateMyThreadsQuantity(true)
         }
@@ -34,9 +50,15 @@ open class ThreadManagement: ChatManagement() {
 
     fun deleteThread(operations: ThreadOperations){
 
+        //READING
+        val threadList = mutableListOf<MainThread>()
+        val rw = ReadWrite.getRW()
+        rw.readThread()?.let { threadList.add(it) }
+        //READING
+
         val indexThread = getThreadIndex(operations.idThread)
-        val indexUser = getUserIndex(getLoggedUser())
-        if(getLoggedUser() != -1 && verifyUserSocialProfile(getLoggedUser()) && indexThread != -1 && threadList[indexThread].getCreator() == getLoggedUser()){
+        val indexUser = getUserIndex(management)
+        if(management != "" && verifyUserSocialProfile(management) && indexThread != -1 && threadList[indexThread].getCreator() == management){
             threadList.remove(threadList[indexThread])
             userList[indexUser].social.updateMyThreadsQuantity(false)
         }
@@ -44,12 +66,18 @@ open class ThreadManagement: ChatManagement() {
 
     fun createSubThread(subThreadData: SubThreadContent){
 
-        val indexThread = getThreadIndex(subThreadData.idThread)
-        if(getLoggedUser() != -1 && verifyUserSocialProfile(getLoggedUser()) && indexThread != -1){
+        //READING
+        val threadList = mutableListOf<MainThread>()
+        val rw = ReadWrite.getRW()
+        rw.readThread()?.let { threadList.add(it) }
+        //READING
 
-            val indexUser = getUserIndex(getLoggedUser())
+        val indexThread = getThreadIndex(subThreadData.idThread)
+        if(management != "" && verifyUserSocialProfile(management) && indexThread != -1){
+
+            val indexUser = getUserIndex(management)
             val idSubThread = generateSubThreadId(threadList[indexThread])
-            val subThread = SubThread(mutableListOf(),mutableListOf(), getLoggedUser(), subThreadData.title, subThreadData.body, userList[indexUser].social.getUserName(), idSubThread)
+            val subThread = SubThread(mutableListOf(),mutableListOf(), management, subThreadData.title, subThreadData.body, userList[indexUser].social.getUserName(), idSubThread)
 
             threadList[indexThread].addSubThread(subThread)
         }
@@ -57,31 +85,43 @@ open class ThreadManagement: ChatManagement() {
 
     fun deleteSubThread(operations: SubThreadOperations){
 
+        //READING
+        val threadList = mutableListOf<MainThread>()
+        val rw = ReadWrite.getRW()
+        rw.readThread()?.let { threadList.add(it) }
+        //READING
+
         val indexMainThread = getThreadIndex(operations.idMainThread)
-        if(getLoggedUser() != -1 && verifyUserSocialProfile(getLoggedUser()) && indexMainThread != -1 && threadList[indexMainThread].getSubThreadCreator(operations.idSubThread) == getLoggedUser())
-            threadList[indexMainThread].removeSubThread(operations.idSubThread, getLoggedUser())
+        if(management != "" && verifyUserSocialProfile(management) && indexMainThread != -1 && threadList[indexMainThread].getSubThreadCreator(operations.idSubThread) == management)
+            threadList[indexMainThread].removeSubThread(operations.idSubThread, management)
     }
 
     // 1 -> LIKE; 2 -> DISLIKE
     fun likeThread(like: ThreadOperations){
 
+        //READING
+        val threadList = mutableListOf<MainThread>()
+        val rw = ReadWrite.getRW()
+        rw.readThread()?.let { threadList.add(it) }
+        //READING
+
         val indexThread = getThreadIndex(like.idThread)
         val indexCreator = getUserIndex(threadList[indexThread].getCreator())
-        val userName = getSocialNameById(getLoggedUser())
-        if(getLoggedUser() != -1 && indexThread != -1 && indexCreator != -1 && verifyUserSocialProfile(getLoggedUser())){
+        val userName = getSocialNameById(management)
+        if(management != "" && indexThread != -1 && indexCreator != -1 && verifyUserSocialProfile(management)){
 
             val notification = Inbox("$userName liked your thread.", "Thread.")
             when (checkLikeDislike(threadList[indexThread])) {
                 // 0 -> ALREADY LIKED so do nothing
                 1-> {// DISLIKED to LIKED
-                    if(threadList[indexThread].getCreator() != getLoggedUser())
+                    if(threadList[indexThread].getCreator() != management)
                         userList[indexCreator].social.updateInbox(notification)
-                    threadList[indexThread].dislikeToLike(getLoggedUser())
+                    threadList[indexThread].dislikeToLike(management)
                 }
                 2 -> {// 2 hasn't liked yet
-                    if(threadList[indexThread].getCreator() != getLoggedUser())
+                    if(threadList[indexThread].getCreator() != management)
                         userList[indexCreator].social.updateInbox(notification)
-                    threadList[indexThread].like(getLoggedUser())
+                    threadList[indexThread].like(management)
                 }
             }
         }
@@ -89,26 +129,32 @@ open class ThreadManagement: ChatManagement() {
 
     fun likeSubThread(like: SubThreadOperations){
 
+        //READING
+        val threadList = mutableListOf<MainThread>()
+        val rw = ReadWrite.getRW()
+        rw.readThread()?.let { threadList.add(it) }
+        //READING
+
         val indexMainThread = getThreadIndex(like.idMainThread)
         val subThread = threadList[indexMainThread].getSubThreadById(like.idSubThread)
-        if(getLoggedUser() != -1 && indexMainThread != -1 && verifyUserSocialProfile(getLoggedUser()) && subThread.creator != -1){
+        if(management != "" && indexMainThread != -1 && verifyUserSocialProfile(management) && subThread.creator != -1){
 
             val indexCreator = getUserIndex(subThread.creator)
-            val userName = getSocialNameById(getLoggedUser())
+            val userName = getSocialNameById(management)
             val notification = Inbox("$userName liked your reply.", "Thread.")
 
             if(indexCreator != -1){
                 when (checkLikeDislike(subThread)) {
                     // 0 -> ALREADY LIKED so do nothing
                     1-> {// DISLIKED to LIKED
-                        if(threadList[indexMainThread].getSubThreadCreator(like.idSubThread) != getLoggedUser())
+                        if(threadList[indexMainThread].getSubThreadCreator(like.idSubThread) != management)
                             userList[indexCreator].social.updateInbox(notification)
-                        threadList[indexMainThread].dislikeToLikeSubThread(getLoggedUser(),like.idSubThread)
+                        threadList[indexMainThread].dislikeToLikeSubThread(management,like.idSubThread)
                     }
                     2 -> {// 2 hasn't liked yet
-                        if(threadList[indexMainThread].getSubThreadCreator(like.idSubThread) != getLoggedUser())
+                        if(threadList[indexMainThread].getSubThreadCreator(like.idSubThread) != management)
                             userList[indexCreator].social.updateInbox(notification)
-                        threadList[indexMainThread].likeSubThread(getLoggedUser(),like.idSubThread)
+                        threadList[indexMainThread].likeSubThread(management,like.idSubThread)
                     }
                 }
             }
@@ -119,11 +165,16 @@ open class ThreadManagement: ChatManagement() {
     fun dislikeThread(dislike: ThreadOperations) {
 
         val indexThread = getThreadIndex(dislike.idThread)
-        if(getLoggedUser() != -1 && indexThread != -1 && verifyUserSocialProfile(getLoggedUser())){
+        //READING
+        val threadList = mutableListOf<MainThread>()
+        val rw = ReadWrite.getRW()
+        rw.readThread()?.let { threadList.add(it) }
+        //READING
+        if(management != "" && indexThread != -1 && verifyUserSocialProfile(management)){
 
             when (checkLikeDislike(threadList[indexThread])) {
-                0 -> threadList[indexThread].likeToDislike(getLoggedUser()) // like to dislike
-                2 -> threadList[indexThread].dislike(getLoggedUser()) // hasn't DISLIKED yet
+                0 -> threadList[indexThread].likeToDislike(management) // like to dislike
+                2 -> threadList[indexThread].dislike(management) // hasn't DISLIKED yet
             }
         }
     }
@@ -131,12 +182,16 @@ open class ThreadManagement: ChatManagement() {
 
         val indexMainThread = getThreadIndex(dislike.idMainThread)
         val subThread = threadList[indexMainThread].getSubThreadById(dislike.idSubThread)
-
-        if(getLoggedUser() != -1 && indexMainThread != -1 && verifyUserSocialProfile(getLoggedUser()) && subThread.creator != -1){
+        //READING
+        val threadList = mutableListOf<MainThread>()
+        val rw = ReadWrite.getRW()
+        rw.readThread()?.let { threadList.add(it) }
+        //READING
+        if(management != "" && indexMainThread != -1 && verifyUserSocialProfile(management) && subThread.creator != -1){
 
             when (checkLikeDislike(subThread)) {
-                0 -> threadList[indexMainThread].likeToDislikeSubThread(getLoggedUser(),dislike.idSubThread) // like to dislike
-                2 -> threadList[indexMainThread].dislikeSubThread(getLoggedUser(),dislike.idSubThread) // hasn't DISLIKED yet
+                0 -> threadList[indexMainThread].likeToDislikeSubThread(management,dislike.idSubThread) // like to dislike
+                2 -> threadList[indexMainThread].dislikeSubThread(management,dislike.idSubThread) // hasn't DISLIKED yet
             }
         }
     }
@@ -145,16 +200,28 @@ open class ThreadManagement: ChatManagement() {
 
         val myThreads = mutableListOf<MainThread>()
 
+        //READING
+        val threadList = mutableListOf<MainThread>()
+        val rw = ReadWrite.getRW()
+        rw.readThread()?.let { threadList.add(it) }
+        //READING
+
         for (i in 0 until threadList.size){
-            if (threadList[i].getCreator() == getLoggedUser())
+            if (threadList[i].getCreator() == management)
                 myThreads.add(threadList[i])
         }
         return myThreads
     }
 
     fun getMyTimeline(): MutableList<MainThread> {
+        val readThread = ReadWrite.getRW()
+        //READING
+        val threadList = mutableListOf<MainThread>()
+        val rw = ReadWrite.getRW()
+        rw.readThread()?.let { threadList.add(it) }
+        //READING
 
-        val indexUser = getUserIndex(getLoggedUser())
+        val indexUser = getUserIndex(management)
         val followingIds = userList[indexUser].social.following
         val myTimeline = mutableListOf<MainThread>()
         for (i in 0 until threadList.size){
@@ -166,21 +233,21 @@ open class ThreadManagement: ChatManagement() {
 
     private fun checkLikeDislike(thread: MainThread): Int {// IF TRUE THE USER ALREADY LIKED OR DISLIKED THE THREAD
 
-        return when {
-            getLoggedUser() in thread.getLikes() // 0 ALREADY LIKED
+        return when (management) {
+            in thread.getLikes() // 0 ALREADY LIKED
             -> 0
-            getLoggedUser() in thread.getDislikes() // 1 ALREADY DISLIKED
+            in thread.getDislikes() // 1 ALREADY DISLIKED
             -> 1
             else -> 2 // 2 hasn't DISLIKED or liked yet
         }
     }
 
     private fun checkLikeDislike(thread: SubThread): Int {// IF TRUE THE USER ALREADY LIKED OR DISLIKED THE THREAD
-        return if(thread.id != -1){
-            when {
-                getLoggedUser() in thread.likes // 0 ALREADY LIKED
+        return if(thread.id != ""){
+            when (management) {
+                in thread.likes // 0 ALREADY LIKED
                 -> 0
-                getLoggedUser() in thread.dislikes// 1 ALREADY DISLIKED
+                in thread.dislikes// 1 ALREADY DISLIKED
                 -> 1
                 else -> 2 // 2 hasn't DISLIKED or liked yet
             }

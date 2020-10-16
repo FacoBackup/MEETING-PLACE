@@ -6,7 +6,7 @@ import br.meetingplace.servicies.conversationThread.MainThread
 
 class ServiceFinder {
 
-    fun getThreadIndex(threadId: Int): Int {
+    fun getThreadIndex(threadId: String): Int {
         val management = GeneralManagement.getLoggedUser()
 
         return if(management != ""){
@@ -14,10 +14,8 @@ class ServiceFinder {
             //READING
             val rw = ReadWrite.getRW()
             val threadList = mutableListOf<MainThread>()
+            rw.readThread()?.let { threadList.add(it) }
 
-            repeat(threadList.size) {
-                rw.readThread()
-            }
             //READING
 
             for (i in 0 until threadList.size){
