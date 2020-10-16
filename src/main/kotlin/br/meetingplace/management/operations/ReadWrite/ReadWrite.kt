@@ -14,31 +14,48 @@ class ReadWrite private constructor(){
         fun getRW () = rw
     }
 
-    fun readUser(): User? {
-        val gson = GsonBuilder().setPrettyPrinting().create()
-        val file = File("br/meetingplace/logFiles/Users.json")
+    fun readUser(fileName: String): User{
+
+        val file = File("$fileName.json")
         val bufferedReader = file.bufferedReader()
         val inputString = bufferedReader.use{ it.readText()}
         return gson.fromJson(inputString, User::class.java)
     }
-    fun readGroup(): Group? {
-        val gson = GsonBuilder().setPrettyPrinting().create()
-        val file = File("br/meetingplace/logFiles/groups.json")
+
+    fun readGroup(fileName: String): Group {
+
+        val file = File("$fileName.json")
         val bufferedReader = file.bufferedReader()
         val inputString = bufferedReader.use{ it.readText()}
         return gson.fromJson(inputString, Group::class.java)
     }
-    fun readThread(): MainThread? {
-        val gson = GsonBuilder().setPrettyPrinting().create()
-        val file = File("br/meetingplace/logFiles/thread.json")
+
+    fun readThread(fileName: String): MainThread {
+
+        val file = File("$fileName.json")
         val bufferedReader = file.bufferedReader()
         val inputString = bufferedReader.use{ it.readText()}
         return gson.fromJson(inputString, MainThread::class.java)
     }
 
-    fun write(nameFile: String){
-        val file = File("$nameFile.json")
-        val json = gson.toJson(this)
+    fun writeUser(fileName: String,user: User){
+
+        val file = File("$fileName.json")
+        val json = gson.toJson(user)
+        file.writeText(json)
+    }
+
+    fun writeGroup(fileName: String,group: Group){
+
+        val file = File("$fileName.json")
+        val json = gson.toJson(group)
+        file.writeText(json)
+    }
+
+    fun writeThread(fileName: String,thread: MainThread){
+
+        val file = File("$fileName.json")
+        val json = gson.toJson(thread)
         file.writeText(json)
     }
 }

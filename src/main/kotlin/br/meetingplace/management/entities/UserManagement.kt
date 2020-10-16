@@ -4,55 +4,65 @@ import br.meetingplace.data.PasswordOperations
 import br.meetingplace.data.entities.group.UserMember
 import br.meetingplace.data.startup.UserData
 import br.meetingplace.entities.user.User
-import br.meetingplace.management.interfaces.Generator
+import br.meetingplace.interfaces.Generator
 
-class UserManagement: ProfileManagement(), Generator {
+import br.meetingplace.management.GeneralManagement
+import br.meetingplace.management.operations.ReadWrite.ReadWrite
+import br.meetingplace.management.operations.verifiers.UserVerifiers
+import java.io.File
+
+class UserManagement: ProfileManagement(), Generator{
+
+    private val verifier = UserVerifiers.getUserVerifier()
+    private val rw = ReadWrite.getRW()
+    private val system = GeneralManagement.getManagement()
+    private val management = system.getLoggedUser()
+    private val cachedPass = system.getCachedPassword()
 
     fun createUser(newUser: UserData){
 
         val user = User(newUser.realName, newUser.age, newUser.email, newUser.password)
 
-        if(user.getId() == "" && getLoggedUser() == "" && user.getEmail() !in emailList && user.getEmail() != ""){
+        if(user.getId() == "" && management == "" && user.getEmail() != ""){
             user.startUser(generateId())
-            userList.add(user)
-            emailList.add(user.getEmail())
+            rw.writeUser(user.getId(),user)
         }
     }
 
     fun deleteUser(operation: PasswordOperations){
+        val fileUser = File("$management.json").exists()
 
-        if(getLoggedUser() !=  "" && operation.pass == cachedPass){
-
-            val indexUser = getUserIndex(getLoggedUser())
+        if(management !=  "" && operation.pass == cachedPass && fileUser){
+            val user = rw.readUser(management)
             var member: UserMember
 
-            for(i in 0 until userList[indexUser].social.followers.size){
-                val indexFollower = getUserIndex(userList[indexUser].social.followers[i])
-                if(indexFollower != -1)
-                    userList[indexFollower].social.following.remove(getLoggedUser())
+            for(i in 0 until user.social.followers.size){
+                val fileFollower = File("${user.social.followers[i]}.json").exists()
+                if(fileFollower) {
+                    val following = rw.readUser(user.social.following[i])
+                    following.social.following.remove(management)
+                    rw.writeUser(following.getId(), following)
+                }
             }
 
-            for(i in 0 until userList[indexUser].social.following.size){
-                val indexFollowing = getUserIndex(userList[indexUser].social.following[i])
-                if(indexFollowing != -1)
-                    userList[indexFollowing].social.followers.remove(getLoggedUser())
+            for(i in 0 until user.social.following.size){
+                val fileFollowing = File("${user.social.following[i]}.json").exists()
+                if(fileFollowing){
+                    val follower = rw.readUser(user.social.following[i])
+                    follower.social.followers.remove(management)
+                    rw.writeUser(follower.getId(),follower)
+                }
             }
-
+        /*
             for(i in 0 until groupList.size){
-                member = UserMember(getLoggedUser(),groupList[i].getId())
+                member = UserMember(management,groupList[i].getId())
                 removeMember(member) // should use an override here
             }
 
+         */
             deleteAllThreadsFromUserId()
 
-            emailList.remove(userList[indexUser].getEmail())
-
-            if(userList[indexUser].social.getUserName() != "")
-                nameList.remove(userList[indexUser].social.getUserName())
-
-            userList.remove(userList[indexUser])
-
-            logoff()
+            system.logoff()
         }
     }
 }

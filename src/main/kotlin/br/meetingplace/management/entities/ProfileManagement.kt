@@ -1,30 +1,39 @@
 package br.meetingplace.management.entities
 
-import br.meetingplace.data.conversation.operations.ChatOperations
-import br.meetingplace.data.conversation.ChatContent
 import br.meetingplace.data.entities.user.Follower
 import br.meetingplace.data.entities.group.UserMember
 import br.meetingplace.data.startup.SocialProfileData
 import br.meetingplace.entities.user.profiles.SocialProfile
+import br.meetingplace.management.GeneralManagement
+import br.meetingplace.management.operations.ReadWrite.ReadWrite
+import br.meetingplace.management.operations.verifiers.UserVerifiers
 import br.meetingplace.servicies.notification.Inbox
+import java.io.File
 
-open class ProfileManagement: GroupManagement() {
+open class ProfileManagement: GroupManagement(){
+
+    private val verifier = UserVerifiers.getUserVerifier()
+    private val rw = ReadWrite.getRW()
+    private val system = GeneralManagement.getManagement()
+    private val management = system.getLoggedUser()
+
 
     fun createSocialProfile(newProfile: SocialProfileData){
+        val fileUser = File("$management.json").exists()
 
-        if(getLoggedUser() != -1 && newProfile.ProfileName !in nameList){
+
+        if(management != "" && fileUser){
+            val user = rw.readUser(management)
             val social = SocialProfile(newProfile.ProfileName, newProfile.gender, newProfile.nationality, newProfile.about)
-            val indexUser = getUserIndex(getLoggedUser())
-
-            userList[indexUser].createSocialProfile(social)
-            nameList.add(userList[indexUser].social.getUserName())
+            user.createSocialProfile(social)
+            rw.writeUser(management,user)
         }
     }
 
 /*
     fun createProfessionalProfile(user: ProfessionalProfile){ // NEEDS WORK
 
-        if(getLoggedUser() != -1 && verifyUserSocialProfile(getLoggedUser()))
+        if(management != -1 && verifyUserSocialProfile(management))
             createProfessionalProfile(user)
     }
 
@@ -32,37 +41,45 @@ open class ProfileManagement: GroupManagement() {
 
     fun follow(data: Follower){
 
-        if(getLoggedUser() != -1){
-            val indexExternal = getUserIndex(data.external)
-            val indexCurrent = getUserIndex(getLoggedUser())
-            val notification = Inbox("${userList[indexCurrent].social.getUserName()} is now following you.", "New follower.")
+        val fileUser = File("$management.json").exists()
+        val fileExternal = File("${data.external}.json").exists()
+        if(management != "" && fileUser && fileExternal){
+            val user = rw.readUser(management)
+            val external = rw.readUser(data.external)
+            val notification = Inbox("${user.social.getUserName()} is now following you.", "New follower.")
 
-            if(indexExternal != -1 && verifyFollower(data) == 0){ // verifies if the user you want to follow exists
-                userList[indexExternal].social.updateInbox(notification)
-                userList[indexExternal].social.followers.add(getLoggedUser())
-                userList[indexCurrent].social.following.add(data.external)
+            if(verifier.verifyFollower(data)){ // verifies if the user you want to follow exists
+                external.social.updateInbox(notification)
+                external.social.followers.add(management)
+                user.social.following.add(data.external)
+
+                rw.writeUser(management,user)
+                rw.writeUser(data.external,external)
             }
         }
     }
 
     fun unfollow(data: Follower){
 
-        val logged = getLoggedUser()
-        if(logged != -1 && verifyUserSocialProfile(logged)){
-            val indexExternal = getUserIndex(data.external)
-            val indexCurrent = getUserIndex(logged)
+        val fileUser = File("$management.json").exists()
+        val fileExternal = File("${data.external}.json").exists()
 
-            if( indexCurrent != -1 && indexExternal != -1){
-                userList[indexCurrent].social.following.remove(data.external)
-                userList[indexExternal].social.followers.remove(logged)
-            }
+        if(management != "" && fileUser && fileExternal){
+
+            val user = rw.readUser(management)
+            val external = rw.readUser(data.external)
+
+            user.social.following.remove(data.external)
+            external.social.followers.remove(management)
+
+            rw.writeUser(management,user)
+            rw.writeUser(data.external,external)
         }
     }
-
+/*
     fun leaveGroup(member: UserMember){
 
-        val logged = getLoggedUser()
-        if( logged != -1){
+        if(management != ""){
 
             val indexGroup = getGroupIndex(member.group)
 
@@ -70,6 +87,8 @@ open class ProfileManagement: GroupManagement() {
                 removeMember(member)
         }
     }
+
+ */
 
 
 }

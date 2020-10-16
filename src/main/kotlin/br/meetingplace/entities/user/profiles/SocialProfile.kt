@@ -1,6 +1,5 @@
 package br.meetingplace.entities.user.profiles
 
-import br.meetingplace.data.conversation.ChatContent
 import br.meetingplace.data.conversation.ChatFullContent
 import br.meetingplace.data.conversation.operations.ChatOperations
 import br.meetingplace.servicies.chat.Chat
@@ -79,7 +78,7 @@ class SocialProfile(
         else ""
     }
 
-    fun getChatIndex(idChat: Int): Int{
+    fun getChatIndex(idChat: String): Int{
         for(i in 0 until chat.size){
             if(chat[i].getConversationId() == idChat)
                 return i

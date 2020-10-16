@@ -1,4 +1,4 @@
-package br.meetingplace.management.interfaces
+package br.meetingplace.interfaces
 
 import java.util.*
 

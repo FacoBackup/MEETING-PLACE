@@ -1,11 +1,10 @@
 package br.meetingplace.servicies.chat
 
 import br.meetingplace.data.conversation.operations.ChatOperations
-import br.meetingplace.data.conversation.ChatContent
 import br.meetingplace.data.conversation.ChatFullContent
 
 class Chat(
-    private var conversationId: Int//the id of the conversation is the sum of the users id's
+    private var conversationId: String//the id of the conversation is the sum of the users id's
 ){
 
     private var conversation = mutableListOf<Message>()
