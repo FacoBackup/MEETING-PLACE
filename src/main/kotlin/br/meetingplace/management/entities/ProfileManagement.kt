@@ -17,7 +17,10 @@ open class ProfileManagement private constructor(): GroupManagement(){
     private val system = GeneralManagement.getManagement()
     private val management = system.getLoggedUser()
 
-
+    companion object{
+        private val management = ProfileManagement()
+        fun getManagement () = management
+    }
     fun createSocialProfile(newProfile: SocialProfileData){
         val fileUser = File("$management.json").exists()
 

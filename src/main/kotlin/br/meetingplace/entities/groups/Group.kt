@@ -10,7 +10,7 @@ open class Group(){
     private var name = ""
     private var about= ""
     var members = mutableListOf<Member>()
-    private val chat = Chat(-1)
+    private val chat = Chat("")
 
     //GETTERS
     fun getCreator() = creator

@@ -24,7 +24,7 @@ open class GeneralManagement private constructor(): Generator{
 
     //AUTHENTICATION SYSTEM
     fun loginId(log: LoginById){
-        val fileUser = File("$management.json").exists()
+        val fileUser = File("${log.user}.json").exists()
 
         if(fileUser){
             val user = rw.readUser(log.user)
@@ -34,6 +34,19 @@ open class GeneralManagement private constructor(): Generator{
             }
         }
     }
+
+//
+//    fun loginEmail(log: LoginByEmail){
+//        val fileUser = File("$management.json").exists()
+//
+//        if(fileUser){
+//            val user = rw.readUser(log.user)
+//            if(log.password == user.getPassword()){
+//                logged = log.user
+//                cachedPass = log.password
+//            }
+//        }
+//    }
 
     fun logoff(){
 

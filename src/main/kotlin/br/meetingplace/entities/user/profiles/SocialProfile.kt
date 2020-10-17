@@ -13,7 +13,7 @@ class SocialProfile(
     private var about: String){
 
     //private var conversationThread = mutableListOf<>()
-    private var myThreads = 0
+    private var myThreads = mutableListOf<String>() // ALL THREADS IDS
     private var chat = mutableListOf<Chat>()
     private var chatIds = mutableListOf<String>()
     var followers = mutableListOf<String>()
@@ -21,7 +21,7 @@ class SocialProfile(
     var groups = mutableListOf<String>()
     private var inbox = mutableListOf<Inbox>()
 
-
+    fun getMyThreads () = myThreads
     fun getUserName() = userName
     fun updateAbout(newAbout: String){
         about = newAbout
@@ -98,11 +98,18 @@ class SocialProfile(
     }
 
     fun getMyThreadsQuantity () = myThreads
-    fun updateMyThreadsQuantity (status: Boolean) {
-        when(status){
-            true->myThreads+=1
-            false->myThreads-=1
+    fun updateMyThreads (id: String, operation: Boolean) {
+        when(operation){
+            true-> {
+                if (id !in myThreads)
+                    myThreads.add(id)
+            }
+            false->{
+                if (id in myThreads)
+                    myThreads.remove(id)
+            }
         }
+
     }
     // SUB METHODS
 }

@@ -58,7 +58,7 @@ class Chat(
     }
 
     //GETTERS
-    private fun getMessageIndex(id: Int): Int {
+    private fun getMessageIndex(id: String): Int {
         for (i in 0 until idMessages.size){
             if(idMessages[i] == id)
                 return i

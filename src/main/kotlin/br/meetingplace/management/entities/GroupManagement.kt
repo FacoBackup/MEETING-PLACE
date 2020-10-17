@@ -6,8 +6,8 @@ import br.meetingplace.data.entities.group.UserMember
 import br.meetingplace.entities.groups.Group
 import br.meetingplace.management.servicies.ThreadManagement
 
-open class GroupManagement: ThreadManagement() {
-
+open class GroupManagement{
+/*
     fun createGroup(group: Group){
 
 
@@ -80,4 +80,6 @@ open class GroupManagement: ThreadManagement() {
 
     }
 
+
+ */
 }

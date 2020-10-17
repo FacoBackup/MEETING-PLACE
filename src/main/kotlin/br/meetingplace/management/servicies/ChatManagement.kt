@@ -22,7 +22,7 @@ class ChatManagement private constructor(): br.meetingplace.interfaces.Message, 
 
     companion object{
         private val chatManagement = ChatManagement()
-        fun getChatManagement()= chatManagement
+        fun getManagement()= chatManagement
     }
 
     override fun sendMessage(message: ChatContent){

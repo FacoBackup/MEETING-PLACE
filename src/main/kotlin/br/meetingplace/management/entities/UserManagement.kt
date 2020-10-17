@@ -9,15 +9,17 @@ import br.meetingplace.interfaces.Generator
 import br.meetingplace.management.GeneralManagement
 import br.meetingplace.management.operations.ReadWrite.ReadWrite
 import br.meetingplace.management.operations.verifiers.UserVerifiers
+import br.meetingplace.management.servicies.ThreadManagement
+import br.meetingplace.servicies.conversationThread.MainThread
 import java.io.File
 
-class UserManagement: ProfileManagement(), Generator{
+class UserManagement: Generator{
 
-    private val verifier = UserVerifiers.getUserVerifier()
     private val rw = ReadWrite.getRW()
     private val system = GeneralManagement.getManagement()
     private val management = system.getLoggedUser()
     private val cachedPass = system.getCachedPassword()
+
 
     fun createUser(newUser: UserData){
 
@@ -60,9 +62,68 @@ class UserManagement: ProfileManagement(), Generator{
             }
 
          */
-            deleteAllThreadsFromUserId()
-
+            val threadManagement = ThreadManagement.getManagement()
+            threadManagement.deleteAllThreadsFromUserId()
             system.logoff()
         }
+    }
+
+    fun getMyProfile(): User {
+        println(management)
+        val fileUser = File("$management.json").exists()
+        val nullUser = User("", -1, "", "")
+        return if(fileUser)
+            rw.readUser(management)
+        else nullUser
+    }
+
+    fun getMyThreads(): MutableList<MainThread> {
+
+        val fileUser = File("$management.json").exists()
+        val myThreads = mutableListOf<MainThread>()
+
+        if(fileUser && management != ""){
+            val user = rw.readUser(management)
+            val myThreadsIds = user.social.getMyThreads()
+
+            for (i in 0 until myThreadsIds.size){
+                val fileThread = File("${myThreadsIds[i]}.json").exists()
+                if (fileThread){
+                    val thread = rw.readThread(myThreadsIds[i])
+                    myThreads.add(thread)
+                }
+            }
+            return myThreads
+        }
+        return myThreads
+    }
+
+    fun getMyTimeline(): MutableList<MainThread> {
+        val fileUser = File("$management.json").exists()
+        val myTimeline = mutableListOf<MainThread>()
+
+        if(fileUser && management != "") {
+            val user = rw.readUser(management)
+            val followingIds = user.social.following
+
+            for (i in 0 until followingIds.size){
+                val fileFollowing = File("${followingIds[i]}.json").exists()
+                if(fileFollowing){
+
+                    val following = rw.readUser(followingIds[i])
+                    val followingThreads = following.social.getMyThreads()
+
+                    for (j in 0 until followingThreads.size){
+                        val fileThread = File("${followingThreads[j]}.json").exists()
+                        if (fileThread){
+                            val thread = rw.readThread(followingThreads[j])
+                            myTimeline.add(thread)
+                        }
+                    }
+                }
+            }
+            return myTimeline
+        }
+        return myTimeline
     }
 }

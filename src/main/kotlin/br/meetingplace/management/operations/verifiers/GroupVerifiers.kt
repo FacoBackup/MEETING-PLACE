@@ -1,7 +1,7 @@
 package br.meetingplace.management.operations.verifiers
 
 class GroupVerifiers private constructor(){
-
+/*
     companion object{
         private val verifier = GroupVerifiers()
         fun getGroupVerifier () = verifier
@@ -24,4 +24,6 @@ class GroupVerifiers private constructor(){
         return false
     }
 
+
+ */
 }
