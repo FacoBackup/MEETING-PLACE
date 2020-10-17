@@ -1,18 +1,15 @@
 package br.meetingplace.management.operations.verifiers
 
 import br.meetingplace.data.entities.user.Follower
-import br.meetingplace.entities.user.User
-import br.meetingplace.management.GeneralManagement
-import br.meetingplace.management.operations.ReadWrite.ReadWrite
+import br.meetingplace.interfaces.ReadFile
+import br.meetingplace.interfaces.WriteFile
 import java.io.File
 
 
-class UserVerifiers private constructor(){
+class UserVerifiers private constructor(): ReadFile, WriteFile{
 
-    private val verifier = UserVerifiers.getUserVerifier()
-    private val rw = ReadWrite.getRW()
-    private val system = GeneralManagement.getManagement()
-    private val management = system.getLoggedUser()
+    private val log = readLoggedUser()
+    private val management = log.user
 
     companion object{
         private val verifier = UserVerifiers()
@@ -22,7 +19,7 @@ class UserVerifiers private constructor(){
     fun verifyUserSocialProfile(id: String): Boolean {
         val fileUser = File("$management.json").exists()
         if(fileUser && management != ""){
-            val user = rw.readUser(management)
+            val user = readUser(management)
             if(user.social.getUserName() != "")
                 return true
             return false
@@ -36,7 +33,7 @@ class UserVerifiers private constructor(){
 //            //READING
 //            val rw = ReadWrite.getRW()
 //            val userList = mutableListOf<User>()
-//            rw.readUser()?.let { userList.add(it) }
+//            readUser()?.let { userList.add(it) }
 //            //READING
 //
 //            for(i in 0 until userList.size){
@@ -54,7 +51,7 @@ class UserVerifiers private constructor(){
         val fileUser = File("$management.json").exists()
         val fileFollower = File("${data.external}.json").exists()
         if(fileUser && fileFollower && management != ""){
-            val userFollower = rw.readUser(data.external)
+            val userFollower = readUser(data.external)
 
             if(management in userFollower.social.followers)
                 return true

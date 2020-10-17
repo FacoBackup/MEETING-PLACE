@@ -1,35 +1,34 @@
 package br.meetingplace.management.entities
 
 import br.meetingplace.data.entities.user.Follower
-import br.meetingplace.data.entities.group.UserMember
 import br.meetingplace.data.startup.SocialProfileData
 import br.meetingplace.entities.user.profiles.SocialProfile
-import br.meetingplace.management.GeneralManagement
-import br.meetingplace.management.operations.ReadWrite.ReadWrite
+import br.meetingplace.interfaces.ReadFile
+import br.meetingplace.interfaces.Refresh
+import br.meetingplace.interfaces.WriteFile
 import br.meetingplace.management.operations.verifiers.UserVerifiers
 import br.meetingplace.servicies.notification.Inbox
 import java.io.File
 
-open class ProfileManagement private constructor(): GroupManagement(){
+class ProfileManagement private constructor(): ReadFile, WriteFile, Refresh{
 
     private val verifier = UserVerifiers.getUserVerifier()
-    private val rw = ReadWrite.getRW()
-    private val system = GeneralManagement.getManagement()
-    private val management = system.getLoggedUser()
 
     companion object{
         private val management = ProfileManagement()
         fun getManagement () = management
     }
     fun createSocialProfile(newProfile: SocialProfileData){
+        val log = refreshData()
+        val management = log.user
         val fileUser = File("$management.json").exists()
 
 
         if(management != "" && fileUser){
-            val user = rw.readUser(management)
+            val user = readUser(management)
             val social = SocialProfile(newProfile.ProfileName, newProfile.gender, newProfile.nationality, newProfile.about)
             user.createSocialProfile(social)
-            rw.writeUser(management,user)
+            writeUser(management,user)
         }
     }
 
@@ -43,12 +42,13 @@ open class ProfileManagement private constructor(): GroupManagement(){
  */
 
     fun follow(data: Follower){
-
+        val log = refreshData()
+        val management = log.user
         val fileUser = File("$management.json").exists()
         val fileExternal = File("${data.external}.json").exists()
         if(management != "" && fileUser && fileExternal){
-            val user = rw.readUser(management)
-            val external = rw.readUser(data.external)
+            val user = readUser(management)
+            val external = readUser(data.external)
             val notification = Inbox("${user.social.getUserName()} is now following you.", "New follower.")
 
             if(verifier.verifyFollower(data)){ // verifies if the user you want to follow exists
@@ -56,27 +56,28 @@ open class ProfileManagement private constructor(): GroupManagement(){
                 external.social.followers.add(management)
                 user.social.following.add(data.external)
 
-                rw.writeUser(management,user)
-                rw.writeUser(data.external,external)
+                writeUser(management,user)
+                writeUser(data.external,external)
             }
         }
     }
 
     fun unfollow(data: Follower){
-
+        val log = refreshData()
+        val management = log.user
         val fileUser = File("$management.json").exists()
         val fileExternal = File("${data.external}.json").exists()
 
         if(management != "" && fileUser && fileExternal){
 
-            val user = rw.readUser(management)
-            val external = rw.readUser(data.external)
+            val user = readUser(management)
+            val external = readUser(data.external)
 
             user.social.following.remove(data.external)
             external.social.followers.remove(management)
 
-            rw.writeUser(management,user)
-            rw.writeUser(data.external,external)
+            writeUser(management,user)
+            writeUser(data.external,external)
         }
     }
 /*

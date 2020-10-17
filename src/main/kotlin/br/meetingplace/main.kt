@@ -18,6 +18,7 @@ import br.meetingplace.data.startup.UserData
 import br.meetingplace.entities.groups.Group
 import br.meetingplace.entities.user.User
 import br.meetingplace.entities.user.profiles.SocialProfile
+import br.meetingplace.interfaces.Refresh
 import br.meetingplace.management.GeneralManagement
 import br.meetingplace.management.entities.ProfileManagement
 import br.meetingplace.management.entities.UserManagement
@@ -35,7 +36,7 @@ import io.ktor.server.netty.*
 
 
 val LogSystem = GeneralManagement.getManagement()
-val UserSystem = UserManagement(LogSystem)
+val UserSystem = UserManagement()
 val ProfileSystem = ProfileManagement.getManagement()
 val ThreadSystem = ThreadManagement.getManagement()
 val ChatSystem = ChatManagement.getManagement()
@@ -55,7 +56,7 @@ fun main (){
             }
 
             get("/logged") {
-                call.respond(GeneralManagement.getManagement().getLoggedUser())
+                call.respond(UserSystem.getLoggedUser())
             }
 
             post("/user/create"){

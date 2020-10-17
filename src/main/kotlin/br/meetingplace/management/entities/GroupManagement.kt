@@ -1,12 +1,13 @@
 package br.meetingplace.management.entities
 
-import br.meetingplace.data.conversation.GroupChatContent
-import br.meetingplace.data.entities.group.Member
-import br.meetingplace.data.entities.group.UserMember
-import br.meetingplace.entities.groups.Group
-import br.meetingplace.management.servicies.ThreadManagement
+import br.meetingplace.interfaces.ReadFile
+import br.meetingplace.interfaces.WriteFile
 
-open class GroupManagement{
+class GroupManagement: ReadFile, WriteFile{
+
+    private val log = readLoggedUser()
+    private val management = log.user
+
 /*
     fun createGroup(group: Group){
 
