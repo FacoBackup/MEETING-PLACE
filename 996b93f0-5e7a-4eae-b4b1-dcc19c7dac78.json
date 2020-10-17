@@ -1,21 +1,21 @@
 {
-  "id": "38c3299e-cec5-4b7f-9473-cbf872b76faa",
+  "id": "996b93f0-5e7a-4eae-b4b1-dcc19c7dac78",
   "social": {
     "myThreads": [],
-    "chat": [],
-    "chatIds": [],
+    "myChats": [
+      "996b93f060281fbf"
+    ],
     "followers": [],
     "following": [],
-    "groups": [],
     "inbox": [],
-    "userName": "pelicano",
+    "userName": "joaooa",
     "gender": "masculino",
     "nationality": "brasil",
     "about": "sla"
   },
   "professional": {},
-  "realName": "joana",
+  "realName": "Roque",
   "age": 18,
-  "email": "cafe@gmail.com",
+  "email": "aasdsd@gmail.com",
   "password": "12345"
 }

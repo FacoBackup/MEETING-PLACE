@@ -10,6 +10,7 @@ import br.meetingplace.interfaces.Refresh
 import br.meetingplace.interfaces.WriteFile
 import br.meetingplace.management.GeneralManagement
 import br.meetingplace.management.servicies.ThreadManagement
+import br.meetingplace.servicies.chat.Chat
 import br.meetingplace.servicies.conversationThread.MainThread
 import java.io.File
 
@@ -38,23 +39,23 @@ class UserManagement: ReadFile, WriteFile, Refresh, Generator{
             val user = readUser(management)
             var member: UserMember
 
-            for(i in 0 until user.social.followers.size){
-                val fileFollower = File("${user.social.followers[i]}.json").exists()
-                if(fileFollower) {
-                    val following = readUser(user.social.following[i])
-                    following.social.following.remove(management)
-                    writeUser(following.getId(), following)
-                }
-            }
-
-            for(i in 0 until user.social.following.size){
-                val fileFollowing = File("${user.social.following[i]}.json").exists()
-                if(fileFollowing){
-                    val follower = readUser(user.social.following[i])
-                    follower.social.followers.remove(management)
-                    writeUser(follower.getId(),follower)
-                }
-            }
+//            for(i in 0 until user.social.followers.size){
+//                val fileFollower = File("${user.social.followers[i]}.json").exists()
+//                if(fileFollower) {
+//                    val following = readUser(user.social.following[i])
+//                    following.social.following.remove(management)
+//                    writeUser(following.getId(), following)
+//                }
+//            }
+//
+//            for(i in 0 until user.social.following.size){
+//                val fileFollowing = File("${user.social.following[i]}.json").exists()
+//                if(fileFollowing){
+//                    val follower = readUser(user.social.following[i])
+//                    follower.social.followers.remove(management)
+//                    writeUser(follower.getId(),follower)
+//                }
+//            }
         /*
             for(i in 0 until groupList.size){
                 member = UserMember(management,groupList[i].getId())
@@ -71,14 +72,32 @@ class UserManagement: ReadFile, WriteFile, Refresh, Generator{
     fun getMyProfile(): User {
         val log = refreshData()
         val management = log.user
-
-        println(management)
         val fileUser = File("$management.json").exists()
-        println(fileUser)
         val nullUser = User("", -1, "", "")
         return if(fileUser)
             readUser(management)
         else nullUser
+    }
+
+    fun getMyChats(): MutableList<Chat> {
+        val log = refreshData()
+        val management = log.user
+        val fileUser = File("$management.json").exists()
+        val chats = mutableListOf<Chat>()
+        if(fileUser){
+            val user = readUser(management)
+
+            val userChats = user.social.getMyChats()
+            for(i in 0 until userChats.size){
+                val fileChat = File("${userChats[i]}.json").exists()
+                if (fileChat){
+                    val chat = readChat(userChats[i])
+                    chats.add(chat)
+                }
+            }
+            return chats
+        }
+        return chats
     }
 
     fun getMyThreads(): MutableList<MainThread> {

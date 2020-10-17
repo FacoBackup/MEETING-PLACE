@@ -99,6 +99,9 @@ fun main (){
             }
 
             //MESSAGES
+            get("/messages") {
+                call.respond(UserSystem.getMyChats())
+            }
             post("/user/message"){
                 val chat = call.receive<ChatContent>()
                 call.respond(ChatSystem.sendMessage(chat))

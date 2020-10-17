@@ -4,7 +4,8 @@ import br.meetingplace.data.conversation.operations.ChatOperations
 import br.meetingplace.data.conversation.ChatFullContent
 
 class Chat(
-    private var conversationId: String//the id of the conversation is the sum of the users id's
+    private var conversationId: String,
+    private var owners: List<String>
 ){
 
     private var conversation = mutableListOf<Message>()
@@ -65,7 +66,7 @@ class Chat(
         }
         return -1
     }
-
+    fun getOwners() = owners
     fun getConversation ()= conversation
     fun getFavoriteMessagesIds() = favoriteMessagesIds
     fun getMessageIds() = idMessages

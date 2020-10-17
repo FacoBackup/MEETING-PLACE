@@ -3,6 +3,7 @@ package br.meetingplace.interfaces
 import br.meetingplace.data.startup.LoginById
 import br.meetingplace.entities.groups.Group
 import br.meetingplace.entities.user.User
+import br.meetingplace.servicies.chat.Chat
 import br.meetingplace.servicies.conversationThread.MainThread
 import com.google.gson.GsonBuilder
 import java.io.File
@@ -28,7 +29,12 @@ interface WriteFile {
         val json = gson.toJson(group)
         file.writeText(json)
     }
-
+    fun writeChat(fileName: String,chat: Chat){
+        val gson = GsonBuilder().setPrettyPrinting().create()
+        val file = File("$fileName.json")
+        val json = gson.toJson(chat)
+        file.writeText(json)
+    }
     fun writeThread(fileName: String,thread: MainThread){
         val gson = GsonBuilder().setPrettyPrinting().create()
         val file = File("$fileName.json")

@@ -15,54 +15,71 @@ import java.io.File
 
 class ChatManagement private constructor(): ReadFile, WriteFile, Refresh, br.meetingplace.interfaces.Message, Generator{
 
-
     private val verifier = UserVerifiers.getUserVerifier()
-    private val generator = generateId()
-
 
     companion object{
         private val chatManagement = ChatManagement()
         fun getManagement()= chatManagement
     }
 
-    override fun sendMessage(message: ChatContent){
+    fun sendMessage(content: ChatContent){
         val log = refreshData()
         val management = log.user
 
-        val idChat = management + message.receiverId
-        val fileUser = File("$management.json").exists()
-        val fileReceiver = File("${message.receiverId}.json").exists()
+        val idChat = getChatId(management, content.receiverId)
 
-        if(fileUser && fileReceiver && management != "" && message.receiverId != management ) {
+        val fileUser = File("$management.json").exists()
+        val fileReceiver = File("${content.receiverId}.json").exists()
+        println(verifier.verifyUserSocialProfile(management))
+        if(fileUser && fileReceiver && management != "" && content.receiverId != management  ) {
 
             val user = readUser(management)
-            val receiver = readUser(management)
-            if (user.social.getChatIndex(idChat) == -1) { // the conversation doesn't exist
-                val notification = Inbox("${user.social.getUserName()} started a conversation with you.", "Message.")
-                val newChat = Chat(idChat)
-                val content = Message(message.message, generator, message.static)
-                newChat.addMessage(content)
-                message.message = message.message + user.social.getUserName()
+            val receiver = readUser(content.receiverId)
+            println(receiver.social.getUserName())
 
-                receiver.social.startChat(newChat)
-                user.social.startChat(newChat)
+            val fileChat = File("$idChat.json").exists()
+            if (!fileChat) { // the conversation doesn't exist
+                val notification = Inbox("${user.social.getUserName()} started a conversation with you.", "Message.")
+                val newChat = Chat(idChat,listOf(management, content.receiverId))
+
+                content.message = content.message + user.social.getUserName()
+                val msg = Message(content.message, generateId(), true)
+                newChat.addMessage(msg)
+
+
+                user.social.updateMyChats(idChat)
+                receiver.social.updateMyChats(idChat)
                 receiver.social.updateInbox(notification)
+
+                writeChat(idChat,newChat)
+                writeUser(user.getId(), user)
+                writeUser(receiver.getId(), receiver)
             }
             else{ //the conversation exists
-
-                val content = Message(message.message, generator, message.static)
+                content.message = content.message + user.social.getUserName()
+                val msg = Message(content.message, generateId(), content.static)
                 val notification = Inbox("${user.social.getUserName()} sent a new message.", "Message.")
-                message.message = message.message + user.social.getUserName()
 
-                receiver.social.newMessage(content, idChat)
+                val chat = readChat(idChat)
+
+                chat.addMessage(msg)
+                writeChat(idChat,chat)
+
+
+                receiver.social.updateMyChats(idChat)
                 receiver.social.updateInbox(notification)
+                user.social.updateMyChats(idChat)
+                writeUser(user.getId(), user)
+                writeUser(receiver.getId(), receiver)
+
             }
         }
     }
 
-    override fun deleteMessage(message: ChatOperations){
+    fun deleteMessage(message: ChatOperations){
         val log = refreshData()
         val management = log.user
+
         val fileUser = File("$management.json").exists()
         val fileReceiver= File("${message.receiverId}.json").exists()
 
@@ -70,15 +87,20 @@ class ChatManagement private constructor(): ReadFile, WriteFile, Refresh, br.mee
 
             val user = readUser(management)
             val receiver = readUser(message.receiverId)
-            val idChat = management + message.receiverId
+            val idChat = getChatId(management, message.receiverId)
+            val fileChat = File("$idChat.json").exists()
 
-            user.social.deleteMessage(message, idChat)
-            writeUser(user.getId(), user)
-            writeUser(receiver.getId(),receiver)
+            if(fileChat) {
+                val chat = readChat(idChat)
+                chat.deleteMessage(message)
+                writeChat(idChat,chat)
+                writeUser(user.getId(), user)
+                writeUser(receiver.getId(), receiver)
+            }
         }
     }
 
-    override fun favoriteMessage(message: ChatOperations){
+    fun favoriteMessage(message: ChatOperations){
         val log = refreshData()
         val management = log.user
         val fileUser = File("$management.json").exists()
@@ -87,14 +109,20 @@ class ChatManagement private constructor(): ReadFile, WriteFile, Refresh, br.mee
         if(fileUser && fileReceiver && management != ""  && verifier.verifyUserSocialProfile(management) && message.receiverId != management){
             val user = readUser(management)
             val receiver = readUser(message.receiverId)
-            val idChat = management + message.receiverId
-            user.social.favoriteMessage(message, idChat)
-            writeUser(user.getId(), user)
-            writeUser(receiver.getId(),receiver)
+            val idChat = getChatId(management, message.receiverId)
+            val fileChat = File("$idChat.json").exists()
+
+            if(fileChat) {
+                val chat = readChat(idChat)
+                chat.favoriteMessage(message)
+                writeChat(idChat,chat)
+                writeUser(user.getId(), user)
+                writeUser(receiver.getId(), receiver)
+            }
         }
     }
 
-   override fun unFavoriteMessage(message: ChatOperations){
+   fun unFavoriteMessage(message: ChatOperations){
        val log = refreshData()
        val management = log.user
        val fileUser = File("$management.json").exists()
@@ -102,15 +130,19 @@ class ChatManagement private constructor(): ReadFile, WriteFile, Refresh, br.mee
         if(fileUser && fileReceiver && management !=  ""  && verifier.verifyUserSocialProfile(management) && message.receiverId != management){
             val user = readUser(management)
             val receiver = readUser(message.receiverId)
-            val idChat = management + message.receiverId
+            val idChat = getChatId(management, message.receiverId)
+            val fileChat = File("$idChat.json").exists()
 
-            user.social.unFavoriteMessage(message, idChat)
-            writeUser(user.getId(), user)
-            writeUser(receiver.getId(),receiver)
+            if(fileChat) {
+                val chat = readChat(idChat)
+                chat.unFavoriteMessage(message)
+                writeChat(idChat,chat)
+                writeUser(user.getId(), user)
+                writeUser(receiver.getId(), receiver)
+            }
         }
-    }
-
-    override fun quoteMessage(message: ChatFullContent){
+   }
+    fun quoteMessage(message: ChatFullContent){
         val log = refreshData()
         val management = log.user
         val fileUser = File("$management.json").exists()
@@ -119,18 +151,21 @@ class ChatManagement private constructor(): ReadFile, WriteFile, Refresh, br.mee
 
             val user = readUser(management)
             val receiver = readUser(message.receiverId)
-            val idChat = management + message.receiverId
-            val newId = generator
+            val idChat = getChatId(management, message.receiverId)
+            val newId = generateId()
             message.idNewMessage = newId
-            user.social.quoteMessage(message, idChat)
-            writeUser(user.getId(), user)
-            writeUser(receiver.getId(),receiver)
+            val fileChat = File("$idChat.json").exists()
+
+            if(fileChat) {
+                val chat = readChat(idChat)
+                chat.quoteMessage(message)
+                writeChat(idChat,chat)
+                writeUser(user.getId(), user)
+                writeUser(receiver.getId(), receiver)
+            }
         }
     }
 
-    override fun shareMessage(content: ChatFullContent) {
-        TODO("Not yet implemented")
-    }
     /*
     override fun shareMessage(content: ChatFullContent){ //NEEDS WORK
 

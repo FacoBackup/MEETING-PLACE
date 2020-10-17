@@ -3,6 +3,7 @@ package br.meetingplace.interfaces
 import br.meetingplace.data.startup.LoginById
 import br.meetingplace.entities.groups.Group
 import br.meetingplace.entities.user.User
+import br.meetingplace.servicies.chat.Chat
 import br.meetingplace.servicies.conversationThread.MainThread
 import com.google.gson.GsonBuilder
 import java.io.File
@@ -32,9 +33,13 @@ interface ReadFile {
         val inputString = bufferedReader.use{ it.readText()}
         return gson.fromJson(inputString, MainThread::class.java)
     }
-
-
-
+    fun readChat(fileName: String): Chat {
+        val gson = GsonBuilder().setPrettyPrinting().create()
+        val file = File("$fileName.json")
+        val bufferedReader = file.bufferedReader()
+        val inputString = bufferedReader.use{ it.readText()}
+        return gson.fromJson(inputString, Chat::class.java)
+    }
     fun readLoggedUser(): LoginById {
         val gson = GsonBuilder().setPrettyPrinting().create()
         val file = File("logged.json")
