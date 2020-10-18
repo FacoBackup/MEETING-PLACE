@@ -3,13 +3,17 @@ package br.meetingplace.management.servicies
 import br.meetingplace.data.conversation.ChatContent
 import br.meetingplace.data.conversation.ChatFullContent
 import br.meetingplace.data.conversation.operations.ChatOperations
-import br.meetingplace.interfaces.*
+import br.meetingplace.interfaces.file.ReadFile
+import br.meetingplace.interfaces.file.WriteFile
+import br.meetingplace.interfaces.utility.Generator
+import br.meetingplace.interfaces.utility.Path
+import br.meetingplace.interfaces.utility.Refresh
+import br.meetingplace.interfaces.utility.Verifiers
 import br.meetingplace.servicies.chat.Chat
 import br.meetingplace.servicies.chat.Message
 import br.meetingplace.servicies.notification.Inbox
-import java.io.File
 
-class ChatManagement private constructor(): ReadFile, WriteFile, Refresh, br.meetingplace.interfaces.Message, Generator, Path, Verifiers{
+class ChatManagement private constructor(): ReadFile, WriteFile, Refresh, Generator, Path, Verifiers {
 
     companion object{
         private val chatManagement = ChatManagement()

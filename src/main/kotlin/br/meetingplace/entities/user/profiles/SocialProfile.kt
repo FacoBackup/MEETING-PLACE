@@ -10,12 +10,37 @@ class SocialProfile(
 
     private var myThreads = mutableListOf<String>()
     private var myChats = mutableListOf<String>()
+    private var myGroups = mutableListOf<String>()
+    private var memberIn = mutableListOf<String>()
     private var followers = mutableListOf<String>()
     private var following = mutableListOf<String>()
     private var inbox = mutableListOf<Inbox>()
-    //private var groups = mutableListOf<String>()
-    //UPDATE
 
+    //UPDATE
+    fun updateMyGroups(idGroup: String, delete: Boolean){
+        when (delete){
+            true->{
+                if(idGroup in myGroups)
+                    myGroups.remove(idGroup)
+            }
+            false->{
+                if(idGroup !in myGroups)
+                    myGroups.add(idGroup)
+            }
+        }
+    }
+    fun updateMemberIn(idGroup: String, leave: Boolean){
+        when (leave){
+            true->{
+                if(idGroup in memberIn)
+                    memberIn.remove(idGroup)
+            }
+            false->{
+                if(idGroup !in memberIn)
+                    memberIn.add(idGroup)
+            }
+        }
+    }
     fun updateFollowers(userEmail: String, remove: Boolean){
         when (remove){
             true ->{

@@ -2,12 +2,12 @@ package br.meetingplace.servicies.chat
 
 import br.meetingplace.data.conversation.operations.ChatOperations
 import br.meetingplace.data.conversation.ChatFullContent
-import br.meetingplace.interfaces.Refresh
+import br.meetingplace.interfaces.utility.Refresh
 
 class Chat(
     private var conversationId: String,
     private var owners: List<String>
-): Refresh{
+): Refresh {
     private var conversation = mutableListOf<Message>()
     private var idMessages= mutableListOf<String>()
     private var favoriteMessagesIds= mutableListOf<String>()

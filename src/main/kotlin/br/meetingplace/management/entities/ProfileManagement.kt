@@ -3,11 +3,14 @@ package br.meetingplace.management.entities
 import br.meetingplace.data.entities.user.Follower
 import br.meetingplace.data.startup.SocialProfileData
 import br.meetingplace.entities.user.profiles.SocialProfile
-import br.meetingplace.interfaces.*
+import br.meetingplace.interfaces.file.ReadFile
+import br.meetingplace.interfaces.file.WriteFile
+import br.meetingplace.interfaces.utility.Path
+import br.meetingplace.interfaces.utility.Refresh
+import br.meetingplace.interfaces.utility.Verifiers
 import br.meetingplace.servicies.notification.Inbox
-import java.io.File
 
-class ProfileManagement private constructor(): ReadFile, WriteFile, Refresh,Path, Verifiers{
+class ProfileManagement private constructor(): ReadFile, WriteFile, Refresh, Path, Verifiers {
 
     companion object{
         private val management = ProfileManagement()

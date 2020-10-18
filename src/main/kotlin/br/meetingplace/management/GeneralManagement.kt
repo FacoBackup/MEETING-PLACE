@@ -1,13 +1,13 @@
 package br.meetingplace.management
 
 import br.meetingplace.data.startup.LoginByEmail
-import br.meetingplace.interfaces.Generator
-import br.meetingplace.interfaces.ReadFile
-import br.meetingplace.interfaces.WriteFile
+import br.meetingplace.interfaces.utility.Generator
+import br.meetingplace.interfaces.file.ReadFile
+import br.meetingplace.interfaces.file.WriteFile
 import java.io.File
 
 // CHANGE TO INTERFACE
-open class GeneralManagement private constructor(): ReadFile, WriteFile,Generator{
+open class GeneralManagement private constructor(): ReadFile, WriteFile, Generator {
 
     companion object{
         private val management = GeneralManagement()

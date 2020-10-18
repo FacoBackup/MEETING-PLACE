@@ -35,7 +35,7 @@ val ChatSystem = ChatManagement.getManagement()
 
 fun main (){
 
-    embeddedServer(Netty, 8823) {
+    embeddedServer(Netty, 3000) {
         routing {
             install(ContentNegotiation) {
                 gson {
@@ -74,13 +74,10 @@ fun main (){
                 val user = call.receive<SocialProfileData>()
                 call.respond(ProfileSystem.createSocialProfile(user))
             }
-    /*
-            post("/user/create/professional"){
-                val user = call.receive<ProfessionalProfile>()
-                call.respond(UserSystem.createProfessionalProfile(user))
-            }
-     */
-
+//            post("/user/create/professional"){
+//                val user = call.receive<ProfessionalProfile>()
+//                call.respond(UserSystem.createProfessionalProfile(user))
+//            }
             post("/user/follow"){
                 val follow = call.receive<Follower>()
                 call.respond(ProfileSystem.follow(follow))

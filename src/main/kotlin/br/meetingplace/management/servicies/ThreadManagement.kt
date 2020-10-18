@@ -4,7 +4,13 @@ import br.meetingplace.data.threads.SubThreadContent
 import br.meetingplace.data.threads.operations.SubThreadOperations
 import br.meetingplace.data.threads.ThreadContent
 import br.meetingplace.data.threads.operations.ThreadOperations
-import br.meetingplace.interfaces.*
+import br.meetingplace.interfaces.file.DeleteFile
+import br.meetingplace.interfaces.file.ReadFile
+import br.meetingplace.interfaces.file.WriteFile
+import br.meetingplace.interfaces.utility.Generator
+import br.meetingplace.interfaces.utility.Path
+import br.meetingplace.interfaces.utility.Refresh
+import br.meetingplace.interfaces.utility.Verifiers
 import br.meetingplace.servicies.conversationThread.MainThread
 import br.meetingplace.servicies.conversationThread.SubThread
 import br.meetingplace.servicies.notification.Inbox
@@ -12,7 +18,7 @@ import br.meetingplace.servicies.notification.Inbox
 import java.io.File
 
 
-class ThreadManagement private constructor(): ReadFile, WriteFile,DeleteFile,Refresh,Generator, Path, Verifiers{
+class ThreadManagement private constructor(): ReadFile, WriteFile, DeleteFile, Refresh, Generator, Path, Verifiers {
 
     companion object{
         private val threadManagement = ThreadManagement()

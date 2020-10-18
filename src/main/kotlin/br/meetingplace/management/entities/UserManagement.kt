@@ -3,16 +3,19 @@ package br.meetingplace.management.entities
 import br.meetingplace.data.PasswordOperations
 import br.meetingplace.data.entities.group.UserMember
 import br.meetingplace.data.startup.LoginByEmail
-
 import br.meetingplace.data.startup.UserData
 import br.meetingplace.entities.user.User
-import br.meetingplace.interfaces.*
+import br.meetingplace.interfaces.file.ReadFile
+import br.meetingplace.interfaces.file.WriteFile
+import br.meetingplace.interfaces.utility.Generator
+import br.meetingplace.interfaces.utility.Path
+import br.meetingplace.interfaces.utility.Refresh
 import br.meetingplace.management.GeneralManagement
 import br.meetingplace.management.servicies.ThreadManagement
 import br.meetingplace.servicies.chat.Chat
 import br.meetingplace.servicies.conversationThread.MainThread
 
-class UserManagement: ReadFile, WriteFile, Refresh, Generator, Path{
+class UserManagement: ReadFile, WriteFile, Refresh, Generator, Path {
 
     fun createUser(newUser: UserData){
         val management = readLoggedUser().email
