@@ -1,6 +1,6 @@
 package br.meetingplace.management
 
-import br.meetingplace.data.startup.LoginById
+import br.meetingplace.data.startup.LoginByEmail
 import br.meetingplace.interfaces.Generator
 import br.meetingplace.interfaces.ReadFile
 import br.meetingplace.interfaces.WriteFile
@@ -15,21 +15,21 @@ open class GeneralManagement private constructor(): ReadFile, WriteFile,Generato
     }
 
     //AUTHENTICATION SYSTEM
-    fun loginId(log: LoginById){
-        val pathUser = File("build.gradle").absolutePath.removeSuffix("build.gradle") + "/src/main/kotlin/br/meetingplace/logs/users/${log.user}.json"
+    fun login(log: LoginByEmail){
+        val pathUser = File("build.gradle").absolutePath.removeSuffix("build.gradle") + "/src/main/kotlin/br/meetingplace/logs/users/${log.email}.json"
         val pathLogged = File("build.gradle").absolutePath.removeSuffix("build.gradle") + "/src/main/kotlin/br/meetingplace/logs/logged.json"
 
         val fileUser = File(pathUser).exists()
         val fileLog = File(pathLogged).exists()
 
         if(fileUser && fileLog){
-            val user = readUser(log.user)
+            val user = readUser(log.email)
             val loggedFile = readLoggedUser()
-            if(log.password == user.getPassword() && loggedFile.user == "")
+            if(log.password == user.getPassword() && loggedFile.email == "")
                 writeLoggedUser(log)
         }
         else if (fileUser && !fileLog){
-            val user = readUser(log.user)
+            val user = readUser(log.email)
             if(log.password == user.getPassword())
                 writeLoggedUser(log)
         }
@@ -41,14 +41,11 @@ open class GeneralManagement private constructor(): ReadFile, WriteFile,Generato
         if(fileLog){
 
             val log = readLoggedUser()
-            if(log.user != ""){
-                println("Here")
-                log.user = ""
+            if(log.email != ""){
+                log.email = ""
                 log.password = ""
                 writeLoggedUser(log)
-                println("Done")
             }
-
         }
     }
     //AUTHENTICATION SYSTEM

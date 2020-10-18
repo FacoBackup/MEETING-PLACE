@@ -2,7 +2,8 @@ package br.meetingplace.management.entities
 
 import br.meetingplace.data.PasswordOperations
 import br.meetingplace.data.entities.group.UserMember
-import br.meetingplace.data.startup.LoginById
+import br.meetingplace.data.startup.LoginByEmail
+
 import br.meetingplace.data.startup.UserData
 import br.meetingplace.entities.user.User
 import br.meetingplace.interfaces.*
@@ -10,28 +11,23 @@ import br.meetingplace.management.GeneralManagement
 import br.meetingplace.management.servicies.ThreadManagement
 import br.meetingplace.servicies.chat.Chat
 import br.meetingplace.servicies.conversationThread.MainThread
-import java.io.File
 
 class UserManagement: ReadFile, WriteFile, Refresh, Generator, Path{
 
     fun createUser(newUser: UserData){
-        val log = refreshData()
-        val management = log.user
-
+        val management = readLoggedUser().email
         val user = User(newUser.realName, newUser.age, newUser.email, newUser.password)
 
-        if(user.getId() == "" && management == "" && user.getEmail() != ""){
-            user.startUser(generateId())
-            writeUser(user.getId(),user)
-            val login = LoginById(user.getId(), user.getPassword())
-            GeneralManagement.getManagement().loginId(login)
+        if(!verifyPath("users", user.getEmail()) && management == "" && user.getEmail() != ""){
+            writeUser(user.getEmail(),user)
+            val login = LoginByEmail(user.getEmail(), user.getPassword())
+            GeneralManagement.getManagement().login(login)
         }
     }
 
     fun deleteUser(operation: PasswordOperations){
-        val log = refreshData()
-        val management = log.user
-        val cachedPass = log.password
+        val management = readLoggedUser().email
+        val cachedPass = readLoggedUser().password
 
 
 
@@ -44,7 +40,7 @@ class UserManagement: ReadFile, WriteFile, Refresh, Generator, Path{
 //                if(fileFollower) {
 //                    val following = readUser(user.social.following[i])
 //                    following.social.following.remove(management)
-//                    writeUser(following.getId(), following)
+//                    writeUser(following.getEmail(), following)
 //                }
 //            }
 //
@@ -53,12 +49,12 @@ class UserManagement: ReadFile, WriteFile, Refresh, Generator, Path{
 //                if(fileFollowing){
 //                    val follower = readUser(user.social.following[i])
 //                    follower.social.followers.remove(management)
-//                    writeUser(follower.getId(),follower)
+//                    writeUser(follower.getEmail(),follower)
 //                }
 //            }
         /*
             for(i in 0 until groupList.size){
-                member = UserMember(management,groupList[i].getId())
+                member = UserMember(management,groupList[i].getEmail())
                 removeMember(member) // should use an override here
             }
 
@@ -70,8 +66,7 @@ class UserManagement: ReadFile, WriteFile, Refresh, Generator, Path{
     }
 
     fun getMyProfile(): User {
-        val log = refreshData()
-        val management = log.user
+        val management = readLoggedUser().email
         val nullUser = User("", -1, "", "")
         return if(verifyPath("users",management))
             readUser(management)
@@ -79,8 +74,7 @@ class UserManagement: ReadFile, WriteFile, Refresh, Generator, Path{
     }
 
     fun getMyChats(): MutableList<Chat> {
-        val log = refreshData()
-        val management = log.user
+        val management = readLoggedUser().email
 
         val chats = mutableListOf<Chat>()
         if( verifyPath("users",management)){
@@ -99,18 +93,14 @@ class UserManagement: ReadFile, WriteFile, Refresh, Generator, Path{
     }
 
     fun getMyThreads(): MutableList<MainThread> {
-        val log = refreshData()
-        val management = log.user
-
-
+        val management = readLoggedUser().email
         val myThreads = mutableListOf<MainThread>()
 
-        if( verifyPath("users",management) && management != ""){
+        if(verifyPath("users",management) && management != ""){
             val user = readUser(management)
             val myThreadsIds = user.social.getMyThreads()
 
             for (i in 0 until myThreadsIds.size){
-
                 if (verifyPath("threads",myThreadsIds[i])){
                     val thread = readThread(myThreadsIds[i])
                     myThreads.add(thread)
@@ -122,15 +112,13 @@ class UserManagement: ReadFile, WriteFile, Refresh, Generator, Path{
     }
 
     fun getMyTimeline(): MutableList<MainThread> {
-        val log = refreshData()
-        val management = log.user
-
+        val management = readLoggedUser().email
 
         val myTimeline = mutableListOf<MainThread>()
 
         if( verifyPath("users",management) && management != "") {
             val user = readUser(management)
-            val followingIds = user.social.following
+            val followingIds = user.social.getFollowing()
 
             for (i in 0 until followingIds.size){
                 if( verifyPath("users",followingIds[i])){
@@ -151,5 +139,5 @@ class UserManagement: ReadFile, WriteFile, Refresh, Generator, Path{
         return myTimeline
     }
 
-    fun getLoggedUser()= refreshData().user
+    fun getLoggedUser()= refreshData().email
 }

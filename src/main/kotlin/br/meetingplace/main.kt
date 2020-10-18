@@ -3,28 +3,20 @@ package br.meetingplace
 import br.meetingplace.data.*
 import br.meetingplace.data.conversation.ChatContent
 import br.meetingplace.data.conversation.ChatFullContent
-import br.meetingplace.data.conversation.GroupChatContent
 import br.meetingplace.data.conversation.operations.ChatOperations
 import br.meetingplace.data.threads.SubThreadContent
 import br.meetingplace.data.threads.operations.SubThreadOperations
 import br.meetingplace.data.threads.ThreadContent
 import br.meetingplace.data.threads.operations.ThreadOperations
 import br.meetingplace.data.entities.user.Follower
-import br.meetingplace.data.startup.LoginById
-import br.meetingplace.data.entities.group.UserMember
 import br.meetingplace.data.startup.LoginByEmail
 import br.meetingplace.data.startup.SocialProfileData
 import br.meetingplace.data.startup.UserData
-import br.meetingplace.entities.groups.Group
-import br.meetingplace.entities.user.User
-import br.meetingplace.entities.user.profiles.SocialProfile
-import br.meetingplace.interfaces.Refresh
 import br.meetingplace.management.GeneralManagement
 import br.meetingplace.management.entities.ProfileManagement
 import br.meetingplace.management.entities.UserManagement
 import br.meetingplace.management.servicies.ChatManagement
 import br.meetingplace.management.servicies.ThreadManagement
-
 import io.ktor.application.*
 import io.ktor.features.*
 import io.ktor.gson.*
@@ -70,8 +62,8 @@ fun main (){
             }
 
             post("/user/loginId"){
-                val user = call.receive<LoginById>()
-                call.respond(LogSystem.loginId(user))
+                val user = call.receive<LoginByEmail>()
+                call.respond(LogSystem.login(user))
             }
 
             post("/user/logoff"){
@@ -121,6 +113,10 @@ fun main (){
             post("/user/unFavorite/message"){
                 val chat = call.receive<ChatOperations>()
                 call.respond(ChatSystem.unFavoriteMessage(chat))
+            }
+            post("/user/share/message"){
+                val chat = call.receive<ChatFullContent>()
+                call.respond(ChatSystem.shareMessage(chat))
             }
             //MESSAGES
 

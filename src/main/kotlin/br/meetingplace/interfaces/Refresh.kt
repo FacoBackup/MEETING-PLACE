@@ -1,9 +1,9 @@
 package br.meetingplace.interfaces
 
-import br.meetingplace.data.startup.LoginById
+import br.meetingplace.data.startup.LoginByEmail
 
 interface Refresh:ReadFile {
-    fun refreshData(): LoginById {
+    fun refreshData(): LoginByEmail {
         return readLoggedUser()
     }
 }

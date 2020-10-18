@@ -10,26 +10,49 @@ class SocialProfile(
 
     private var myThreads = mutableListOf<String>()
     private var myChats = mutableListOf<String>()
-    var followers = mutableListOf<String>()
-    var following = mutableListOf<String>()
+    private var followers = mutableListOf<String>()
+    private var following = mutableListOf<String>()
     private var inbox = mutableListOf<Inbox>()
     //private var groups = mutableListOf<String>()
     //UPDATE
+
+    fun updateFollowers(userEmail: String, remove: Boolean){
+        when (remove){
+            true ->{
+                if (userEmail in followers)
+                    followers.remove(userEmail)
+            }
+            false->{
+                if (userEmail !in followers)
+                    followers.add(userEmail)
+            }
+        }
+
+    }
+    fun updateFollowing(userEmail: String, remove: Boolean){
+        when (remove){
+            true ->{
+                if (userEmail in following)
+                    following.remove(userEmail)
+            }
+            false->{
+                if (userEmail !in following)
+                    following.add(userEmail)
+            }
+        }
+    }
     fun updateAbout(newAbout: String){
         about = newAbout
     }
     fun updateInbox(notification: Inbox){
         inbox.add(notification)
     }
-
     fun updateMyChats (id: String) {
-        println(userName)
         if (id !in myChats)
             myChats.add(id)
     }
-
-    fun updateMyThreads (id: String, operation: Boolean) {
-        when(operation){
+    fun updateMyThreads (id: String, add: Boolean) {
+        when(add){
             true-> {
                 if (id !in myThreads)
                     myThreads.add(id)
@@ -44,6 +67,8 @@ class SocialProfile(
     //UPDATE
 
     //GETTERS
+    fun getFollowing() = following
+    fun getFollowers() = followers
     fun getMyChats () = myChats
     fun getMyThreads () = myThreads
     fun getUserName() = userName

@@ -2,12 +2,12 @@ package br.meetingplace.servicies.chat
 
 import br.meetingplace.data.conversation.operations.ChatOperations
 import br.meetingplace.data.conversation.ChatFullContent
+import br.meetingplace.interfaces.Refresh
 
 class Chat(
     private var conversationId: String,
     private var owners: List<String>
-){
-
+): Refresh{
     private var conversation = mutableListOf<Message>()
     private var idMessages= mutableListOf<String>()
     private var favoriteMessagesIds= mutableListOf<String>()
@@ -23,11 +23,12 @@ class Chat(
 
         if(message.idMessage in idMessages){
             val indexMessage = getMessageIndex(message.idMessage)
-            conversation.remove(conversation[indexMessage])
-            idMessages.remove(message.idMessage)
-
-            if(message.idMessage in favoriteMessagesIds)
-                unFavoriteMessage(message)
+            if(refreshData().email == conversation[indexMessage].creator){
+                conversation.remove(conversation[indexMessage])
+                idMessages.remove(message.idMessage)
+                if(message.idMessage in favoriteMessagesIds)
+                    unFavoriteMessage(message)
+            }
         }
     }
 
@@ -45,7 +46,7 @@ class Chat(
         val indexMessage = getMessageIndex(message.idMessage)
         if(message.idNewMessage !in idMessages && indexMessage != -1 && message.idMessage in idMessages){
             message.message = "|${conversation[indexMessage].message}|  "+ message.message
-            val newMessage = Message(message.message, message.idNewMessage,true)
+            val newMessage = Message(message.message, message.idNewMessage,refreshData().email, true)
             println("LEVEL 3")
             addMessage(newMessage)
         }

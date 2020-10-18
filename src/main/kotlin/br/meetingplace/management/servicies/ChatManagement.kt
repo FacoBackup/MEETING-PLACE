@@ -17,15 +17,13 @@ class ChatManagement private constructor(): ReadFile, WriteFile, Refresh, br.mee
     }
 
     fun sendMessage(content: ChatContent){
-        val log = refreshData()
-        val management = log.user
+        val management = readLoggedUser().email
 
         val idChat = getChatId(management, content.receiverId)
         if( verifyPath("users",management) &&  verifyPath("users",content.receiverId) && management != "" && content.receiverId != management && verifyUserSocialProfile(management)) {
 
             val user = readUser(management)
             val receiver = readUser(content.receiverId)
-            println(receiver.social.getUserName())
 
 
             if (!verifyPath("chats",idChat)) { // the conversation doesn't exist
@@ -33,7 +31,7 @@ class ChatManagement private constructor(): ReadFile, WriteFile, Refresh, br.mee
                 val newChat = Chat(idChat,listOf(management, content.receiverId))
 
                 content.message = content.message + user.social.getUserName()
-                val msg = Message(content.message, generateId(), true)
+                val msg = Message(content.message, generateId(), management,true)
                 newChat.addMessage(msg)
 
 
@@ -42,12 +40,12 @@ class ChatManagement private constructor(): ReadFile, WriteFile, Refresh, br.mee
                 receiver.social.updateInbox(notification)
 
                 writeChat(idChat,newChat)
-                writeUser(user.getId(), user)
-                writeUser(receiver.getId(), receiver)
+                writeUser(user.getEmail(), user)
+                writeUser(receiver.getEmail(), receiver)
             }
             else{ //the conversation exists
                 content.message = content.message + user.social.getUserName()
-                val msg = Message(content.message, generateId(), content.static)
+                val msg = Message(content.message, generateId(), management,true)
                 val notification = Inbox("${user.social.getUserName()} sent a new message.", "Message.")
                 val chat = readChat(idChat)
 
@@ -57,17 +55,15 @@ class ChatManagement private constructor(): ReadFile, WriteFile, Refresh, br.mee
                 receiver.social.updateMyChats(idChat)
                 receiver.social.updateInbox(notification)
                 user.social.updateMyChats(idChat)
-                writeUser(user.getId(), user)
-                writeUser(receiver.getId(), receiver)
+                writeUser(user.getEmail(), user)
+                writeUser(receiver.getEmail(), receiver)
 
             }
         }
     }
 
     fun deleteMessage(message: ChatOperations){
-        val log = refreshData()
-        val management = log.user
-
+        val management = readLoggedUser().email
         if (verifyPath("users",management) && verifyPath("users",message.receiverId) && management != ""
                 && verifyUserSocialProfile(management) && message.receiverId != management){
 
@@ -79,15 +75,14 @@ class ChatManagement private constructor(): ReadFile, WriteFile, Refresh, br.mee
                 val chat = readChat(idChat)
                 chat.deleteMessage(message)
                 writeChat(idChat,chat)
-                writeUser(user.getId(), user)
-                writeUser(receiver.getId(), receiver)
+                writeUser(user.getEmail(), user)
+                writeUser(receiver.getEmail(), receiver)
             }
         }
     }
 
     fun favoriteMessage(message: ChatOperations){
-        val log = refreshData()
-        val management = log.user
+        val management = readLoggedUser().email
 
         if( verifyPath("users",management) &&  verifyPath("users",message.receiverId) && management != ""  && verifyUserSocialProfile(management)
                 && message.receiverId != management){
@@ -99,15 +94,14 @@ class ChatManagement private constructor(): ReadFile, WriteFile, Refresh, br.mee
                 val chat = readChat(idChat)
                 chat.favoriteMessage(message)
                 writeChat(idChat,chat)
-                writeUser(user.getId(), user)
-                writeUser(receiver.getId(), receiver)
+                writeUser(user.getEmail(), user)
+                writeUser(receiver.getEmail(), receiver)
             }
         }
     }
 
    fun unFavoriteMessage(message: ChatOperations){
-       val log = refreshData()
-       val management = log.user
+       val management = readLoggedUser().email
 
         if( verifyPath("users",management) &&  verifyPath("users",message.receiverId) && management !=  ""
                 && verifyUserSocialProfile(management) && message.receiverId != management){
@@ -120,14 +114,13 @@ class ChatManagement private constructor(): ReadFile, WriteFile, Refresh, br.mee
                 val chat = readChat(idChat)
                 chat.unFavoriteMessage(message)
                 writeChat(idChat,chat)
-                writeUser(user.getId(), user)
-                writeUser(receiver.getId(), receiver)
+                writeUser(user.getEmail(), user)
+                writeUser(receiver.getEmail(), receiver)
             }
         }
    }
     fun quoteMessage(message: ChatFullContent){
-        val log = refreshData()
-        val management = log.user
+        val management = readLoggedUser().email
 
         if( verifyPath("users",management) &&  verifyPath("users",message.receiverId) && management !=  ""
                 && verifyUserSocialProfile(management) && message.receiverId!= management){
@@ -142,31 +135,28 @@ class ChatManagement private constructor(): ReadFile, WriteFile, Refresh, br.mee
                 val chat = readChat(idChat)
                 chat.quoteMessage(message)
                 writeChat(idChat,chat)
-                writeUser(user.getId(), user)
-                writeUser(receiver.getId(), receiver)
+                writeUser(user.getEmail(), user)
+                writeUser(receiver.getEmail(), receiver)
             }
         }
     }
 
-    /*
-    override fun shareMessage(content: ChatFullContent){ //NEEDS WORK
+    fun shareMessage(content: ChatFullContent){ //NEEDS WORK
+        val management = readLoggedUser().email
 
-        val fileUser = File("$management.json").exists()
-        if(fileUser && management !=  ""  && verifyUserSocialProfile(management) && content.receiverId!= management){
+        val idChat = management + content.receiverId
 
-            val user = readUser(management)
-            val idChat = management + content.receiverId
+        if( verifyPath("users", management) && management !=  "" &&  verifyPath("users", content.receiverId) && verifyUserSocialProfile(management)
+                && content.receiverId!= management && verifyPath("chats", idChat)){
+
             val operation = ChatOperations(content.idMessage, content.receiverId)
-            val message = user.social.shareMessage(operation, idChat)
+            val chat = readChat(idChat)
+            val message = chat.shareMessage(operation)
 
-            if(message != ""){
-                val sharedMessage = ChatContent(content.message, content.receiverId,true)
+            if(message != "" && content.receiverId !in chat.getOwners()){
+                val sharedMessage = ChatContent(message, content.receiverId,true)
                 sendMessage(sharedMessage)
             }
         }
     }
-
-     */
-
-
 }

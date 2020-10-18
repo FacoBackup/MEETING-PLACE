@@ -20,8 +20,7 @@ class ThreadManagement private constructor(): ReadFile, WriteFile,DeleteFile,Ref
     }
 
     fun deleteAllThreadsFromUserId(){
-        val log = refreshData()
-        val management = log.user
+        val management = readLoggedUser().email
 
         if(verifyPath("user",management) && management != "" && verifyUserSocialProfile(management)){
 
@@ -38,8 +37,7 @@ class ThreadManagement private constructor(): ReadFile, WriteFile,DeleteFile,Ref
 
     //MAINTHREAD CRUD OPERATIONS
     fun createMainThread(content: ThreadContent){
-        val log = refreshData()
-        val management = log.user
+        val management = readLoggedUser().email
 
         if(verifyPath("users",management) && management != "" && verifyUserSocialProfile(management)){
             val thread = MainThread()
@@ -48,13 +46,12 @@ class ThreadManagement private constructor(): ReadFile, WriteFile,DeleteFile,Ref
             thread.startThread(content,generateId(), user.social.getUserName(), management)
             writeThread(thread.getId(), thread)
             user.social.updateMyThreads(thread.getId(),true)
-            writeUser(user.getId(),user)
+            writeUser(user.getEmail(),user)
         }
     } //CREATE
 
     fun readMainThread(operations: SubThreadOperations){ //READ
-        val log = refreshData()
-        val management = log.user
+        val management = readLoggedUser().email
         if(verifyPath("users",management) && verifyPath("threads",operations.idMainThread)
                 && management != "" && verifyUserSocialProfile(management)){
 
@@ -66,8 +63,7 @@ class ThreadManagement private constructor(): ReadFile, WriteFile,DeleteFile,Ref
 
     //UPDATE
     fun likeThread(like: ThreadOperations){
-        val log = refreshData()
-        val management = log.user
+        val management = readLoggedUser().email
 
         if(verifyPath("users",management) && verifyPath("threads",like.idThread)
                 && management != "" && verifyUserSocialProfile(management)) {
@@ -105,9 +101,7 @@ class ThreadManagement private constructor(): ReadFile, WriteFile,DeleteFile,Ref
 
     // 1 -> LIKE; 2 -> DISLIKE
     fun dislikeThread(dislike: ThreadOperations) {
-        val log = refreshData()
-        val management = log.user
-
+        val management = readLoggedUser().email
         if(verifyPath("users",management) && verifyPath("threads",dislike.idThread)
                 && management != "" && verifyUserSocialProfile(management)) {
 
@@ -130,8 +124,7 @@ class ThreadManagement private constructor(): ReadFile, WriteFile,DeleteFile,Ref
     //UPDATE
 
     fun deleteThread(operations: ThreadOperations){//DELETE
-        val log = refreshData()
-        val management = log.user
+        val management = readLoggedUser().email
 
         if(verifyPath("users",management) && verifyPath("threads",operations.idThread)
                 && management != "" && verifyUserSocialProfile(management)){
@@ -139,7 +132,7 @@ class ThreadManagement private constructor(): ReadFile, WriteFile,DeleteFile,Ref
             val user = readUser(management)
             delete(File("${operations.idThread}.json"))
             user.social.updateMyThreads(operations.idThread,false) //FALSE IS TO REMOVE THREAD
-            writeUser(user.getId(), user)
+            writeUser(user.getEmail(), user)
         }
     }
     //MAINTHREAD CRUD OPERATIONS
@@ -147,8 +140,7 @@ class ThreadManagement private constructor(): ReadFile, WriteFile,DeleteFile,Ref
 
     //SUBTHREAD CRUD OPERATIONS
     fun createSubThread(subThreadData: SubThreadContent){ // CREATE
-        val log = refreshData()
-        val management = log.user
+        val management = readLoggedUser().email
         if(verifyPath("users",management) && verifyPath("threads",subThreadData.idThread)
                 && management != "" && verifyUserSocialProfile(management)){
 
@@ -164,9 +156,7 @@ class ThreadManagement private constructor(): ReadFile, WriteFile,DeleteFile,Ref
 
     //UPDATE
     fun dislikeSubThread(dislike: SubThreadOperations) {
-        val log = refreshData()
-        val management = log.user
-
+        val management = readLoggedUser().email
 
         if(verifyPath("users",management) && verifyPath("threads",dislike.idMainThread)
                 && management != "" && verifyUserSocialProfile(management)){
@@ -188,9 +178,7 @@ class ThreadManagement private constructor(): ReadFile, WriteFile,DeleteFile,Ref
     }
 
     fun likeSubThread(like: SubThreadOperations){
-        val log = refreshData()
-        val management = log.user
-
+        val management = readLoggedUser().email
         if(verifyPath("users",management) && verifyPath("threads",like.idMainThread)
                 && management != "" && verifyUserSocialProfile(management)){
             val user = readUser(management)
@@ -203,17 +191,17 @@ class ThreadManagement private constructor(): ReadFile, WriteFile,DeleteFile,Ref
                 val userCreator = readUser(subThread.creator)
                 when (checkLikeDislike(subThread)) {
                     1 -> {
-                        if(user.getId() != userCreator.getId()){
+                        if(user.getEmail() != userCreator.getEmail()){
                             userCreator.social.updateInbox(notification)
-                            writeUser(userCreator.getId(), userCreator)
+                            writeUser(userCreator.getEmail(), userCreator)
                         }
                         thread.dislikeToLikeSubThread(management,like.idSubThread)
                         writeThread(thread.getId(),thread)
                     } // like to dislike
                     2 -> {
-                        if(user.getId() != userCreator.getId()){
+                        if(user.getEmail() != userCreator.getEmail()){
                             userCreator.social.updateInbox(notification)
-                            writeUser(userCreator.getId(), userCreator)
+                            writeUser(userCreator.getEmail(), userCreator)
                         }
                         thread.likeSubThread(management,like.idSubThread)
                         writeThread(thread.getId(),thread)
@@ -225,8 +213,7 @@ class ThreadManagement private constructor(): ReadFile, WriteFile,DeleteFile,Ref
     //UPDATE
 
     fun deleteSubThread(operations: SubThreadOperations){ //DELETE
-        val log = refreshData()
-        val management = log.user
+        val management = readLoggedUser().email
 
         if(verifyPath("users",management) && verifyPath("threads",operations.idMainThread)
                 && management != "" && verifyUserSocialProfile(management)){
@@ -244,7 +231,7 @@ class ThreadManagement private constructor(): ReadFile, WriteFile,DeleteFile,Ref
 
     private fun checkLikeDislike(thread: MainThread): Int {// IF TRUE THE USER ALREADY LIKED OR DISLIKED THE THREAD
         val log = refreshData()
-        return when (log.user) {
+        return when (log.email) {
             in thread.getLikes() // 0 ALREADY LIKED
             -> 0
             in thread.getDislikes() // 1 ALREADY DISLIKED
@@ -255,7 +242,7 @@ class ThreadManagement private constructor(): ReadFile, WriteFile,DeleteFile,Ref
 
     private fun checkLikeDislike(thread: SubThread): Int {// IF TRUE THE USER ALREADY LIKED OR DISLIKED THE THREAD
         val log = refreshData()
-        val management = log.user
+        val management = log.email
         return if(thread.id != ""){
             when (management) {
                 in thread.likes // 0 ALREADY LIKED

@@ -1,6 +1,6 @@
 package br.meetingplace.interfaces
 
-import br.meetingplace.data.startup.LoginById
+import br.meetingplace.data.startup.LoginByEmail
 import br.meetingplace.entities.groups.Group
 import br.meetingplace.entities.user.User
 import br.meetingplace.servicies.chat.Chat
@@ -9,7 +9,7 @@ import com.google.gson.GsonBuilder
 import java.io.File
 
 interface WriteFile {
-    fun writeLoggedUser(data: LoginById){
+    fun writeLoggedUser(data: LoginByEmail){
         val path = File("build.gradle").absolutePath.removeSuffix("build.gradle") + "/src/main/kotlin/br/meetingplace/logs/logged.json"
         val gson = GsonBuilder().setPrettyPrinting().create()
         val file= File(path)

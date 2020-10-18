@@ -1,6 +1,7 @@
 package br.meetingplace.interfaces
 
-import br.meetingplace.data.startup.LoginById
+import br.meetingplace.data.startup.LoginByEmail
+
 import br.meetingplace.entities.groups.Group
 import br.meetingplace.entities.user.User
 import br.meetingplace.servicies.chat.Chat
@@ -44,15 +45,15 @@ interface ReadFile {
         val inputString = bufferedReader.use{ it.readText()}
         return gson.fromJson(inputString, Chat::class.java)
     }
-    fun readLoggedUser(): LoginById {
+    fun readLoggedUser(): LoginByEmail {
         val path = File("build.gradle").absolutePath.removeSuffix("build.gradle") + "/src/main/kotlin/br/meetingplace/logs/logged.json"
         val gson = GsonBuilder().setPrettyPrinting().create()
         val file = File(path)
-        val nullLog = LoginById("", "")
+        val nullLog = LoginByEmail("", "")
         if(file.exists()){
             val bufferedReader = file.bufferedReader()
             val inputString = bufferedReader.use{ it.readText()}
-            return gson.fromJson(inputString, LoginById::class.java)
+            return gson.fromJson(inputString, LoginByEmail::class.java)
         }
         return nullLog
     }

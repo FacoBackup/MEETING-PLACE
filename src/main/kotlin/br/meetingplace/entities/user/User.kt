@@ -9,24 +9,17 @@ open class User(
     private var email: String,
     private var password: String){
 
-    private var id = ""
-
     var social =  SocialProfile("", "", "", "") //initializes as a null profile
     val professional = ProfessionalProfile()
 
     //Setters
-    fun startUser (new: String){
-        if(id == "")
-            id = new
-    }
-
     fun createSocialProfile(profile: SocialProfile){ // overrides the null profile
-        if(age >= 16 && id != "" && social.getUserName() == "")
+        if(age >= 16 && email != "" && social.getUserName() == "")
             social = profile
     }
 
     fun professionalProfile(profile: ProfessionalProfile){
-        if(age >= 18 && id != ""){
+        if(age >= 18 && email != ""){
             /*
             professional.userName = profile.userName
             professional.about = profile.about
@@ -38,10 +31,6 @@ open class User(
     //Setters
 
     //Update
-    fun changeEmail(new: String) {//NEEDS WORK HERE
-        email = new
-    }
-
     fun changePass(oldPass: String, newPass: String){ //NEEDS WORK HERE
         if(oldPass == password && newPass != password)
             password = newPass
@@ -49,8 +38,6 @@ open class User(
     //Update
 
     //Getters
-    fun getId() = id
-
     fun getPassword() = password
 
     fun getEmail() = email

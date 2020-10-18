@@ -5,8 +5,7 @@ import br.meetingplace.interfaces.WriteFile
 
 class GroupManagement: ReadFile, WriteFile{
 
-    private val log = readLoggedUser()
-    private val management = log.user
+    val management = readLoggedUser().email
 
 /*
     fun createGroup(group: Group){

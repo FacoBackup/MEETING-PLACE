@@ -14,8 +14,7 @@ class ProfileManagement private constructor(): ReadFile, WriteFile, Refresh,Path
         fun getManagement () = management
     }
     fun createSocialProfile(newProfile: SocialProfileData){
-        val log = refreshData()
-        val management = log.user
+        val management = readLoggedUser().email
 
         if(management != "" && verifyPath("users",management)){
             val user = readUser(management)
@@ -35,19 +34,18 @@ class ProfileManagement private constructor(): ReadFile, WriteFile, Refresh,Path
  */
 
     fun follow(data: Follower){
-        val log = refreshData()
-        val management = log.user
+        val management = readLoggedUser().email
 
         if(management != "" && verifyPath("users",management) && verifyPath("users",data.external)){
+        println("Starting")
             val user = readUser(management)
             val external = readUser(data.external)
             val notification = Inbox("${user.social.getUserName()} is now following you.", "New follower.")
-
-            if(verifyFollower(data)){ // verifies if the user you want to follow exists
+            if(!verifyFollower(data)){ // verifies if the user you want to follow exists
+                println("step2")
                 external.social.updateInbox(notification)
-                external.social.followers.add(management)
-                user.social.following.add(data.external)
-
+                external.social.updateFollowers(management,false)
+                user.social.updateFollowing(data.external,false)
                 writeUser(management,user)
                 writeUser(data.external,external)
             }
@@ -55,16 +53,15 @@ class ProfileManagement private constructor(): ReadFile, WriteFile, Refresh,Path
     }
 
     fun unfollow(data: Follower){
-        val log = refreshData()
-        val management = log.user
+        val management = readLoggedUser().email
 
         if(management != "" && verifyPath("users",management) && verifyPath("users",data.external)){
 
             val user = readUser(management)
             val external = readUser(data.external)
 
-            user.social.following.remove(data.external)
-            external.social.followers.remove(management)
+            user.social.updateFollowing(data.external,true)
+            external.social.updateFollowers(management,true)
 
             writeUser(management,user)
             writeUser(data.external,external)
