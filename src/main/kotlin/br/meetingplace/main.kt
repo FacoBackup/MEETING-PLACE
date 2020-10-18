@@ -1,22 +1,19 @@
 package br.meetingplace
 
 import br.meetingplace.data.*
-import br.meetingplace.data.conversation.ChatContent
-import br.meetingplace.data.conversation.ChatFullContent
-import br.meetingplace.data.conversation.operations.ChatOperations
-import br.meetingplace.data.threads.SubThreadContent
-import br.meetingplace.data.threads.operations.SubThreadOperations
-import br.meetingplace.data.threads.ThreadContent
-import br.meetingplace.data.threads.operations.ThreadOperations
-import br.meetingplace.data.entities.user.Follower
-import br.meetingplace.data.startup.LoginByEmail
-import br.meetingplace.data.startup.SocialProfileData
-import br.meetingplace.data.startup.UserData
-import br.meetingplace.management.GeneralManagement
-import br.meetingplace.management.entities.ProfileManagement
-import br.meetingplace.management.entities.UserManagement
-import br.meetingplace.management.servicies.ChatManagement
-import br.meetingplace.management.servicies.ThreadManagement
+import br.meetingplace.data.chat.users.ChatNewMessage
+import br.meetingplace.data.chat.users.ChatFullContent
+import br.meetingplace.data.chat.users.ChatOperations
+import br.meetingplace.data.threads.subThread.SubThreadContent
+import br.meetingplace.data.threads.subThread.SubThreadOperations
+import br.meetingplace.data.threads.mainThread.ThreadContent
+import br.meetingplace.data.threads.mainThread.ThreadOperations
+import br.meetingplace.data.user.Follower
+import br.meetingplace.data.user.LoginByEmail
+import br.meetingplace.data.user.SocialProfileData
+import br.meetingplace.data.user.UserData
+import br.meetingplace.interfaces.utility.Refresh
+import br.meetingplace.management.Core
 import io.ktor.application.*
 import io.ktor.features.*
 import io.ktor.gson.*
@@ -26,13 +23,7 @@ import io.ktor.routing.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 
-
-val LogSystem = GeneralManagement.getManagement()
-val UserSystem = UserManagement()
-val ProfileSystem = ProfileManagement.getManagement()
-val ThreadSystem = ThreadManagement.getManagement()
-val ChatSystem = ChatManagement.getManagement()
-
+val core = Core()
 fun main (){
 
     embeddedServer(Netty, 3000) {
@@ -44,143 +35,143 @@ fun main (){
             }
 
             get("/user"){
-                call.respond(UserSystem.getMyProfile())
+                call.respond(core.getMyProfile())
             }
 
             get("/logged") {
-                call.respond(UserSystem.getLoggedUser())
+                call.respond(core.readLoggedUser().email)
             }
 
             post("/user/create"){
                 val user = call.receive<UserData>()
-                call.respond(UserSystem.createUser(user))
+                call.respond(core.createUser(user))
             }
 
             post("/user/delete"){
                 val user = call.receive<PasswordOperations>()
-                call.respond(UserSystem.deleteUser(user))
+                call.respond(core.deleteUser(user))
             }
 
             post("/user/loginId"){
                 val user = call.receive<LoginByEmail>()
-                call.respond(LogSystem.login(user))
+                call.respond(core.login(user))
             }
 
             post("/user/logoff"){
-                call.respond(LogSystem.logoff())
+                call.respond(core.logout())
             }
 
             post("/user/create/social"){
                 val user = call.receive<SocialProfileData>()
-                call.respond(ProfileSystem.createSocialProfile(user))
+                call.respond(core.createSocialProfile(user))
             }
 //            post("/user/create/professional"){
 //                val user = call.receive<ProfessionalProfile>()
-//                call.respond(UserSystem.createProfessionalProfile(user))
+//                call.respond(core.createProfessionalProfile(user))
 //            }
             post("/user/follow"){
                 val follow = call.receive<Follower>()
-                call.respond(ProfileSystem.follow(follow))
+                call.respond(core.follow(follow))
             }
             post("/user/unfollow"){
                 val follow = call.receive<Follower>()
-                call.respond(ProfileSystem.unfollow(follow))
+                call.respond(core.unfollow(follow))
             }
 
             //MESSAGES
             get("/messages") {
-                call.respond(UserSystem.getMyChats())
+                call.respond(core.getMyChats())
             }
             post("/user/message"){
-                val chat = call.receive<ChatContent>()
-                call.respond(ChatSystem.sendMessage(chat))
+                val chat = call.receive<ChatNewMessage>()
+                call.respond(core.sendMessage(chat))
             }
             post("/user/delete/message"){
                 val chat = call.receive<ChatOperations>()
-                call.respond(ChatSystem.deleteMessage(chat))
+                call.respond(core.deleteMessage(chat))
             }
             post("/user/quote/message"){
                 val chat = call.receive<ChatFullContent>()
-                call.respond(ChatSystem.quoteMessage(chat))
+                call.respond(core.quoteMessage(chat))
             }
             post("/user/favorite/message"){
                 val chat = call.receive<ChatOperations>()
-                call.respond(ChatSystem.favoriteMessage(chat))
+                call.respond(core.favoriteMessage(chat))
             }
             post("/user/unFavorite/message"){
                 val chat = call.receive<ChatOperations>()
-                call.respond(ChatSystem.unFavoriteMessage(chat))
+                call.respond(core.unFavoriteMessage(chat))
             }
             post("/user/share/message"){
                 val chat = call.receive<ChatFullContent>()
-                call.respond(ChatSystem.shareMessage(chat))
+                call.respond(core.shareMessage(chat))
             }
             //MESSAGES
 
 //            THREADS
             get("/user/see/threads"){
-                call.respond(UserSystem.getMyThreads())
+                call.respond(core.getMyThreads())
             }
             get("/user/see/timeline"){
-                call.respond(UserSystem.getMyTimeline())
+                call.respond(core.getMyTimeline())
             }
 
             post("/user/thread"){
                 val new = call.receive<ThreadContent>()
-                call.respond(ThreadSystem.createMainThread(new))
+                call.respond(core.createMainThread(new))
             }
             post("/user/subthread"){
                 val content = call.receive<SubThreadContent>()
-                call.respond(ThreadSystem.createSubThread(content))
+                call.respond(core.createSubThread(content))
             }
             post("/user/delete/subthread"){
                 val content = call.receive<SubThreadOperations>()
-                call.respond(ThreadSystem.deleteSubThread(content))
+                call.respond(core.deleteSubThread(content))
             }
             post("/user/like"){
                 val post = call.receive<ThreadOperations>()
-                call.respond(ThreadSystem.likeThread(post))
+                call.respond(core.likeThread(post))
             }
 
             post("/user/dislike"){
                 val post = call.receive<ThreadOperations>()
-                call.respond(ThreadSystem.dislikeThread(post))
+                call.respond(core.dislikeThread(post))
             }
 
             post("/user/like/sub"){
                 val post = call.receive<SubThreadOperations>()
-                call.respond(ThreadSystem.likeSubThread(post))
+                call.respond(core.likeSubThread(post))
             }
             post("/user/dislike/sub"){
                 val post = call.receive<SubThreadOperations>()
-                call.respond(ThreadSystem.dislikeSubThread(post))
+                call.respond(core.dislikeSubThread(post))
             }
             post("/user/delete/thread"){
                 val thread = call.receive<ThreadOperations>()
-                call.respond(ThreadSystem.deleteThread(thread))
+                call.respond(core.deleteThread(thread))
             }
             //THREADS
 
             /*
             //GROUPS
             get("/group"){
-                call.respond(UserSystem.getGroups())
+                call.respond(core.getGroups())
             }
             post("/group/create"){
                 val group = call.receive<Group>()
-                call.respond(UserSystem.createGroup(group))
+                call.respond(core.createGroup(group))
             }
             post("/group/member"){
                 val member = call.receive<UserMember>()
-                call.respond(UserSystem.addMember(member))
+                call.respond(core.addMember(member))
             }
             post("/group/member/remove"){
                 val member = call.receive<UserMember>()
-                call.respond(UserSystem.removeMember(member))
+                call.respond(core.removeMember(member))
             }
             post("/group/message"){
                 val chatGroup = call.receive<GroupChatContent>()
-                call.respond(UserSystem.messengerGroup(chatGroup))
+                call.respond(core.messengerGroup(chatGroup))
             }
             //GROUPS
 

@@ -1,8 +1,8 @@
 package br.meetingplace.interfaces.file
 
-import br.meetingplace.data.startup.LoginByEmail
+import br.meetingplace.data.user.LoginByEmail
 import br.meetingplace.servicies.groups.Group
-import br.meetingplace.entities.user.User
+import br.meetingplace.entitie.User
 import br.meetingplace.servicies.chat.Chat
 import br.meetingplace.servicies.conversationThread.MainThread
 import com.google.gson.GsonBuilder

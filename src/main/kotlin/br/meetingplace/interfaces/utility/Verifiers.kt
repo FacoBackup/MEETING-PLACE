@@ -1,6 +1,6 @@
 package br.meetingplace.interfaces.utility
 
-import br.meetingplace.data.entities.user.Follower
+import br.meetingplace.data.user.Follower
 
 interface Verifiers: Refresh, Path {
 

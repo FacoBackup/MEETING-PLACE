@@ -1,7 +1,7 @@
 package br.meetingplace.servicies.chat
 
-import br.meetingplace.data.conversation.operations.ChatOperations
-import br.meetingplace.data.conversation.ChatFullContent
+import br.meetingplace.data.chat.users.ChatOperations
+import br.meetingplace.data.chat.users.ChatFullContent
 import br.meetingplace.interfaces.utility.Refresh
 
 class Chat(
