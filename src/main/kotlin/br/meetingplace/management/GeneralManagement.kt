@@ -16,34 +16,28 @@ open class GeneralManagement private constructor(): ReadFile, WriteFile,Generato
 
     //AUTHENTICATION SYSTEM
     fun loginId(log: LoginById){
+        val pathUser = File("build.gradle").absolutePath.removeSuffix("build.gradle") + "/src/main/kotlin/br/meetingplace/logs/users/${log.user}.json"
+        val pathLogged = File("build.gradle").absolutePath.removeSuffix("build.gradle") + "/src/main/kotlin/br/meetingplace/logs/logged.json"
 
-        val fileUser = File("${log.user}.json").exists()
-        val fileLog = File("logged.json").exists()
-        println(fileUser)
-        println(log.user)
+        val fileUser = File(pathUser).exists()
+        val fileLog = File(pathLogged).exists()
+
         if(fileUser && fileLog){
             val user = readUser(log.user)
             val loggedFile = readLoggedUser()
-            if(log.password == user.getPassword() && loggedFile.user == ""){
+            if(log.password == user.getPassword() && loggedFile.user == "")
                 writeLoggedUser(log)
-                println("done")
-            }
-
         }
         else if (fileUser && !fileLog){
-
-            println("ELSE if")
             val user = readUser(log.user)
             if(log.password == user.getPassword())
                 writeLoggedUser(log)
         }
-        println("nothing")
     }
 
     fun logoff(){
-
-        val fileLog = File("logged.json").exists()
-        println(fileLog)
+        val path = File("build.gradle").absolutePath.removeSuffix("build.gradle") + "/src/main/kotlin/br/meetingplace/logs/logged.json"
+        val fileLog = File(path).exists()
         if(fileLog){
 
             val log = readLoggedUser()

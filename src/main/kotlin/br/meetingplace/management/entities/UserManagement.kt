@@ -2,19 +2,17 @@ package br.meetingplace.management.entities
 
 import br.meetingplace.data.PasswordOperations
 import br.meetingplace.data.entities.group.UserMember
+import br.meetingplace.data.startup.LoginById
 import br.meetingplace.data.startup.UserData
 import br.meetingplace.entities.user.User
-import br.meetingplace.interfaces.Generator
-import br.meetingplace.interfaces.ReadFile
-import br.meetingplace.interfaces.Refresh
-import br.meetingplace.interfaces.WriteFile
+import br.meetingplace.interfaces.*
 import br.meetingplace.management.GeneralManagement
 import br.meetingplace.management.servicies.ThreadManagement
 import br.meetingplace.servicies.chat.Chat
 import br.meetingplace.servicies.conversationThread.MainThread
 import java.io.File
 
-class UserManagement: ReadFile, WriteFile, Refresh, Generator{
+class UserManagement: ReadFile, WriteFile, Refresh, Generator, Path{
 
     fun createUser(newUser: UserData){
         val log = refreshData()
@@ -25,6 +23,8 @@ class UserManagement: ReadFile, WriteFile, Refresh, Generator{
         if(user.getId() == "" && management == "" && user.getEmail() != ""){
             user.startUser(generateId())
             writeUser(user.getId(),user)
+            val login = LoginById(user.getId(), user.getPassword())
+            GeneralManagement.getManagement().loginId(login)
         }
     }
 
@@ -33,9 +33,9 @@ class UserManagement: ReadFile, WriteFile, Refresh, Generator{
         val management = log.user
         val cachedPass = log.password
 
-        val fileUser = File("$management.json").exists()
 
-        if(management !=  "" && operation.pass == cachedPass && fileUser){
+
+        if(management !=  "" && operation.pass == cachedPass && verifyPath("users",management)){
             val user = readUser(management)
             var member: UserMember
 
@@ -72,9 +72,8 @@ class UserManagement: ReadFile, WriteFile, Refresh, Generator{
     fun getMyProfile(): User {
         val log = refreshData()
         val management = log.user
-        val fileUser = File("$management.json").exists()
         val nullUser = User("", -1, "", "")
-        return if(fileUser)
+        return if(verifyPath("users",management))
             readUser(management)
         else nullUser
     }
@@ -82,15 +81,14 @@ class UserManagement: ReadFile, WriteFile, Refresh, Generator{
     fun getMyChats(): MutableList<Chat> {
         val log = refreshData()
         val management = log.user
-        val fileUser = File("$management.json").exists()
+
         val chats = mutableListOf<Chat>()
-        if(fileUser){
+        if( verifyPath("users",management)){
             val user = readUser(management)
 
             val userChats = user.social.getMyChats()
             for(i in 0 until userChats.size){
-                val fileChat = File("${userChats[i]}.json").exists()
-                if (fileChat){
+                if (verifyPath("chats",userChats[i])){
                     val chat = readChat(userChats[i])
                     chats.add(chat)
                 }
@@ -104,16 +102,16 @@ class UserManagement: ReadFile, WriteFile, Refresh, Generator{
         val log = refreshData()
         val management = log.user
 
-        val fileUser = File("$management.json").exists()
+
         val myThreads = mutableListOf<MainThread>()
 
-        if(fileUser && management != ""){
+        if( verifyPath("users",management) && management != ""){
             val user = readUser(management)
             val myThreadsIds = user.social.getMyThreads()
 
             for (i in 0 until myThreadsIds.size){
-                val fileThread = File("${myThreadsIds[i]}.json").exists()
-                if (fileThread){
+
+                if (verifyPath("threads",myThreadsIds[i])){
                     val thread = readThread(myThreadsIds[i])
                     myThreads.add(thread)
                 }
@@ -127,23 +125,21 @@ class UserManagement: ReadFile, WriteFile, Refresh, Generator{
         val log = refreshData()
         val management = log.user
 
-        val fileUser = File("$management.json").exists()
+
         val myTimeline = mutableListOf<MainThread>()
 
-        if(fileUser && management != "") {
+        if( verifyPath("users",management) && management != "") {
             val user = readUser(management)
             val followingIds = user.social.following
 
             for (i in 0 until followingIds.size){
-                val fileFollowing = File("${followingIds[i]}.json").exists()
-                if(fileFollowing){
+                if( verifyPath("users",followingIds[i])){
 
                     val following = readUser(followingIds[i])
                     val followingThreads = following.social.getMyThreads()
 
                     for (j in 0 until followingThreads.size){
-                        val fileThread = File("${followingThreads[j]}.json").exists()
-                        if (fileThread){
+                        if (verifyPath("threads",followingThreads[j])){
                             val thread = readThread(followingThreads[j])
                             myTimeline.add(thread)
                         }

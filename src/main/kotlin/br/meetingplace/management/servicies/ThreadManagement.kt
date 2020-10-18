@@ -5,7 +5,6 @@ import br.meetingplace.data.threads.operations.SubThreadOperations
 import br.meetingplace.data.threads.ThreadContent
 import br.meetingplace.data.threads.operations.ThreadOperations
 import br.meetingplace.interfaces.*
-import br.meetingplace.management.operations.verifiers.UserVerifiers
 import br.meetingplace.servicies.conversationThread.MainThread
 import br.meetingplace.servicies.conversationThread.SubThread
 import br.meetingplace.servicies.notification.Inbox
@@ -13,9 +12,7 @@ import br.meetingplace.servicies.notification.Inbox
 import java.io.File
 
 
-class ThreadManagement private constructor(): ReadFile, WriteFile,DeleteFile,Refresh,Generator{
-
-    private val verifier = UserVerifiers.getUserVerifier()
+class ThreadManagement private constructor(): ReadFile, WriteFile,DeleteFile,Refresh,Generator, Path, Verifiers{
 
     companion object{
         private val threadManagement = ThreadManagement()
@@ -26,17 +23,15 @@ class ThreadManagement private constructor(): ReadFile, WriteFile,DeleteFile,Ref
         val log = refreshData()
         val management = log.user
 
-        val fileUser = File("$management.json").exists()
-
-        if(fileUser && management != ""){
+        if(verifyPath("user",management) && management != "" && verifyUserSocialProfile(management)){
 
             val user = readUser(management)
             val threads = user.social.getMyThreads()
 
             for(i in 0 until threads.size){
-                val fileThread = File("${threads[i]}.json").exists()
-                if(fileThread)
-                    delete(File("${threads[i]}.json"))
+
+                if(verifyPath("threads",threads[i]))
+                    delete(File("${threads[i]}.json")) //HERE
             }
         }
     }
@@ -45,11 +40,8 @@ class ThreadManagement private constructor(): ReadFile, WriteFile,DeleteFile,Ref
     fun createMainThread(content: ThreadContent){
         val log = refreshData()
         val management = log.user
-        val fileUser = File("$management.json").exists()
-        println(fileUser)
-        println(verifier.verifyUserSocialProfile(management))
-        if(fileUser && management != "" && verifier.verifyUserSocialProfile(management)){
-            println("Creating thread")
+
+        if(verifyPath("users",management) && management != "" && verifyUserSocialProfile(management)){
             val thread = MainThread()
             val user = readUser(management)
 
@@ -57,16 +49,14 @@ class ThreadManagement private constructor(): ReadFile, WriteFile,DeleteFile,Ref
             writeThread(thread.getId(), thread)
             user.social.updateMyThreads(thread.getId(),true)
             writeUser(user.getId(),user)
-            println("Created")
         }
     } //CREATE
 
     fun readMainThread(operations: SubThreadOperations){ //READ
         val log = refreshData()
         val management = log.user
-        val fileUser = File("$management.json").exists()
-        val fileThread = File("${operations.idMainThread}.json").exists()
-        if(fileUser && fileThread && management != ""){
+        if(verifyPath("users",management) && verifyPath("threads",operations.idMainThread)
+                && management != "" && verifyUserSocialProfile(management)){
 
             val thread = readThread(operations.idMainThread)
             thread.removeSubThread(operations.idSubThread,management)
@@ -78,15 +68,15 @@ class ThreadManagement private constructor(): ReadFile, WriteFile,DeleteFile,Ref
     fun likeThread(like: ThreadOperations){
         val log = refreshData()
         val management = log.user
-        val fileUser = File("$management.json").exists()
-        val fileThread = File("${like.idThread}.json").exists()
-        if(fileUser && fileThread && management != "") {
+
+        if(verifyPath("users",management) && verifyPath("threads",like.idThread)
+                && management != "" && verifyUserSocialProfile(management)) {
             val user = readUser(management)
             val thread = readThread(like.idThread)
             val notification = Inbox("${user.social.getUserName()} liked your thread.", "Thread.")
-            val fileCreator = File("${thread.getCreator()}.json").exists()
 
-            if(fileCreator){
+
+            if(verifyPath("users",thread.getCreator())){
                 val userCreator = readUser(thread.getCreator())
                 when (checkLikeDislike(thread)) {
                     // 0 -> ALREADY LIKED so do nothing
@@ -117,9 +107,9 @@ class ThreadManagement private constructor(): ReadFile, WriteFile,DeleteFile,Ref
     fun dislikeThread(dislike: ThreadOperations) {
         val log = refreshData()
         val management = log.user
-        val fileUser = File("$management.json").exists()
-        val fileThread = File("${dislike.idThread}.json").exists()
-        if(fileUser && fileThread && management != "") {
+
+        if(verifyPath("users",management) && verifyPath("threads",dislike.idThread)
+                && management != "" && verifyUserSocialProfile(management)) {
 
             val thread = readThread(dislike.idThread)
 
@@ -142,10 +132,9 @@ class ThreadManagement private constructor(): ReadFile, WriteFile,DeleteFile,Ref
     fun deleteThread(operations: ThreadOperations){//DELETE
         val log = refreshData()
         val management = log.user
-        val fileUser = File("$management.json").exists()
-        val fileThread = File("${operations.idThread}.json").exists()
 
-        if(fileUser && fileThread && management != "" ){
+        if(verifyPath("users",management) && verifyPath("threads",operations.idThread)
+                && management != "" && verifyUserSocialProfile(management)){
 
             val user = readUser(management)
             delete(File("${operations.idThread}.json"))
@@ -160,9 +149,8 @@ class ThreadManagement private constructor(): ReadFile, WriteFile,DeleteFile,Ref
     fun createSubThread(subThreadData: SubThreadContent){ // CREATE
         val log = refreshData()
         val management = log.user
-        val fileUser = File("$management.json").exists()
-        val fileThread = File("${subThreadData.idThread}.json").exists()
-        if(fileUser && fileThread && management != ""){
+        if(verifyPath("users",management) && verifyPath("threads",subThreadData.idThread)
+                && management != "" && verifyUserSocialProfile(management)){
 
             val user = readUser(management)
             val thread = readThread(subThreadData.idThread)
@@ -178,10 +166,10 @@ class ThreadManagement private constructor(): ReadFile, WriteFile,DeleteFile,Ref
     fun dislikeSubThread(dislike: SubThreadOperations) {
         val log = refreshData()
         val management = log.user
-        val fileUser = File("$management.json").exists()
-        val fileThread = File("${dislike.idMainThread}.json").exists()
 
-        if(fileUser && fileThread && management != ""){
+
+        if(verifyPath("users",management) && verifyPath("threads",dislike.idMainThread)
+                && management != "" && verifyUserSocialProfile(management)){
 
             val thread = readThread(dislike.idMainThread)
             val subThread = thread.getSubThreadById(dislike.idSubThread)
@@ -202,18 +190,16 @@ class ThreadManagement private constructor(): ReadFile, WriteFile,DeleteFile,Ref
     fun likeSubThread(like: SubThreadOperations){
         val log = refreshData()
         val management = log.user
-        val fileUser = File("$management.json").exists()
-        val fileThread = File("${like.idMainThread}.json").exists()
 
-        if(fileUser && fileThread && management != ""){
+        if(verifyPath("users",management) && verifyPath("threads",like.idMainThread)
+                && management != "" && verifyUserSocialProfile(management)){
             val user = readUser(management)
 
             val thread = readThread(like.idMainThread)
             val subThread = thread.getSubThreadById(like.idSubThread)
             val notification = Inbox("${user.social.getUserName()} liked your reply.", "Thread.")
-            val fileCreator=  File("${subThread.creator}.json").exists()
 
-            if(fileCreator){
+            if(verifyPath("users",subThread.creator)){
                 val userCreator = readUser(subThread.creator)
                 when (checkLikeDislike(subThread)) {
                     1 -> {
@@ -241,9 +227,9 @@ class ThreadManagement private constructor(): ReadFile, WriteFile,DeleteFile,Ref
     fun deleteSubThread(operations: SubThreadOperations){ //DELETE
         val log = refreshData()
         val management = log.user
-        val fileUser = File("$management.json").exists()
-        val fileThread = File("${operations.idMainThread}.json").exists()
-        if(fileUser && fileThread && management != ""){
+
+        if(verifyPath("users",management) && verifyPath("threads",operations.idMainThread)
+                && management != "" && verifyUserSocialProfile(management)){
 
             val user = readUser(management)
             val thread = readThread(operations.idMainThread)
@@ -258,8 +244,7 @@ class ThreadManagement private constructor(): ReadFile, WriteFile,DeleteFile,Ref
 
     private fun checkLikeDislike(thread: MainThread): Int {// IF TRUE THE USER ALREADY LIKED OR DISLIKED THE THREAD
         val log = refreshData()
-        val management = log.user
-        return when (management) {
+        return when (log.user) {
             in thread.getLikes() // 0 ALREADY LIKED
             -> 0
             in thread.getDislikes() // 1 ALREADY DISLIKED

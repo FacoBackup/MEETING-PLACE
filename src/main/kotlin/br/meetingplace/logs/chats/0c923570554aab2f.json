@@ -1,0 +1,18 @@
+{
+  "conversation": [
+    {
+      "message": "Opa testanasdasdasddo o chatasdasdasdds",
+      "idMessage": "29ac5882-5233-4d61-88ef-c59c7bc0b365",
+      "static": true
+    }
+  ],
+  "idMessages": [
+    "29ac5882-5233-4d61-88ef-c59c7bc0b365"
+  ],
+  "favoriteMessagesIds": [],
+  "conversationId": "0c923570554aab2f",
+  "owners": [
+    "0c923570-6b04-4ccf-89f7-e4fd1f64747c",
+    "554aab2f-2935-43ba-b6c6-1cc853e75d29"
+  ]
+}

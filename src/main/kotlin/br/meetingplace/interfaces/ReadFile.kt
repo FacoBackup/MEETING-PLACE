@@ -10,39 +10,44 @@ import java.io.File
 
 interface ReadFile {
     fun readUser(fileName: String): User {
-
+        val path = File("build.gradle").absolutePath.removeSuffix("build.gradle") + "/src/main/kotlin/br/meetingplace/logs/users/$fileName.json"
         val gson = GsonBuilder().setPrettyPrinting().create()
-        val file = File("$fileName.json")
+        val file = File(path)
         val bufferedReader = file.bufferedReader()
         val inputString = bufferedReader.use{ it.readText()}
         return gson.fromJson(inputString, User::class.java)
     }
 
     fun readGroup(fileName: String): Group {
+
+        val path = File("build.gradle").absolutePath.removeSuffix("build.gradle") + "/src/main/kotlin/br/meetingplace/logs/groups/$fileName.json"
         val gson = GsonBuilder().setPrettyPrinting().create()
-        val file = File("$fileName.json")
+        val file = File(path)
         val bufferedReader = file.bufferedReader()
         val inputString = bufferedReader.use{ it.readText()}
         return gson.fromJson(inputString, Group::class.java)
     }
 
     fun readThread(fileName: String): MainThread {
+        val path = File("build.gradle").absolutePath.removeSuffix("build.gradle") + "/src/main/kotlin/br/meetingplace/logs/threads/$fileName.json"
         val gson = GsonBuilder().setPrettyPrinting().create()
-        val file = File("$fileName.json")
+        val file = File(path)
         val bufferedReader = file.bufferedReader()
         val inputString = bufferedReader.use{ it.readText()}
         return gson.fromJson(inputString, MainThread::class.java)
     }
     fun readChat(fileName: String): Chat {
+        val path = File("build.gradle").absolutePath.removeSuffix("build.gradle") + "/src/main/kotlin/br/meetingplace/logs/chats/$fileName.json"
         val gson = GsonBuilder().setPrettyPrinting().create()
-        val file = File("$fileName.json")
+        val file = File(path)
         val bufferedReader = file.bufferedReader()
         val inputString = bufferedReader.use{ it.readText()}
         return gson.fromJson(inputString, Chat::class.java)
     }
     fun readLoggedUser(): LoginById {
+        val path = File("build.gradle").absolutePath.removeSuffix("build.gradle") + "/src/main/kotlin/br/meetingplace/logs/logged.json"
         val gson = GsonBuilder().setPrettyPrinting().create()
-        val file = File("logged.json")
+        val file = File(path)
         val nullLog = LoginById("", "")
         if(file.exists()){
             val bufferedReader = file.bufferedReader()
