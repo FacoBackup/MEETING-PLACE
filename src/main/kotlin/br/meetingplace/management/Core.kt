@@ -10,10 +10,10 @@ import br.meetingplace.interfaces.file.WriteFile
 import br.meetingplace.interfaces.utility.Generator
 import br.meetingplace.interfaces.utility.Path
 import br.meetingplace.interfaces.utility.Refresh
-import br.meetingplace.management.interfaces.Group
+import br.meetingplace.management.interfaces.groups.Group
 import br.meetingplace.management.interfaces.Login
-import br.meetingplace.management.interfaces.Profile
-import br.meetingplace.management.interfaces.UserChat
+import br.meetingplace.management.interfaces.users.Profile
+import br.meetingplace.management.interfaces.users.UserChat
 import br.meetingplace.management.interfaces.thread.MainThread
 import br.meetingplace.management.interfaces.thread.SubThread
 

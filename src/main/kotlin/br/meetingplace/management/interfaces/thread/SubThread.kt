@@ -9,7 +9,7 @@ import br.meetingplace.interfaces.utility.Generator
 import br.meetingplace.interfaces.utility.Path
 import br.meetingplace.interfaces.utility.Refresh
 import br.meetingplace.interfaces.utility.Verifiers
-import br.meetingplace.servicies.conversationThread.SubThread
+import br.meetingplace.servicies.threads.SubThread
 import br.meetingplace.servicies.notification.Inbox
 
 interface SubThread: ReadFile, WriteFile, DeleteFile, Refresh, Generator, Path, Verifiers {

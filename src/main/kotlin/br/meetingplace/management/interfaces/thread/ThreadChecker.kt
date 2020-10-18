@@ -2,8 +2,8 @@ package br.meetingplace.management.interfaces.thread
 
 
 import br.meetingplace.interfaces.utility.Refresh
-import br.meetingplace.servicies.conversationThread.MainThread
-import br.meetingplace.servicies.conversationThread.SubThread
+import br.meetingplace.servicies.threads.MainThread
+import br.meetingplace.servicies.threads.SubThread
 
 class ThreadChecker private constructor(): Refresh{
 

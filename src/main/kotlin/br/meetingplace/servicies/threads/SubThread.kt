@@ -1,4 +1,4 @@
-package br.meetingplace.servicies.conversationThread
+package br.meetingplace.servicies.threads
 
 
 // NEEDS WORK (DATA CLASS)

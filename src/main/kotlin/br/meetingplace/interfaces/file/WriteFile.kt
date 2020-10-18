@@ -4,7 +4,7 @@ import br.meetingplace.data.user.LoginByEmail
 import br.meetingplace.servicies.groups.Group
 import br.meetingplace.entitie.User
 import br.meetingplace.servicies.chat.Chat
-import br.meetingplace.servicies.conversationThread.MainThread
+import br.meetingplace.servicies.threads.MainThread
 import com.google.gson.GsonBuilder
 import java.io.File
 

@@ -1,8 +1,8 @@
-package br.meetingplace.servicies.conversationThread
+package br.meetingplace.servicies.threads
 
 import br.meetingplace.data.threads.mainThread.ThreadContent
 
-open class MainThread(){
+class MainThread(){
 
     private var likes = mutableListOf<String>() // Stores the IDs from the users who liked it
     private var dislikes = mutableListOf<String>() // Stores the IDs from the users who disliked it

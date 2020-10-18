@@ -1,4 +1,4 @@
-package br.meetingplace.management.interfaces
+package br.meetingplace.management.interfaces.users
 
 import br.meetingplace.data.chat.users.ChatFullContent
 import br.meetingplace.data.chat.users.ChatNewMessage

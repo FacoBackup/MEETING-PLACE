@@ -9,7 +9,7 @@ import br.meetingplace.interfaces.utility.Generator
 import br.meetingplace.interfaces.utility.Path
 import br.meetingplace.interfaces.utility.Refresh
 import br.meetingplace.interfaces.utility.Verifiers
-import br.meetingplace.servicies.conversationThread.MainThread
+import br.meetingplace.servicies.threads.MainThread
 import br.meetingplace.servicies.notification.Inbox
 import java.io.File
 

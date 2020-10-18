@@ -1,4 +1,4 @@
-package br.meetingplace.management.interfaces
+package br.meetingplace.management.interfaces.groups
 
 import br.meetingplace.data.group.GroupOperations
 import br.meetingplace.interfaces.file.DeleteFile

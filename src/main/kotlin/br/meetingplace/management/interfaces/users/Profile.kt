@@ -1,4 +1,4 @@
-package br.meetingplace.management.interfaces
+package br.meetingplace.management.interfaces.users
 
 import br.meetingplace.data.user.Follower
 import br.meetingplace.data.user.SocialProfileData

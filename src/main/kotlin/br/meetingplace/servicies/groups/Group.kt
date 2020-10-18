@@ -2,8 +2,7 @@ package br.meetingplace.servicies.groups
 
 import br.meetingplace.data.group.Member
 
-open class Group(){
-
+class Group(){
     private var creator = ""
     private var id = ""
     private var name = ""
