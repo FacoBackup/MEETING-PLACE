@@ -1,7 +1,7 @@
 package br.meetingplace.servicies.chat
 
-import br.meetingplace.data.chat.users.ChatOperations
-import br.meetingplace.data.chat.users.ChatFullContent
+import br.meetingplace.data.chat.ChatComplexOperations
+import br.meetingplace.data.chat.ChatOperations
 import br.meetingplace.interfaces.utility.Refresh
 
 class Chat(
@@ -42,12 +42,11 @@ class Chat(
             favoriteMessagesIds.remove(message.idMessage)
     }
 
-    fun quoteMessage(message: ChatFullContent){
+    fun quoteMessage(message: ChatComplexOperations, newId: String){
         val indexMessage = getMessageIndex(message.idMessage)
-        if(message.idNewMessage !in idMessages && indexMessage != -1 && message.idMessage in idMessages){
+        if(indexMessage != -1 && message.idMessage in idMessages){
             message.message = "|${conversation[indexMessage].message}|  "+ message.message
-            val newMessage = Message(message.message, message.idNewMessage,refreshData().email, true)
-            println("LEVEL 3")
+            val newMessage = Message(message.message, newId,refreshData().email, true)
             addMessage(newMessage)
         }
     }
@@ -66,6 +65,10 @@ class Chat(
                 return i
         }
         return -1
+    }
+
+    fun verifyMessage(idMessage: String): Boolean {
+        return idMessage in idMessages
     }
     fun getOwners() = owners
     fun getConversation ()= conversation

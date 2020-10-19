@@ -1,9 +1,9 @@
 package br.meetingplace
 
 import br.meetingplace.data.*
-import br.meetingplace.data.chat.users.ChatNewMessage
-import br.meetingplace.data.chat.users.ChatFullContent
-import br.meetingplace.data.chat.users.ChatOperations
+import br.meetingplace.data.chat.ChatComplexOperations
+import br.meetingplace.data.chat.ChatMessage
+import br.meetingplace.data.chat.ChatOperations
 import br.meetingplace.data.threads.subThread.SubThreadContent
 import br.meetingplace.data.threads.subThread.SubThreadOperations
 import br.meetingplace.data.threads.mainThread.ThreadContent
@@ -12,7 +12,6 @@ import br.meetingplace.data.user.Follower
 import br.meetingplace.data.user.LoginByEmail
 import br.meetingplace.data.user.SocialProfileData
 import br.meetingplace.data.user.UserData
-import br.meetingplace.interfaces.utility.Refresh
 import br.meetingplace.management.Core
 import io.ktor.application.*
 import io.ktor.features.*
@@ -78,35 +77,35 @@ fun main (){
                 call.respond(core.unfollow(follow))
             }
 
-            //MESSAGES
+            //MESSAGES USERS
             get("/messages") {
                 call.respond(core.getMyChats())
             }
             post("/user/message"){
-                val chat = call.receive<ChatNewMessage>()
-                call.respond(core.sendMessage(chat))
+                val chat = call.receive<ChatMessage>()
+                call.respond(core.sendMessageUser(chat))
             }
             post("/user/delete/message"){
                 val chat = call.receive<ChatOperations>()
-                call.respond(core.deleteMessage(chat))
+                call.respond(core.deleteMessageUser(chat))
             }
             post("/user/quote/message"){
-                val chat = call.receive<ChatFullContent>()
-                call.respond(core.quoteMessage(chat))
+                val chat = call.receive<ChatComplexOperations>()
+                call.respond(core.quoteMessageUser(chat))
             }
             post("/user/favorite/message"){
                 val chat = call.receive<ChatOperations>()
-                call.respond(core.favoriteMessage(chat))
+                call.respond(core.favoriteMessageUser(chat))
             }
             post("/user/unFavorite/message"){
                 val chat = call.receive<ChatOperations>()
-                call.respond(core.unFavoriteMessage(chat))
+                call.respond(core.unFavoriteMessageUser(chat))
             }
             post("/user/share/message"){
-                val chat = call.receive<ChatFullContent>()
-                call.respond(core.shareMessage(chat))
+                val chat = call.receive<ChatComplexOperations>()
+                call.respond(core.shareMessageUser(chat))
             }
-            //MESSAGES
+            //MESSAGES USERS
 
 //            THREADS
             get("/user/see/threads"){

@@ -1,7 +1,7 @@
 package br.meetingplace.management
 
 import br.meetingplace.data.PasswordOperations
-import br.meetingplace.data.group.UserMember
+import br.meetingplace.data.group.MemberInput
 import br.meetingplace.data.user.LoginByEmail
 import br.meetingplace.data.user.UserData
 import br.meetingplace.entitie.User
@@ -12,12 +12,13 @@ import br.meetingplace.interfaces.utility.Path
 import br.meetingplace.interfaces.utility.Refresh
 import br.meetingplace.management.interfaces.groups.Group
 import br.meetingplace.management.interfaces.Login
+import br.meetingplace.management.interfaces.groups.GroupChat
 import br.meetingplace.management.interfaces.users.Profile
 import br.meetingplace.management.interfaces.users.UserChat
 import br.meetingplace.management.interfaces.thread.MainThread
 import br.meetingplace.management.interfaces.thread.SubThread
 
-class Core: ReadFile, WriteFile, Refresh, Generator, Path,Login, MainThread, Group, Profile, UserChat, SubThread {
+class Core: ReadFile, WriteFile, Refresh, Generator, Path,Login, Profile, UserChat, MainThread, SubThread, Group, GroupChat{
 
     fun createUser(newUser: UserData){
 
@@ -44,7 +45,6 @@ class Core: ReadFile, WriteFile, Refresh, Generator, Path,Login, MainThread, Gro
         val cachedPass = readLoggedUser().password
         if(management !=  "" && operation.pass == cachedPass && verifyPath("users",management)){
             val user = readUser(management)
-            var member: UserMember
 
             val followers = user.social.getFollowers()
             val following = user.social.getFollowing()

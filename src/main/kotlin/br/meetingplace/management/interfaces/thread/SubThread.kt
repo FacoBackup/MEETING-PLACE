@@ -17,7 +17,7 @@ interface SubThread: ReadFile, WriteFile, DeleteFile, Refresh, Generator, Path, 
     fun createSubThread(subThreadData: SubThreadContent){
         val management = readLoggedUser().email
         if(verifyPath("users",management) && verifyPath("threads",subThreadData.idThread)
-                && management != "" && verifyUserSocialProfile(management)){
+                && management != "" && verifyUserSocialProfile()){
 
             val user = readUser(management)
             val thread = readThread(subThreadData.idThread)
@@ -32,7 +32,7 @@ interface SubThread: ReadFile, WriteFile, DeleteFile, Refresh, Generator, Path, 
         val management = readLoggedUser().email
 
         if(verifyPath("users",management) && verifyPath("threads",dislike.idMainThread)
-                && management != "" && verifyUserSocialProfile(management)){
+                && management != "" && verifyUserSocialProfile()){
 
             val thread = readThread(dislike.idMainThread)
             val subThread = thread.getSubThreadById(dislike.idSubThread)
@@ -52,7 +52,7 @@ interface SubThread: ReadFile, WriteFile, DeleteFile, Refresh, Generator, Path, 
     fun likeSubThread(like: SubThreadOperations){
         val management = readLoggedUser().email
         if(verifyPath("users",management) && verifyPath("threads",like.idMainThread)
-                && management != "" && verifyUserSocialProfile(management)){
+                && management != "" && verifyUserSocialProfile()){
             val user = readUser(management)
 
             val thread = readThread(like.idMainThread)
@@ -87,9 +87,8 @@ interface SubThread: ReadFile, WriteFile, DeleteFile, Refresh, Generator, Path, 
         val management = readLoggedUser().email
 
         if(verifyPath("users",management) && verifyPath("threads",operations.idMainThread)
-                && management != "" && verifyUserSocialProfile(management)){
+                && management != "" && verifyUserSocialProfile()){
 
-            val user = readUser(management)
             val thread = readThread(operations.idMainThread)
 
             thread.removeSubThread(operations.idSubThread,management)

@@ -1,6 +1,6 @@
 package br.meetingplace.servicies.communities
 
-import br.meetingplace.data.group.Member
+import br.meetingplace.servicies.groups.Member
 
 class Community{
     //LIKE GROUPS BUT HAS THREADS INSTEAD OF A CHAT AND ALL OF THE THREADS GOES TO THE MEMBERS TIMELINE

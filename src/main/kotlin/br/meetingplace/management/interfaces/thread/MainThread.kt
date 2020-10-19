@@ -18,7 +18,7 @@ interface MainThread: ReadFile, WriteFile, DeleteFile, Refresh, Generator, Path,
     fun createMainThread(content: ThreadContent){
         val management = readLoggedUser().email
 
-        if(verifyPath("users",management) && management != "" && verifyUserSocialProfile(management)){
+        if(verifyPath("users",management) && management != "" && verifyUserSocialProfile()){
             val thread = MainThread()
             val user = readUser(management)
 
@@ -77,7 +77,7 @@ interface MainThread: ReadFile, WriteFile, DeleteFile, Refresh, Generator, Path,
         val management = readLoggedUser().email
 
         if(verifyPath("users",management) && verifyPath("threads",like.idThread)
-                && management != "" && verifyUserSocialProfile(management)) {
+                && management != "" && verifyUserSocialProfile()) {
             val user = readUser(management)
             val thread = readThread(like.idThread)
             val notification = Inbox("${user.social.getUserName()} liked your thread.", "Thread.")
@@ -113,7 +113,7 @@ interface MainThread: ReadFile, WriteFile, DeleteFile, Refresh, Generator, Path,
     fun dislikeThread(dislike: ThreadOperations) {
         val management = readLoggedUser().email
         if(verifyPath("users",management) && verifyPath("threads",dislike.idThread)
-                && management != "" && verifyUserSocialProfile(management)) {
+                && management != "" && verifyUserSocialProfile()) {
 
             val thread = readThread(dislike.idThread)
             val checker = ThreadChecker.getChecker()
@@ -133,7 +133,7 @@ interface MainThread: ReadFile, WriteFile, DeleteFile, Refresh, Generator, Path,
         val management = readLoggedUser().email
 
         if(verifyPath("users",management) && verifyPath("threads",operations.idThread)
-                && management != "" && verifyUserSocialProfile(management)){
+                && management != "" && verifyUserSocialProfile()){
 
             val user = readUser(management)
             delete(File("${operations.idThread}.json"))
@@ -144,7 +144,7 @@ interface MainThread: ReadFile, WriteFile, DeleteFile, Refresh, Generator, Path,
     fun deleteAllThreadsFromUserId(){
         val management = readLoggedUser().email
 
-        if(verifyPath("user",management) && management != "" && verifyUserSocialProfile(management)){
+        if(verifyPath("user",management) && management != "" && verifyUserSocialProfile()){
 
             val user = readUser(management)
             val threads = user.social.getMyThreads()

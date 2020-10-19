@@ -15,7 +15,7 @@ interface Verifiers: Refresh, Path {
         return false
     }
 
-    fun verifyUserSocialProfile(id: String): Boolean {
+    fun verifyUserSocialProfile(): Boolean {
         val management = readLoggedUser().email
         if(verifyPath("users", management) && management != ""){
             val user = readUser(management)

@@ -45,7 +45,7 @@ class MainThread(){
         }
     }
 
-    open fun likeSubThread(idUser: String, idSubThread: String){
+    fun likeSubThread(idUser: String, idSubThread: String){
 
         if(idSubThread in subThreadId){
             val indexSubThread = getSubThreadIndex(idSubThread)
@@ -53,7 +53,7 @@ class MainThread(){
         }
     }
 
-    open fun dislikeSubThread(idUser: String, idSubThread: String){
+    fun dislikeSubThread(idUser: String, idSubThread: String){
 
         if(idSubThread in subThreadId){
             val indexSubThread = getSubThreadIndex(idSubThread)
@@ -61,7 +61,7 @@ class MainThread(){
         }
     }
 
-    open fun likeToDislikeSubThread(idUser: String, idSubThread: String){
+    fun likeToDislikeSubThread(idUser: String, idSubThread: String){
         if(idSubThread in subThreadId){
             val indexSubThread = getSubThreadIndex(idSubThread)
             subThread[indexSubThread].likes.remove(idUser)
@@ -69,7 +69,7 @@ class MainThread(){
         }
     }
 
-    open fun dislikeToLikeSubThread(idUser: String, idSubThread: String) {
+    fun dislikeToLikeSubThread(idUser: String, idSubThread: String) {
         if(idSubThread in subThreadId){
             val indexSubThread = getSubThreadIndex(idSubThread)
 
@@ -78,14 +78,14 @@ class MainThread(){
         }
     }
 
-    open fun addSubThread(sub: SubThread){
+    fun addSubThread(sub: SubThread){
         if(sub.creator != ""){
             subThreadId.add(sub.id)
             subThread.add(sub)
         }
     }
 
-    open fun removeSubThread(idSubThread: String, idCreator: String){
+    fun removeSubThread(idSubThread: String, idCreator: String){
 
         val indexSubThread = getSubThreadIndex(idSubThread)
         if(idSubThread in subThreadId && idCreator == subThread[indexSubThread].creator){

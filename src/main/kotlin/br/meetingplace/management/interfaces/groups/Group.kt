@@ -1,6 +1,8 @@
 package br.meetingplace.management.interfaces.groups
 
+import br.meetingplace.data.group.GroupData
 import br.meetingplace.data.group.GroupOperations
+import br.meetingplace.data.group.MemberInput
 import br.meetingplace.interfaces.file.DeleteFile
 import br.meetingplace.interfaces.file.ReadFile
 import br.meetingplace.interfaces.file.WriteFile
@@ -9,25 +11,27 @@ import br.meetingplace.interfaces.utility.Path
 import br.meetingplace.interfaces.utility.Refresh
 import br.meetingplace.interfaces.utility.Verifiers
 import br.meetingplace.servicies.groups.Group
+import br.meetingplace.servicies.groups.Member
+import br.meetingplace.servicies.notification.Inbox
 
 interface Group: Refresh, ReadFile, WriteFile, Path, Generator, Verifiers, DeleteFile{
 
-    fun createGroup(group: Group){
+    fun createGroup(group: GroupData){
         val management = readLoggedUser().email
 
-        if(verifyPath("users",management) && group.getId() == "" && verifyUserSocialProfile(management) && management != ""){
+        if(verifyPath("users",management) && verifyUserSocialProfile() && management != ""){
             val user = readUser(management)
-            group.startGroup(generateId(), management)
-            user.social.updateMyGroups(group.getId(),false)
-            writeGroup(group.getId(),group)
+            val newGroup = Group()
+            newGroup.startGroup(generateId(),group.name, group.about, management)
+            user.social.updateMyGroups(newGroup.getId(),false)
+            writeGroup(newGroup.getId(),newGroup)
             writeUser(management,user)
         }
     }
-
     fun deleteGroup(operations: GroupOperations){
         val management = readLoggedUser().email
 
-        if(verifyPath("users",management) && verifyPath("groups",operations.idGroup) && verifyUserSocialProfile(management) && management != "") {
+        if(verifyPath("users",management) && verifyPath("groups",operations.idGroup) && verifyUserSocialProfile() && management != "") {
             val user = readUser(management)
             val group = readGroup(operations.idGroup)
 
@@ -35,8 +39,8 @@ interface Group: Refresh, ReadFile, WriteFile, Path, Generator, Verifiers, Delet
 
                 val members = group.getMembers()
                 for(i in 0 until members.size){
-                    if(verifyPath("users", members[i].userId)) {
-                        val member = readUser(members[i].userId)
+                    if(verifyPath("users", members[i].userEmail)) {
+                        val member = readUser(members[i].userEmail)
                         member.social.updateMemberIn(group.getId(),true)
                         writeUser(member.getEmail(), member)
                     }
@@ -49,73 +53,43 @@ interface Group: Refresh, ReadFile, WriteFile, Path, Generator, Verifiers, Delet
                 writeUser(management, user)
             }
         }
+    } //DELETE CHAT FROM GROUP
+    fun addMember(member: MemberInput){
+        val management = readLoggedUser().email
+
+        if(verifyPath("users", management) && verifyPath("groups", member.groupId) && verifyUserSocialProfile() && verifyPath("users", member.externalMember)){
+            val external = readUser(member.externalMember)
+            val group = readGroup(member.groupId)
+
+            if(group.verifyMember(management) && !group.verifyMember(member.externalMember)){
+                val toBeAdded = Member(member.externalMember,group.getMemberRole(management))
+                val notification = Inbox("You're now a member of ${group.getNameGroup()}", "Group.")
+
+                group.updateMember(toBeAdded, false)
+                external.social.updateMemberIn(group.getId(), false)
+
+                external.social.updateInbox(notification)
+
+                writeUser(external.getEmail(), external)
+                writeGroup(group.getId(), group)
+            }
+        }
+
+    }
+    fun removeMember(member: MemberInput){
+        val management = readLoggedUser().email
+
+        if(verifyPath("users", management) && verifyPath("groups", member.groupId) && verifyUserSocialProfile() && verifyPath("users", member.externalMember)){
+            val external = readUser(member.externalMember)
+            val group = readGroup(member.groupId)
+
+            if(group.verifyMember(management) && group.verifyMember(member.externalMember) && group.getMemberRole(management) == 1){
+                val toBeRemoved = Member(member.externalMember,group.getMemberRole(management))
+                group.updateMember(toBeRemoved, true)
+                external.social.updateMemberIn(group.getId(), true)
+                writeUser(external.getEmail(), external)
+                writeGroup(group.getId(), group)
+            }
+        }
     }
 }
-
-
-//
-//    fun messengerGroup(conversation: GroupChatContent){
-//
-//        val management = readLoggedUser().email
-//
-//        if(verifyPath("users",management) && verifyPath("groups",conversation.groupId) && verifyUserSocialProfile(management) && management != "") {
-//            val group = readGroup(conversation.groupId)
-//            val user = readUser(management)
-//            if(group.getChatId() == ""){ // CHAT DOESNT EXIST
-//                val newChat = Chat(group.getId(), listOf(group.getCreator()))
-//                writeChat(group.getId()+ "-chat",newChat)
-//                val message = Message(conversation.message, generateId(), management,true)
-//                newChat.addMessage(message)
-//
-//                val notification = Inbox("${user.social.getUserName()} started the group chat.","Group Message.")
-//                val members = group.getMembers()
-//                for (i in 0 until members.size){
-//                    if(verifyPath("users", members[i].userId)){
-//                        val member = readUser(members[i].userId)
-//                        member.social.updateInbox(notification)
-//                    }
-//                }
-//
-//            }
-//            else{
-//                val chat = readGroupChat(group.getId()+"-chat")
-//
-//            }
-//        }
-//
-//    }
-//
-//    fun addMember(member: UserMember){
-//         val management = readLoggedUser().email
-//        val indexGroup = getGroupIndex(member.group)
-//        val indexUser = getUserIndex(member.id)
-//        val mem = Member(member.id, 0)
-//        val logged = getLoggedUser()
-//
-//        if(indexGroup != -1 && indexUser != -1 && member.id != logged && logged != -1 && verifyUserSocialProfile(getLoggedUser())){
-//            // checks if the logged user is on the group
-//            val indexMember = getMemberIndex(member.id, member.group)
-//            if(indexMember == -1) // isnt part of the group then add
-//                groupList[indexGroup].members.add(mem)
-//
-//        }
-//    }
-//
-//    fun removeMember(member: UserMember){
-//         val management = readLoggedUser().email
-//        val user = member.id
-//        val indexGroup = getGroupIndex(member.group)
-//        val indexUser = getUserIndex(user)
-//        val indexMember = getMemberIndex(user, member.group)
-//        val logged = getLoggedUser()
-//        // checks if the logged user is on the group and is an admin or the creator
-//        if(indexGroup != -1 && indexUser != -1 && indexMember != -1 && logged != -1 && verifyUserSocialProfile(getLoggedUser())){
-//            if(user != getLoggedUser() && groupList[indexGroup].members[indexMember].role == 1)
-//                groupList[indexGroup].members.remove(groupList[indexGroup].members[indexMember])
-//
-//            else
-//                groupList[indexGroup].members.remove(groupList[indexGroup].members[indexMember])
-//        }
-//
-//    }
-//
