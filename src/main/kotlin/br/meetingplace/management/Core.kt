@@ -18,6 +18,7 @@ class Core private constructor(): ReadFile, WriteFile, Refresh, Generator,
     Profile, UserChat, MainThread, SubThread, Group, GroupChat{
 
     companion object{
-        private val cor
+        private val core = Core()
+        fun returnCore () = core
     }
 }

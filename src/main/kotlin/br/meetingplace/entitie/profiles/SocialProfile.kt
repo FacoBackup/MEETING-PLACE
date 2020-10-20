@@ -92,6 +92,8 @@ class SocialProfile(
     //UPDATE
 
     //GETTERS
+    fun getMyGroups () = myGroups
+    fun getMemberIn() = memberIn
     fun getFollowing() = following
     fun getFollowers() = followers
     fun getMyChats () = myChats

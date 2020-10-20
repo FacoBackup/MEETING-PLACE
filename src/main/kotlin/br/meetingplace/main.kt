@@ -4,6 +4,9 @@ import br.meetingplace.data.*
 import br.meetingplace.data.chat.ChatComplexOperations
 import br.meetingplace.data.chat.ChatMessage
 import br.meetingplace.data.chat.ChatOperations
+import br.meetingplace.data.group.GroupData
+import br.meetingplace.data.group.GroupOperations
+import br.meetingplace.data.group.MemberInput
 import br.meetingplace.data.threads.subThread.SubThreadContent
 import br.meetingplace.data.threads.subThread.SubThreadOperations
 import br.meetingplace.data.threads.mainThread.ThreadContent
@@ -22,7 +25,7 @@ import io.ktor.routing.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 
-val core = Core()
+val core = Core.returnCore()
 fun main (){
 
     embeddedServer(Netty, 3000) {
@@ -151,30 +154,54 @@ fun main (){
             }
             //THREADS
 
-            /*
             //GROUPS
-            get("/group"){
-                call.respond(core.getGroups())
+            get("/my/groups"){
+                call.respond(core.readMyGroups())
+            }
+            get("/in/groups"){
+                call.respond(core.readMemberIn())
+            }
+            get("/group/chat"){
+                val member = call.receive<MemberInput>()
+                call.respond(core.getGroupChat(member))
             }
             post("/group/create"){
-                val group = call.receive<Group>()
+                val group = call.receive<GroupData>()
                 call.respond(core.createGroup(group))
             }
             post("/group/member"){
-                val member = call.receive<UserMember>()
+                val member = call.receive<MemberInput>()
                 call.respond(core.addMember(member))
             }
             post("/group/member/remove"){
-                val member = call.receive<UserMember>()
+                val member = call.receive<MemberInput>()
                 call.respond(core.removeMember(member))
             }
             post("/group/message"){
-                val chatGroup = call.receive<GroupChatContent>()
-                call.respond(core.messengerGroup(chatGroup))
+                val chatGroup = call.receive<ChatMessage>()
+                call.respond(core.sendMessage(chatGroup))
+            }
+            post("/group/delete/message"){
+                val chatGroup = call.receive<ChatOperations>()
+                call.respond(core.deleteMessage(chatGroup))
+            }
+            post("/group/favorite/message"){
+                val chatGroup = call.receive<ChatOperations>()
+                call.respond(core.favoriteMessage(chatGroup))
+            }
+            post("/group/unfavorite/message"){
+                val chatGroup = call.receive<ChatOperations>()
+                call.respond(core.unFavoriteMessage(chatGroup))
+            }
+            post("/group/quote/message"){
+                val chatGroup = call.receive<ChatComplexOperations>()
+                call.respond(core.quoteMessage(chatGroup))
+            }
+            post("/group/delete"){
+                val group = call.receive<GroupOperations>()
+                call.respond(core.deleteGroup(group))
             }
             //GROUPS
-
-             */
         }
     }.start(wait = true)
 }

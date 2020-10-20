@@ -19,15 +19,17 @@ interface GroupChat: ReadFile, WriteFile, Refresh, Generator, Verifiers{
         val management = readLoggedUser().email
 
         val chatId = content.id + "-chat"
-
+        println("level 1")
         if( verifyPath("users",management) && verifyPath("groups",content.id) && management != "" && verifyUserSocialProfile() ) {
-
+            println("level 2")
             val user = readUser(management)
             val group = readGroup(content.id)
             val groupMembers = group.getMembers()
 
             if(group.verifyMember(management)){
+                println("level 3")
                 if (!verifyPath("chats",chatId)) { // the conversation doesn't exist
+                    println("level 4")
                     val notification = Inbox("${user.social.getUserName()} started the group conversation.", "Group Message.")
                     val newChat = Chat(chatId,listOf(group.getCreator()))
                     val msg = Message(content.message, generateId(), management,true)
@@ -35,6 +37,7 @@ interface GroupChat: ReadFile, WriteFile, Refresh, Generator, Verifiers{
                     group.updateChat(chatId)
 
                     writeChat(chatId,newChat)
+                    writeGroup(group.getId(),group)
                     //SENDING THE NOTIFICATION TO ALL MEMBERS
                     for(i in 0 until groupMembers.size){
                         if(verifyPath("users", groupMembers[i].userEmail)){
@@ -43,8 +46,11 @@ interface GroupChat: ReadFile, WriteFile, Refresh, Generator, Verifiers{
                             writeUser(member.getEmail(), member)
                         }
                     }
+                    println("done")
                 }
                 else{ //the conversation exists
+
+                    println("level 2")
                     val msg = Message(content.message, generateId(), management,true)
                     val notification = Inbox("${user.social.getUserName()} sent a new message.", "Group Message.")
                     val chat = readChat(chatId)
@@ -59,6 +65,7 @@ interface GroupChat: ReadFile, WriteFile, Refresh, Generator, Verifiers{
                             writeUser(member.getEmail(), member)
                         }//member exists
                     }//for
+                    println("done")
                 }//else
             }//(group.verifyMember(management))
         }//( verifyPath("users",management) && verifyPath("groups",content.groupId) && management != "" && verifyUserSocialProfile(management) )
@@ -112,16 +119,19 @@ interface GroupChat: ReadFile, WriteFile, Refresh, Generator, Verifiers{
         }
     }//UPDATE
 
-    fun quoteMessage(message: ChatComplexOperations){
+    fun quoteMessage(message: ChatComplexOperations){ // NEEDS WORK HERE
 
         val management = readLoggedUser().email
-        if( verifyPath("users",management) &&  verifyPath("group",message.id) && management !=  ""
+        println("START")
+        if( verifyPath("users",management) &&  verifyPath("groups",message.id) && management !=  ""
                 && verifyUserSocialProfile()){
-
+            println("level 1")
             val group = readGroup(message.id)
             if(verifyPath("chats", group.getChatId())){
+                println("level 2")
                 val chat = readChat(group.getChatId())
                 if(chat.verifyMessage(message.idMessage)){
+                    println("level 3")
                     //val notification = Inbox("${user.social.getUserName()} sent a new message.", "Message.")
                     chat.quoteMessage(message, generateId())
                     writeChat(group.getChatId(),chat)
