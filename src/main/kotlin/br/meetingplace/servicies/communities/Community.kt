@@ -12,5 +12,4 @@ class Community{
     private val followers = mutableListOf<String>()
     private val newThreads = mutableListOf<String>()
     private val topThreads = mutableListOf<String>()
-
 }

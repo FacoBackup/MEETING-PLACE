@@ -9,22 +9,20 @@ import br.meetingplace.interfaces.utility.Generator
 import br.meetingplace.interfaces.utility.Path
 import br.meetingplace.interfaces.utility.Refresh
 import br.meetingplace.interfaces.utility.Verifiers
+import br.meetingplace.management.interfaces.ConditionsVerifiers
 import br.meetingplace.servicies.chat.Chat
 import br.meetingplace.servicies.chat.Message
 import br.meetingplace.servicies.notification.Inbox
 
-interface UserChat: ReadFile, WriteFile, Refresh, Generator, Path, Verifiers {
+interface UserChat: ReadFile, WriteFile, Refresh, Generator, Path, Verifiers, ConditionsVerifiers {
 
     fun sendMessageUser(content: ChatMessage){
         val management = readLoggedUser().email
-
         val idChat = getChatId(management, content.id)
-        if( verifyPath("users",management) &&  verifyPath("users",content.id) && management != "" && content.id != management && verifyUserSocialProfile()) {
 
+        if(usersConditions(management,content.id)) {
             val user = readUser(management)
             val receiver = readUser(content.id)
-
-
             if (!verifyPath("chats",idChat)) { // the conversation doesn't exist
                 val notification = Inbox("${user.social.getUserName()} started a conversation with you.", "Message.")
                 val newChat = Chat(idChat,listOf(management, content.id))
@@ -63,7 +61,7 @@ interface UserChat: ReadFile, WriteFile, Refresh, Generator, Path, Verifiers {
         val management = readLoggedUser().email
 
         val chats = mutableListOf<Chat>()
-        if( verifyPath("users",management)){
+        if(verifyPath("users",management) && verifyUserSocialProfile()){
             val user = readUser(management)
 
             val userChats = user.social.getMyChats()
@@ -77,60 +75,49 @@ interface UserChat: ReadFile, WriteFile, Refresh, Generator, Path, Verifiers {
         }
         return chats
     }//READ
-    fun favoriteMessageUser(message: ChatOperations){
+
+    fun favoriteMessageUser(content: ChatOperations){
         val management = readLoggedUser().email
+        val idChat = getChatId(management, content.id)
 
-        if( verifyPath("users",management) &&  verifyPath("users",message.id) && management != ""  && verifyUserSocialProfile()
-                && message.id != management){
-            val idChat = getChatId(management, message.id)
-
-            if(verifyPath("chats",idChat)) {
-                val chat = readChat(idChat)
-                chat.favoriteMessage(message)
-                writeChat(idChat,chat)
-            }
+        if(usersConditions(management, content.id) && verifyPath("chats",idChat)){
+            val chat = readChat(idChat)
+            chat.favoriteMessage(content)
+            writeChat(idChat,chat)
         }
     }//UPDATE
-    fun unFavoriteMessageUser(message: ChatOperations){
+    fun unFavoriteMessageUser(content: ChatOperations){
         val management = readLoggedUser().email
-
-        if( verifyPath("users",management) &&  verifyPath("users",message.id) && management !=  ""
-                && verifyUserSocialProfile() && message.id != management){
-            val idChat = getChatId(management, message.id)
-
-
-            if(verifyPath("chats",idChat)) {
-                val chat = readChat(idChat)
-                chat.unFavoriteMessage(message)
-                writeChat(idChat,chat)
-            }
+        val idChat = getChatId(management, content.id)
+        if(usersConditions(management, content.id) && verifyPath("chats",idChat)){
+            val chat = readChat(idChat)
+            chat.unFavoriteMessage(content)
+            writeChat(idChat,chat)
         }
     }//UPDATE
-    fun quoteMessageUser(message: ChatComplexOperations){
+    fun quoteMessageUser(content: ChatComplexOperations){
         val management = readLoggedUser().email
-        val idChat = getChatId(management, message.id)
-        if( verifyPath("users",management) &&  verifyPath("users",message.id) && management !=  ""
-                && verifyUserSocialProfile() && message.id!= management && verifyPath("chats",idChat)){
+        val idChat = getChatId(management, content.id)
+        if(usersConditions(management, content.id) && verifyPath("chats", idChat)){
 
             val user = readUser(management)
-            val receiver = readUser(message.id)
+            val receiver = readUser(content.id)
             val chat = readChat(idChat)
-            if(chat.verifyMessage(message.idMessage)) {
+            if(chat.verifyMessage(content.idMessage)) {
                 val notification = Inbox("${user.social.getUserName()} sent a new message.", "Message.")
-                chat.quoteMessage(message, generateId())
+                chat.quoteMessage(content, generateId())
                 writeChat(idChat,chat)
                 receiver.social.updateInbox(notification)
                 writeUser(receiver.getEmail(), receiver)
             }
         }
     }//UPDATE
+
     fun shareMessageUser(content: ChatComplexOperations){
         val management = readLoggedUser().email
+        val idChat =  getChatId(management, content.id)
 
-        val idChat = management + content.id
-
-        if( verifyPath("users", management) && management !=  "" &&  verifyPath("users", content.id) && verifyUserSocialProfile()
-                && content.id!= management && verifyPath("chats", idChat)){
+        if(usersConditions(management,content.id) && verifyPath("chats",idChat)){
 
             val operation = ChatOperations(content.idMessage, content.id)
             val chat = readChat(idChat)
@@ -144,20 +131,15 @@ interface UserChat: ReadFile, WriteFile, Refresh, Generator, Path, Verifiers {
     } //UPDATE->CREATE
     fun deleteMessageUser(message: ChatOperations){
         val management = readLoggedUser().email
-        if (verifyPath("users",management) && verifyPath("users",message.id) && management != ""
-                && verifyUserSocialProfile() && message.id != management){
-
+        val idChat = getChatId(management, message.id)
+        if (usersConditions(management,message.id) && verifyPath("chats",idChat)){
             val user = readUser(management)
             val receiver = readUser(message.id)
-            val idChat = getChatId(management, message.id)
-
-            if(verifyPath("chats",idChat)) {
-                val chat = readChat(idChat)
-                chat.deleteMessage(message)
-                writeChat(idChat,chat)
-                writeUser(user.getEmail(), user)
-                writeUser(receiver.getEmail(), receiver)
-            }
+            val chat = readChat(idChat)
+            chat.deleteMessage(message)
+            writeChat(idChat,chat)
+            writeUser(user.getEmail(), user)
+            writeUser(receiver.getEmail(), receiver)
         }
     }//DELETE
 }

@@ -8,9 +8,10 @@ import br.meetingplace.interfaces.file.WriteFile
 import br.meetingplace.interfaces.utility.Path
 import br.meetingplace.interfaces.utility.Refresh
 import br.meetingplace.interfaces.utility.Verifiers
+import br.meetingplace.management.interfaces.ConditionsVerifiers
 import br.meetingplace.servicies.notification.Inbox
 
-interface Profile: ReadFile, WriteFile, Refresh, Path, Verifiers {
+interface Profile: ReadFile, WriteFile, Refresh, Path, Verifiers, ConditionsVerifiers {
 
     fun createSocialProfile(newProfile: SocialProfileData){
         val management = readLoggedUser().email
