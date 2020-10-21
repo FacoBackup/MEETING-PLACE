@@ -1,9 +1,9 @@
 package br.meetingplace.management.interfaces
 
 import br.meetingplace.data.user.LoginByEmail
-import br.meetingplace.interfaces.file.ReadFile
-import br.meetingplace.interfaces.file.WriteFile
-import br.meetingplace.interfaces.utility.Generator
+import br.meetingplace.management.interfaces.file.ReadFile
+import br.meetingplace.management.interfaces.file.WriteFile
+import br.meetingplace.management.interfaces.utility.Generator
 import java.io.File
 
 interface Login: ReadFile, WriteFile, Generator {

@@ -2,14 +2,14 @@ package br.meetingplace.management.interfaces.thread
 
 import br.meetingplace.data.threads.subThread.SubThreadContent
 import br.meetingplace.data.threads.subThread.SubThreadOperations
-import br.meetingplace.interfaces.file.DeleteFile
-import br.meetingplace.interfaces.file.ReadFile
-import br.meetingplace.interfaces.file.WriteFile
-import br.meetingplace.interfaces.utility.Generator
-import br.meetingplace.interfaces.utility.Path
-import br.meetingplace.interfaces.utility.Refresh
-import br.meetingplace.interfaces.utility.Verifiers
-import br.meetingplace.servicies.threads.SubThread
+import br.meetingplace.management.interfaces.file.DeleteFile
+import br.meetingplace.management.interfaces.file.ReadFile
+import br.meetingplace.management.interfaces.file.WriteFile
+import br.meetingplace.management.interfaces.utility.Generator
+import br.meetingplace.management.interfaces.utility.Path
+import br.meetingplace.management.interfaces.utility.Refresh
+import br.meetingplace.management.interfaces.utility.Verifiers
+import br.meetingplace.servicies.thread.SubThread
 import br.meetingplace.servicies.notification.Inbox
 
 interface SubThread: ReadFile, WriteFile, DeleteFile, Refresh, Generator, Path, Verifiers {
@@ -42,6 +42,10 @@ interface SubThread: ReadFile, WriteFile, DeleteFile, Refresh, Generator, Path, 
                     thread.likeToDislikeSubThread(management,dislike.idSubThread)
                     writeThread(thread.getId(),thread)
                 } // like to dislike
+                1->{
+                    thread.removeDislikeSubThread(management,dislike.idSubThread)
+                    writeThread(thread.getId(),thread)
+                }
                 2 -> {
                     thread.dislikeSubThread(management,dislike.idSubThread)
                     writeThread(thread.getId(),thread)
@@ -63,6 +67,10 @@ interface SubThread: ReadFile, WriteFile, DeleteFile, Refresh, Generator, Path, 
                 val userCreator = readUser(subThread.creator)
                 val checker = ThreadChecker.getChecker()
                 when (checker.checkLikeDislike(subThread)) {
+                    0->{
+                        thread.removeLikeSubThread(management,like.idSubThread)
+                        writeThread(thread.getId(),thread)
+                    }
                     1 -> {
                         if(user.getEmail() != userCreator.getEmail()){
                             userCreator.social.updateInbox(notification)

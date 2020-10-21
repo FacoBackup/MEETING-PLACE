@@ -2,7 +2,7 @@ package br.meetingplace.servicies.chat
 
 import br.meetingplace.data.chat.ChatComplexOperations
 import br.meetingplace.data.chat.ChatOperations
-import br.meetingplace.interfaces.utility.Refresh
+import br.meetingplace.management.interfaces.utility.Refresh
 
 class Chat(
     private var conversationId: String,

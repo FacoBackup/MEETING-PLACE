@@ -2,14 +2,14 @@ package br.meetingplace.management.interfaces.thread
 
 import br.meetingplace.data.threads.mainThread.ThreadContent
 import br.meetingplace.data.threads.mainThread.ThreadOperations
-import br.meetingplace.interfaces.file.DeleteFile
-import br.meetingplace.interfaces.file.ReadFile
-import br.meetingplace.interfaces.file.WriteFile
-import br.meetingplace.interfaces.utility.Generator
-import br.meetingplace.interfaces.utility.Path
-import br.meetingplace.interfaces.utility.Refresh
-import br.meetingplace.interfaces.utility.Verifiers
-import br.meetingplace.servicies.threads.MainThread
+import br.meetingplace.management.interfaces.file.DeleteFile
+import br.meetingplace.management.interfaces.file.ReadFile
+import br.meetingplace.management.interfaces.file.WriteFile
+import br.meetingplace.management.interfaces.utility.Generator
+import br.meetingplace.management.interfaces.utility.Path
+import br.meetingplace.management.interfaces.utility.Refresh
+import br.meetingplace.management.interfaces.utility.Verifiers
+import br.meetingplace.servicies.thread.MainThread
 import br.meetingplace.servicies.notification.Inbox
 import java.io.File
 
@@ -88,7 +88,10 @@ interface MainThread: ReadFile, WriteFile, DeleteFile, Refresh, Generator, Path,
                 val checker = ThreadChecker.getChecker()
 
                 when (checker.checkLikeDislike(thread)) {
-                    // 0 -> ALREADY LIKED so do nothing
+                    0->{
+                        thread.removeLike(management)
+                        writeThread(thread.getId(),thread)
+                    }
                     1-> {// DISLIKED to LIKED
                         if(thread.getCreator() != management){
                             userCreator.social.updateInbox(notification)
@@ -122,6 +125,10 @@ interface MainThread: ReadFile, WriteFile, DeleteFile, Refresh, Generator, Path,
                     thread.likeToDislike(management)
                     writeThread(thread.getId(),thread)
                 } // like to dislike
+                1->{
+                    thread.removeDislike(management)
+                    writeThread(thread.getId(),thread)
+                }
                 2 -> {
                     thread.dislike(management)
                     writeThread(thread.getId(),thread)

@@ -1,8 +1,8 @@
 package br.meetingplace.management.interfaces
 
-import br.meetingplace.interfaces.file.ReadFile
-import br.meetingplace.interfaces.utility.Generator
-import br.meetingplace.interfaces.utility.Verifiers
+import br.meetingplace.management.interfaces.file.ReadFile
+import br.meetingplace.management.interfaces.utility.Generator
+import br.meetingplace.management.interfaces.utility.Verifiers
 
 interface ConditionsVerifiers: ReadFile, Verifiers, Generator {
 
