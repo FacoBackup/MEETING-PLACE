@@ -1,12 +1,14 @@
 package br.meetingplace.servicies.group
 
+import br.meetingplace.servicies.chat.Chat
+
 class Group(){
     private var creator = ""
     private var id = ""
     private var name = ""
     private var about= ""
     private val members = mutableListOf<Member>()
-    private var chat = ""
+    private var chat = Chat("", listOf(creator))
 
     //GETTERS
     fun getCreator() = creator
@@ -14,20 +16,21 @@ class Group(){
     fun getAbout() = about
     fun getId() = id
     fun getMembers() = members
-    fun getChatId() = chat
+    fun getChat()= chat
     //GETTERS
 
-    fun updateChat(newChatId: String){
-        if(chat == "" && newChatId != "")
-            chat = newChatId
+    fun updateChat(newChat: Chat){
+        if(chat.getConversationId() != "" && newChat.getConversationId() == chat.getConversationId())
+            chat = newChat
     }
 
-    fun startGroup (newId: String,name: String, about: String,newCreator: String){ // updates the ID
+    fun startGroup (newGroupId: String,newChatId: String, name: String, about: String,newCreator: String){ // updates the ID
         if(id == "" && creator == ""){
-            id = newId
+            id = newGroupId
             this.name = name
             this.about = about
             creator = newCreator
+            chat.updateData(newChatId, listOf(creator))
         }
     }
 

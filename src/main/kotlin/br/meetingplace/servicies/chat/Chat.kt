@@ -12,6 +12,13 @@ class Chat(
     private var idMessages= mutableListOf<String>()
     private var favoriteMessagesIds= mutableListOf<String>()
 
+    fun updateData(newId: String, newOwners: List<String>){
+        if(conversationId == ""){
+            owners = newOwners
+            conversationId = newId
+        }
+    }
+
     fun addMessage(message: Message){
         if(message.idMessage !in idMessages){
             conversation.add(message)

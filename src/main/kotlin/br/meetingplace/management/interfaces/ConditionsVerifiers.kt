@@ -6,27 +6,14 @@ import br.meetingplace.management.interfaces.utility.Verifiers
 
 interface ConditionsVerifiers: ReadFile, Verifiers, Generator {
 
-    fun groupConditions(group: String, user: String): Boolean {
-        if(user != "" && verifyUserSocialProfile() && verifyPath("groups", group) && verifyPath("users", user)){
+    fun groupChatConditions(group: String, user: String): Boolean {
+        if(user != "" && verifyPath("users", user) && verifyUserSocialProfile() && verifyPath("groups", group) ){
             val groupObject = readGroup(group)
-            if(groupObject.verifyMember(user) && groupObject.getChatId() != "" && verifyPath("chats", groupObject.getChatId()))
+            if(groupObject.verifyMember(user))
                 return true
             return false
         }
         else return false
-    }
-
-    fun groupChatConditions(group: String, user: String): Int {
-        if(user != "" && verifyPath("users", user) && verifyUserSocialProfile() && verifyPath("groups", group) ){
-            val groupObject = readGroup(group)
-            if(groupObject.verifyMember(user)){
-                return if(verifyPath("chats", groupObject.getChatId()))
-                    1
-                else 2
-            }
-            return 0
-        }
-        else return 0
     }
 
     fun usersConditions(user: String, user2: String): Boolean {

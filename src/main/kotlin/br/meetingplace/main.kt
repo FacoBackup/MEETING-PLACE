@@ -171,10 +171,6 @@ fun main (){
             get("/in/groups"){
                 call.respond(core.readMemberIn())
             }
-            get("/group/chat"){
-                val member = call.receive<MemberInput>()
-                call.respond(core.getGroupChat(member))
-            }
             post("/group/create"){
                 val group = call.receive<GroupData>()
                 call.respond(core.createGroup(group))

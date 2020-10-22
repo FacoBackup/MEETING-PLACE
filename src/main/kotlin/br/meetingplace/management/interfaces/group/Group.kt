@@ -22,12 +22,14 @@ interface Group: Refresh, ReadFile, WriteFile, Path, Generator, Verifiers, Delet
         if(verifyPath("users",management) && verifyUserSocialProfile() && management != ""){
             val user = readUser(management)
             val newGroup = Group()
-            newGroup.startGroup(generateId(),group.name, group.about, management)
+            val id = generateId()
+            newGroup.startGroup(id, "$id-chat",group.name, group.about, management)
             user.social.updateMyGroups(newGroup.getId(),false)
             writeGroup(newGroup.getId(),newGroup)
             writeUser(management,user)
         }
     } // CREATE
+
     fun readMyGroups(): MutableList<Group> {
 
         val management = readLoggedUser().email
@@ -43,6 +45,7 @@ interface Group: Refresh, ReadFile, WriteFile, Path, Generator, Verifiers, Delet
         }
         return myGroups
     } // READ
+
     fun readMemberIn(): MutableList<Group> {
 
         val management = readLoggedUser().email
@@ -114,8 +117,6 @@ interface Group: Refresh, ReadFile, WriteFile, Path, Generator, Verifiers, Delet
                     }
                 }
                 user.social.updateMyGroups(group.getId(),true)
-                if(verifyPath("chats", group.getChatId()))
-                    delete(getPath("chats", group.getChatId()))
 
                 delete(getPath("groups", group.getId()))
                 writeUser(management, user)
