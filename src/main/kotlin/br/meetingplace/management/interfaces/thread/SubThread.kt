@@ -9,8 +9,8 @@ import br.meetingplace.management.interfaces.utility.Generator
 import br.meetingplace.management.interfaces.utility.Path
 import br.meetingplace.management.interfaces.utility.Refresh
 import br.meetingplace.management.interfaces.utility.Verifiers
-import br.meetingplace.servicies.thread.SubThread
-import br.meetingplace.servicies.notification.Inbox
+import br.meetingplace.services.thread.SubThread
+import br.meetingplace.services.notification.Inbox
 
 interface SubThread: ReadFile, WriteFile, DeleteFile, Refresh, Generator, Path, Verifiers {
 

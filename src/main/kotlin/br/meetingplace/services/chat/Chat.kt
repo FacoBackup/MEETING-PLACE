@@ -1,4 +1,4 @@
-package br.meetingplace.servicies.chat
+package br.meetingplace.services.chat
 
 import br.meetingplace.data.chat.ChatComplexOperations
 import br.meetingplace.data.chat.ChatOperations

@@ -1,4 +1,4 @@
-package br.meetingplace.servicies.notification
+package br.meetingplace.services.notification
 
 class Inbox(Notification: String, Type: String) {
 

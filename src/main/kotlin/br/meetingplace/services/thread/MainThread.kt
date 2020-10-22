@@ -1,4 +1,4 @@
-package br.meetingplace.servicies.thread
+package br.meetingplace.services.thread
 
 import br.meetingplace.data.threads.mainThread.ThreadContent
 

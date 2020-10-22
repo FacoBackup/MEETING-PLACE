@@ -1,0 +1,25 @@
+{
+  "creator": "xablau@gmail.com",
+  "id": "75cb2c64-644a-470e-8700-bd56c6a7c044",
+  "name": "grupo do cafe",
+  "about": "gostamos de cafe",
+  "members": [],
+  "chat": {
+    "conversation": [
+      {
+        "message": "teste",
+        "idMessage": "cbff032f-ab59-4146-a365-0ee03922b981",
+        "creator": "xablau@gmail.com",
+        "static": true
+      }
+    ],
+    "idMessages": [
+      "cbff032f-ab59-4146-a365-0ee03922b981"
+    ],
+    "favoriteMessagesIds": [],
+    "conversationId": "75cb2c64-644a-470e-8700-bd56c6a7c044-chat",
+    "owners": [
+      "xablau@gmail.com"
+    ]
+  }
+}

@@ -1,6 +1,5 @@
 package br.meetingplace.management.interfaces.group
 
-import br.meetingplace.data.group.MemberInput
 import br.meetingplace.data.chat.ChatComplexOperations
 import br.meetingplace.data.chat.ChatMessage
 import br.meetingplace.data.chat.ChatOperations
@@ -10,9 +9,8 @@ import br.meetingplace.management.interfaces.utility.Generator
 import br.meetingplace.management.interfaces.utility.Refresh
 import br.meetingplace.management.interfaces.utility.Verifiers
 import br.meetingplace.management.interfaces.ConditionsVerifiers
-import br.meetingplace.servicies.chat.Chat
-import br.meetingplace.servicies.chat.Message
-import br.meetingplace.servicies.notification.Inbox
+import br.meetingplace.services.chat.Message
+import br.meetingplace.services.notification.Inbox
 
 interface GroupChat: ReadFile, WriteFile, Refresh, Generator, Verifiers, ConditionsVerifiers {
 

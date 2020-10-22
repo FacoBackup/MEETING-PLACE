@@ -2,7 +2,9 @@
   "social": {
     "myThreads": [],
     "myChats": [],
-    "myGroups": [],
+    "myGroups": [
+      "75cb2c64-644a-470e-8700-bd56c6a7c044"
+    ],
     "memberIn": [],
     "followers": [],
     "following": [],

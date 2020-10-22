@@ -1,6 +1,6 @@
 package br.meetingplace.entitie.profiles
 
-import br.meetingplace.servicies.notification.Inbox
+import br.meetingplace.services.notification.Inbox
 
 class SocialProfile(
     private var userName: String,

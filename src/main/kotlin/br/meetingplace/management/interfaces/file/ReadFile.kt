@@ -2,10 +2,10 @@ package br.meetingplace.management.interfaces.file
 
 import br.meetingplace.data.user.LoginByEmail
 
-import br.meetingplace.servicies.group.Group
+import br.meetingplace.services.group.Group
 import br.meetingplace.entitie.User
-import br.meetingplace.servicies.chat.Chat
-import br.meetingplace.servicies.thread.MainThread
+import br.meetingplace.services.chat.Chat
+import br.meetingplace.services.thread.MainThread
 import com.google.gson.GsonBuilder
 import java.io.File
 

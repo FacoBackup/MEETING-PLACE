@@ -1,6 +1,6 @@
-package br.meetingplace.servicies.group
+package br.meetingplace.services.group
 
-import br.meetingplace.servicies.chat.Chat
+import br.meetingplace.services.chat.Chat
 
 class Group(){
     private var creator = ""

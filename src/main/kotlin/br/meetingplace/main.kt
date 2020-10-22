@@ -16,7 +16,6 @@ import br.meetingplace.data.user.LoginByEmail
 import br.meetingplace.data.user.SocialProfileData
 import br.meetingplace.data.user.UserData
 import br.meetingplace.management.Core
-import br.meetingplace.servicies.community.Community
 import io.ktor.application.*
 import io.ktor.features.*
 import io.ktor.gson.*
@@ -39,11 +38,6 @@ fun main (){
 
             get("/user"){
                 call.respond(core.getMyProfile())
-            }
-
-            get("/comunidade"){
-                val comunidade = Community()
-                call.respond(comunidade)
             }
 
             get("/logged") {

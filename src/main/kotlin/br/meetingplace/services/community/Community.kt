@@ -1,9 +1,9 @@
-package br.meetingplace.servicies.community
+package br.meetingplace.services.community
 
-import br.meetingplace.servicies.community.data.Report
-import br.meetingplace.servicies.community.interfaces.Moderators
+import br.meetingplace.services.community.data.Report
+import br.meetingplace.services.thread.MainThread
 
-class Community: Moderators{
+class Community{
     private var name= "" // THE NAME IS THE IDENTIFIER
     private var about= ""
     private val approvedThreads = mutableListOf<String>()
@@ -16,6 +16,58 @@ class Community: Moderators{
     private val reports = mutableListOf<Report>()
     private val reportIds = mutableListOf<String>()
 
+    fun updateFollower(userEmail: String, remove:Boolean){
+        when (remove){
+            true->{
+                if(userEmail in followers){
+                    followers.remove(userEmail)
+                }
+            }
+            false->{
+                if(userEmail !in followers){
+                    followers.add(userEmail)
+                }
+            }
+        }
+    }
+    fun updateThreadRequest(thread: MainThread, requester: String,remove: Boolean){
+        when (remove){
+            true->{
+
+            }
+            false-> {
+
+            }
+        }
+    }
+
+    fun updateApprovedThread(thread: MainThread, requester: String,remove: Boolean){
+        when (remove){
+            true->{
+                if(requester == thread.getCreator() || requester in moderators)
+                    approvedThreads.remove(thread.getId())
+            }
+            false-> {
+                if(requester in moderators)
+                    approvedThreads.add(thread.getId())
+            }
+        }
+    }
+    /*
+    fun updateModerator(userEmail: String, remove:Boolean, requester: String){
+        when (remove){
+            true->{
+                //if(userEmail in moderators)
+                 //   followers.remove(userEmail)
+            }
+            false->{
+                if(userEmail !in moderators){
+                    moderators.add(userEmail)
+                }
+            }
+        }
+    }//NEEDS WORK HERE
+     */
     fun addReport(report: Report){
         if(report.reportId !in reportIds && !report.finished && report.creator in followers &&
             (report.idService in approvedThreads || report.idService in approvedGroups || report.idService in followers)){

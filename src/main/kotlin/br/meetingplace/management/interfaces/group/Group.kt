@@ -10,9 +10,9 @@ import br.meetingplace.management.interfaces.utility.Generator
 import br.meetingplace.management.interfaces.utility.Path
 import br.meetingplace.management.interfaces.utility.Refresh
 import br.meetingplace.management.interfaces.utility.Verifiers
-import br.meetingplace.servicies.group.Group
-import br.meetingplace.servicies.group.Member
-import br.meetingplace.servicies.notification.Inbox
+import br.meetingplace.services.group.Group
+import br.meetingplace.services.group.Member
+import br.meetingplace.services.notification.Inbox
 
 interface Group: Refresh, ReadFile, WriteFile, Path, Generator, Verifiers, DeleteFile{
 
