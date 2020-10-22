@@ -17,9 +17,9 @@ interface ConditionsVerifiers: ReadFile, Verifiers, Generator {
     }
 
     fun groupChatConditions(group: String, user: String): Int {
-        if(user != "" && verifyUserSocialProfile() && verifyPath("groups", group) && verifyPath("users", user)){
+        if(user != "" && verifyPath("users", user) && verifyUserSocialProfile() && verifyPath("groups", group) ){
             val groupObject = readGroup(group)
-            if(groupObject.verifyMember(user) && groupObject.getChatId() != "" && verifyPath("chats", groupObject.getChatId())){
+            if(groupObject.verifyMember(user)){
                 return if(verifyPath("chats", groupObject.getChatId()))
                     1
                 else 2

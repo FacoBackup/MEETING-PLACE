@@ -15,8 +15,11 @@ class SocialProfile(
     private var followers = mutableListOf<String>()
     private var following = mutableListOf<String>()
     private var inbox = mutableListOf<Inbox>()
-
     //UPDATE
+
+    fun clearNotifications(){
+        inbox.clear()
+    }
     fun updateMyGroups(idGroup: String, delete: Boolean){
         when (delete){
             true->{

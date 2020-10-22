@@ -56,19 +56,15 @@ interface Profile: ReadFile, WriteFile, Refresh, Path, Verifiers, ConditionsVeri
             writeUser(data.external,external)
         }
     } //UPDATE
-/*
-    fun leaveGroup(member: UserMember){
+    fun clearNotifications(){
+        val management = readLoggedUser().email
 
-        if(management != ""){
-
-            val indexGroup = getGroupIndex(member.group)
-
-            if(indexGroup != -1 && groupList[indexGroup].getCreator() != logged)
-                removeMember(member)
+        if(management != "" && verifyPath("users", management)){
+            val user = readUser(management)
+            user.social.clearNotifications()
+            writeUser(management,user)
         }
     }
-
- */
 /*
     fun createProfessionalProfile(user: ProfessionalProfile){ // NEEDS WORK
 

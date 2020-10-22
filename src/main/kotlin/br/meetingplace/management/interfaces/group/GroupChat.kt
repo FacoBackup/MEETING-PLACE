@@ -20,34 +20,41 @@ interface GroupChat: ReadFile, WriteFile, Refresh, Generator, Verifiers, Conditi
         val management = readLoggedUser().email
 
         val chatId = content.id + "-chat"
-
         when (groupChatConditions(content.id, management)) {
             1 -> { // The Chat already exists
+                println("step 2")
                 val user = readUser(management)
                 val group = readGroup(content.id)
                 val groupMembers = group.getMembers()
                 val msg = Message(content.message, generateId(), management, true)
-                val notification = Inbox("${user.social.getUserName()} sent a new message.", "Group Message.")
+                val notification = Inbox("${user.social.getUserName()} from ${group.getNameGroup()} sent a new message.", "Group Message.")
                 val chat = readChat(chatId)
                 chat.addMessage(msg)
 
                 writeChat(chatId, chat)
 
                 for (i in 0 until groupMembers.size) {
-                    if (verifyPath("users", groupMembers[i].userEmail)) {
+                    if (verifyPath("users", groupMembers[i].userEmail) && groupMembers[i].userEmail != management) {
                         val member = readUser(groupMembers[i].userEmail)
                         member.social.updateInbox(notification)
                         writeUser(member.getEmail(), member)
                     }//member exists
                 }//for
+
+                if(management != group.getCreator() && verifyPath("users", group.getCreator())){
+                    val creator = readUser(group.getCreator())
+                    creator.social.updateInbox(notification)
+                    writeUser(creator.getEmail(), creator)
+                }
                 println("done")
             }
 
             2 -> { // The Chat doesn't exists
+                println("step 2b")
                 val user = readUser(management)
                 val group = readGroup(content.id)
                 val groupMembers = group.getMembers()
-                val notification = Inbox("${user.social.getUserName()} started the group conversation.", "Group Message.")
+                val notification = Inbox("${user.social.getUserName()} started ${group.getNameGroup()} conversation.", "Group Message.")
                 val newChat = Chat(chatId, listOf(group.getCreator()))
                 val msg = Message(content.message, generateId(), management, true)
                 newChat.addMessage(msg)
@@ -56,11 +63,16 @@ interface GroupChat: ReadFile, WriteFile, Refresh, Generator, Verifiers, Conditi
                 writeGroup(group.getId(), group)
                 //SENDING THE NOTIFICATION TO ALL MEMBERS
                 for (i in 0 until groupMembers.size) {
-                    if (verifyPath("users", groupMembers[i].userEmail)) {
+                    if (verifyPath("users", groupMembers[i].userEmail) && groupMembers[i].userEmail != management) {
                         val member = readUser(groupMembers[i].userEmail)
                         member.social.updateInbox(notification)
                         writeUser(member.getEmail(), member)
                     }
+                }
+                if(management != group.getCreator() && verifyPath("users", group.getCreator())){
+                    val creator = readUser(group.getCreator())
+                    creator.social.updateInbox(notification)
+                    writeUser(creator.getEmail(), creator)
                 }
             }
         }

@@ -16,6 +16,7 @@ import br.meetingplace.data.user.LoginByEmail
 import br.meetingplace.data.user.SocialProfileData
 import br.meetingplace.data.user.UserData
 import br.meetingplace.management.Core
+import br.meetingplace.servicies.community.Community
 import io.ktor.application.*
 import io.ktor.features.*
 import io.ktor.gson.*
@@ -40,8 +41,17 @@ fun main (){
                 call.respond(core.getMyProfile())
             }
 
+            get("/comunidade"){
+                val comunidade = Community()
+                call.respond(comunidade)
+            }
+
             get("/logged") {
                 call.respond(core.readLoggedUser().email)
+            }
+
+            post("/user/clear/notifications"){
+                call.respond(core.clearNotifications())
             }
 
             post("/user/create"){
@@ -54,7 +64,7 @@ fun main (){
                 call.respond(core.deleteUser(user))
             }
 
-            post("/user/loginId"){
+            post("/user/login"){
                 val user = call.receive<LoginByEmail>()
                 call.respond(core.login(user))
             }

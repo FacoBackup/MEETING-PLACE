@@ -1,30 +1,56 @@
 package br.meetingplace.servicies.community
 
-import br.meetingplace.servicies.community.subClasses.CommunityModerators
+import br.meetingplace.servicies.community.data.Report
+import br.meetingplace.servicies.community.interfaces.Moderators
 
-class Community{
+class Community: Moderators{
     private var name= "" // THE NAME IS THE IDENTIFIER
     private var about= ""
-    private val moderators = CommunityModerators.getObj()
+    private val approvedThreads = mutableListOf<String>()
+    private val approvedGroups = mutableListOf<String>()
+    private val followers = mutableListOf<String>()
+    private val moderators = mutableListOf<String>()
+    private val toBeApprovedGroup= mutableListOf<String>()
+    private val toBeApprovedThreads= mutableListOf<String>()
 
-//
-//    private val followers = mutableListOf<String>()
-//    private val groups = mutableListOf<String>()
-//    private val approvedThreads = mutableListOf<String>() //THIS ONE GOES TO THE FOLLOWER TIMELINE
-//
-//    //THESE ONES GOES TO THE INBOX OF THE MODERATORS UNTIL IT IS RESOLVED
-//    private val toBeApprovedThreads = mutableListOf<String>()
-//    private val reportedThreads = mutableListOf<Report>()
-//    private val reportedFollowers = mutableListOf<Report>()
-//    private val reportedGroups = mutableListOf<Report>()
-//
-//
-//    fun startCommunity(data: CommunityData, creator: String){
-//        if(name == "" && about == "" && moderators.size == 0){
-//            name = data.name
-//            moderators.add(creator)
-//            about = data.about
-//        }
-//    }
+    private val reports = mutableListOf<Report>()
+    private val reportIds = mutableListOf<String>()
 
+    fun addReport(report: Report){
+        if(report.reportId !in reportIds && !report.finished && report.creator in followers &&
+            (report.idService in approvedThreads || report.idService in approvedGroups || report.idService in followers)){
+
+            reports.add(report)
+            reportIds.add(report.reportId)
+        }
+    }
+
+    fun removeReport(reportId: String, requester: String){
+        if(reportId in reportIds){
+            val report = reports[getReportIndex(reportId)]
+            if(report.creator == requester || requester in moderators){
+                reportIds.remove(reportId)
+                reports.remove(report)
+            }
+        }
+    }
+
+    fun updateReportStatus(reportId: String, finished: Boolean, requester:String ){
+        if(reportId in reportIds){
+            val report = reports[getReportIndex(reportId)]
+            if(report.creator == requester || requester in moderators){
+                report.finished = finished
+            }
+        }
+    }
+
+    private fun getReportIndex(reportId: String): Int {
+        return if(reportId in reportIds){
+            for(i in 0 until reportIds.size){
+                if(reportId == reportIds[i])
+                    return i
+            }
+            -1
+        } else -1
+    }
 }

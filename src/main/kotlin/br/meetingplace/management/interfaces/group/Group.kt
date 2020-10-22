@@ -66,7 +66,7 @@ interface Group: Refresh, ReadFile, WriteFile, Path, Generator, Verifiers, Delet
             val group = readGroup(member.groupId)
 
             if(group.verifyMember(management) && !group.verifyMember(member.externalMember)){
-                val toBeAdded = Member(member.externalMember,group.getMemberRole(management))
+                val toBeAdded = Member(member.externalMember, 0)
                 val notification = Inbox("You're now a member of ${group.getNameGroup()}", "Group.")
 
                 group.updateMember(toBeAdded, false)

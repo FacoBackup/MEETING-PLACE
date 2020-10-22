@@ -8,20 +8,24 @@ import java.io.File
 
 interface Login: ReadFile, WriteFile, Generator {
 
-    fun login(log: LoginByEmail){
+    fun login(log: LoginByEmail){ //CASE SENSITIVE
         val pathUser = File("build.gradle").absolutePath.removeSuffix("build.gradle") + "/src/main/kotlin/br/meetingplace/logs/users/${log.email}.json"
         val pathLogged = File("build.gradle").absolutePath.removeSuffix("build.gradle") + "/src/main/kotlin/br/meetingplace/logs/logged.json"
 
         val fileUser = File(pathUser).exists()
         val fileLog = File(pathLogged).exists()
-
+        println("step 1")
+        println(fileUser)
+        println(fileLog)
         if(fileUser && fileLog){
+            println("step 2a")
             val user = readUser(log.email)
             val loggedFile = readLoggedUser()
             if(log.password == user.getPassword() && loggedFile.email == "")
                 writeLoggedUser(log)
         }
         else if (fileUser && !fileLog){
+            println("step 2b")
             val user = readUser(log.email)
             if(log.password == user.getPassword())
                 writeLoggedUser(log)
