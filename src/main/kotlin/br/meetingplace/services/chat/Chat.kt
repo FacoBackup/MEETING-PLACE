@@ -2,20 +2,23 @@ package br.meetingplace.services.chat
 
 import br.meetingplace.data.chat.ChatComplexOperations
 import br.meetingplace.data.chat.ChatOperations
-import br.meetingplace.management.interfaces.utility.Refresh
 
-class Chat(
-    private var conversationId: String,
-    private var owners: List<String>
-): Refresh {
+class Chat private constructor(){
+    private var id= ""
+    private var owners = mutableListOf<String>()
     private var conversation = mutableListOf<Message>()
     private var idMessages= mutableListOf<String>()
     private var favoriteMessagesIds= mutableListOf<String>()
 
-    fun updateData(newId: String, newOwners: List<String>){
-        if(conversationId == ""){
-            owners = newOwners
-            conversationId = newId
+    companion object{
+        private val chat = Chat()
+        fun getChat() = chat
+    }
+
+    fun startChat(owners: List<String>, id: String){
+        if(this.id == "" && owners.isEmpty()){
+            this.owners.addAll(owners)
+            this.id = id
         }
     }
 
@@ -30,12 +33,10 @@ class Chat(
 
         if(message.idMessage in idMessages){
             val indexMessage = getMessageIndex(message.idMessage)
-            if(refreshData().email == conversation[indexMessage].creator){
-                conversation.remove(conversation[indexMessage])
-                idMessages.remove(message.idMessage)
-                if(message.idMessage in favoriteMessagesIds)
-                    unFavoriteMessage(message)
-            }
+            conversation.remove(conversation[indexMessage])
+            idMessages.remove(message.idMessage)
+            if(message.idMessage in favoriteMessagesIds)
+                unFavoriteMessage(message)
         }
     }
 
@@ -51,14 +52,15 @@ class Chat(
 
     fun quoteMessage(message: ChatComplexOperations, newId: String){
         val indexMessage = getMessageIndex(message.idMessage)
-        if(indexMessage != -1 && message.idMessage in idMessages){
+        if(indexMessage != -1){
             message.message = "|${conversation[indexMessage].message}|  "+ message.message
-            val newMessage = Message(message.message, newId,refreshData().email, true)
+            val newMessage = Message(message.message, newId,conversation[indexMessage].creator, true)
             addMessage(newMessage)
         }
     }
 
-    fun shareMessage(operations: ChatOperations): String {
+
+    fun shareMessage(operations: ChatComplexOperations): String {
         val indexMessage = getMessageIndex(operations.idMessage)
         return if(indexMessage != -1)
             conversation[indexMessage].message
@@ -81,6 +83,6 @@ class Chat(
     fun getConversation ()= conversation
     fun getFavoriteMessagesIds() = favoriteMessagesIds
     fun getMessageIds() = idMessages
-    fun getConversationId() = conversationId
+    fun getConversationId() = id
     //GETTERS
 }

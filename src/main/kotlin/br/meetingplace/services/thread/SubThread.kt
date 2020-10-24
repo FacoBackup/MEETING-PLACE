@@ -3,7 +3,7 @@ package br.meetingplace.services.thread
 
 // NEEDS WORK (DATA CLASS)
 data class SubThread(
-    var likes: MutableList<String> ,
+    var likes: MutableList<String>,
     var dislikes: MutableList<String>,
     val creator: String,
     var header: String,

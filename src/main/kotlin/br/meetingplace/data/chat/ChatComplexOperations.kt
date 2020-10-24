@@ -1,3 +1,3 @@
 package br.meetingplace.data.chat
 
-data class ChatComplexOperations(var message: String, val id: String, var idMessage: String){}
+data class ChatComplexOperations(var message: String, val idSource: String, var idMessage: String, val idReceiver: String){}

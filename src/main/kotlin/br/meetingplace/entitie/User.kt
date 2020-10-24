@@ -39,7 +39,7 @@ open class User(
 
     //Getters
     fun getPassword() = password
-
+    fun getAge() = age
     fun getEmail() = email
     //Getters
 }

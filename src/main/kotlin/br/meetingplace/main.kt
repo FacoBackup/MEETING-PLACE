@@ -5,17 +5,18 @@ import br.meetingplace.data.chat.ChatComplexOperations
 import br.meetingplace.data.chat.ChatMessage
 import br.meetingplace.data.chat.ChatOperations
 import br.meetingplace.data.group.GroupData
-import br.meetingplace.data.group.GroupOperations
+import br.meetingplace.data.group.GroupOperationsData
 import br.meetingplace.data.group.MemberInput
-import br.meetingplace.data.threads.subThread.SubThreadContent
-import br.meetingplace.data.threads.subThread.SubThreadOperations
-import br.meetingplace.data.threads.mainThread.ThreadContent
-import br.meetingplace.data.threads.mainThread.ThreadOperations
+import br.meetingplace.data.threads.ThreadData
+import br.meetingplace.data.threads.ThreadOperationsData
 import br.meetingplace.data.user.Follower
 import br.meetingplace.data.user.LoginByEmail
 import br.meetingplace.data.user.SocialProfileData
 import br.meetingplace.data.user.UserData
-import br.meetingplace.management.Core
+import br.meetingplace.management.core.Login
+import br.meetingplace.management.core.chat.ChatOperator
+import br.meetingplace.management.core.thread.ThreadOperations
+import br.meetingplace.management.core.user.UserOperations
 import io.ktor.application.*
 import io.ktor.features.*
 import io.ktor.gson.*
@@ -25,7 +26,10 @@ import io.ktor.routing.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 
-val core = Core.returnCore()
+val userSystem= UserOperations()
+val threadSystem=  ThreadOperations()
+val chatSystem = ChatOperator() // controls chat and groups
+val login = Login.getLoginSystem()
 fun main (){
 
     embeddedServer(Netty, 3000) {
@@ -37,169 +41,152 @@ fun main (){
             }
 
             get("/user"){
-                call.respond(core.getMyProfile())
+                call.respond(userSystem.getMyUser())
             }
 
             get("/logged") {
-                call.respond(core.readLoggedUser().email)
+                call.respond(userSystem.readLoggedUser().email)
             }
 
             post("/user/clear/notifications"){
-                call.respond(core.clearNotifications())
+                call.respond(userSystem.clearNotifications())
             }
 
             post("/user/create"){
                 val user = call.receive<UserData>()
-                call.respond(core.createUser(user))
+                call.respond(userSystem.createUser(user))
             }
 
-            post("/user/delete"){
-                val user = call.receive<PasswordOperations>()
-                call.respond(core.deleteUser(user))
+            post("/delete"){
+                call.respond(userSystem.deleteUser())
             }
 
-            post("/user/login"){
+            post("/login"){
                 val user = call.receive<LoginByEmail>()
-                call.respond(core.login(user))
+                call.respond(login.login(user))
             }
 
-            post("/user/logoff"){
-                call.respond(core.logout())
+            post("/logoff"){
+                call.respond(login.logout())
             }
 
-            post("/user/create/social"){
+            post("/create/social"){
                 val user = call.receive<SocialProfileData>()
-                call.respond(core.createSocialProfile(user))
+                call.respond(userSystem.createSocialProfile(user))
             }
 //            post("/user/create/professional"){
 //                val user = call.receive<ProfessionalProfile>()
 //                call.respond(core.createProfessionalProfile(user))
 //            }
-            post("/user/follow"){
+            post("/follow"){
                 val follow = call.receive<Follower>()
-                call.respond(core.follow(follow))
+                call.respond(userSystem.follow(follow))
             }
-            post("/user/unfollow"){
+            post("/unfollow"){
                 val follow = call.receive<Follower>()
-                call.respond(core.unfollow(follow))
+                call.respond(userSystem.unfollow(follow))
             }
 
             //MESSAGES USERS
-            get("/messages") {
-                call.respond(core.getMyChats())
+            get("/my/messages") {
+                call.respond(chatSystem.getMyChats())
             }
-            post("/user/message"){
+            post("/message/send"){
                 val chat = call.receive<ChatMessage>()
-                call.respond(core.sendMessageUser(chat))
+                call.respond(chatSystem.sendMessage(chat))
             }
-            post("/user/delete/message"){
+            post("/message/delete"){
                 val chat = call.receive<ChatOperations>()
-                call.respond(core.deleteMessageUser(chat))
+                call.respond(chatSystem.deleteMessage(chat))
             }
-            post("/user/quote/message"){
+            post("/message/quote"){
                 val chat = call.receive<ChatComplexOperations>()
-                call.respond(core.quoteMessageUser(chat))
+                call.respond(chatSystem.quoteMessage(chat))
             }
-            post("/user/favorite/message"){
+            post("/message/favorite"){
                 val chat = call.receive<ChatOperations>()
-                call.respond(core.favoriteMessageUser(chat))
+                call.respond(chatSystem.favoriteMessage(chat))
             }
-            post("/user/unFavorite/message"){
+            post("/message/unFavorite"){
                 val chat = call.receive<ChatOperations>()
-                call.respond(core.unFavoriteMessageUser(chat))
+                call.respond(chatSystem.unFavoriteMessage(chat))
             }
-            post("/user/share/message"){
+            post("/message/share"){
                 val chat = call.receive<ChatComplexOperations>()
-                call.respond(core.shareMessageUser(chat))
+                call.respond(chatSystem.shareMessage(chat))
             }
             //MESSAGES USERS
 
 //            THREADS
             get("/user/see/threads"){
-                call.respond(core.getMyThreads())
+                call.respond(threadSystem.getMyThreads())
             }
             get("/user/see/timeline"){
-                call.respond(core.getMyTimeline())
+                call.respond(threadSystem.getMyTimeline())
             }
 
-            post("/user/thread"){
-                val new = call.receive<ThreadContent>()
-                call.respond(core.createMainThread(new))
+            post("/thread/create"){
+                val new = call.receive<ThreadData>()
+                call.respond(threadSystem.create(new))
             }
-            post("/user/subthread"){
-                val content = call.receive<SubThreadContent>()
-                call.respond(core.createSubThread(content))
-            }
-            post("/user/delete/subthread"){
-                val content = call.receive<SubThreadOperations>()
-                call.respond(core.deleteSubThread(content))
-            }
-            post("/user/like"){
-                val post = call.receive<ThreadOperations>()
-                call.respond(core.likeThread(post))
+            post("/thread/like"){
+                val post = call.receive<ThreadOperationsData>()
+                call.respond(threadSystem.like(post))
             }
 
-            post("/user/dislike"){
-                val post = call.receive<ThreadOperations>()
-                call.respond(core.dislikeThread(post))
+            post("/thread/dislike"){
+                val post = call.receive<ThreadOperationsData>()
+                call.respond(threadSystem.dislike(post))
             }
 
-            post("/user/like/sub"){
-                val post = call.receive<SubThreadOperations>()
-                call.respond(core.likeSubThread(post))
-            }
-            post("/user/dislike/sub"){
-                val post = call.receive<SubThreadOperations>()
-                call.respond(core.dislikeSubThread(post))
-            }
-            post("/user/delete/thread"){
-                val thread = call.receive<ThreadOperations>()
-                call.respond(core.deleteThread(thread))
+            post("/thread/delete"){
+                val thread = call.receive<ThreadOperationsData>()
+                call.respond(threadSystem.delete(thread))
             }
             //THREADS
 
             //GROUPS
             get("/my/groups"){
-                call.respond(core.readMyGroups())
+                call.respond(chatSystem.readMyGroups())
             }
             get("/in/groups"){
-                call.respond(core.readMemberIn())
+                call.respond(chatSystem.readMemberIn())
             }
             post("/group/create"){
                 val group = call.receive<GroupData>()
-                call.respond(core.createGroup(group))
+                call.respond(chatSystem.createGroup(group))
             }
             post("/group/member"){
                 val member = call.receive<MemberInput>()
-                call.respond(core.addMember(member))
+                call.respond(chatSystem.addMember(member))
             }
             post("/group/member/remove"){
                 val member = call.receive<MemberInput>()
-                call.respond(core.removeMember(member))
+                call.respond(chatSystem.removeMember(member))
             }
             post("/group/message"){
                 val chatGroup = call.receive<ChatMessage>()
-                call.respond(core.sendMessage(chatGroup))
+                call.respond(chatSystem.sendMessage(chatGroup))
             }
             post("/group/delete/message"){
                 val chatGroup = call.receive<ChatOperations>()
-                call.respond(core.deleteMessage(chatGroup))
+                call.respond(chatSystem.deleteMessage(chatGroup))
             }
             post("/group/favorite/message"){
                 val chatGroup = call.receive<ChatOperations>()
-                call.respond(core.favoriteMessage(chatGroup))
+                call.respond(chatSystem.favoriteMessage(chatGroup))
             }
             post("/group/unfavorite/message"){
                 val chatGroup = call.receive<ChatOperations>()
-                call.respond(core.unFavoriteMessage(chatGroup))
+                call.respond(chatSystem.unFavoriteMessage(chatGroup))
             }
             post("/group/quote/message"){
                 val chatGroup = call.receive<ChatComplexOperations>()
-                call.respond(core.quoteMessage(chatGroup))
+                call.respond(chatSystem.quoteMessage(chatGroup))
             }
             post("/group/delete"){
-                val group = call.receive<GroupOperations>()
-                call.respond(core.deleteGroup(group))
+                val group = call.receive<GroupOperationsData>()
+                call.respond(chatSystem.deleteGroup(group))
             }
             //GROUPS
         }

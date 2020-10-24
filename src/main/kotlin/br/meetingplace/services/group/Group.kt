@@ -4,33 +4,32 @@ import br.meetingplace.services.chat.Chat
 
 class Group(){
     private var creator = ""
-    private var id = ""
-    private var name = ""
+    private var name = "" // the name is the new ID
+    private var idGroup = ""
     private var about= ""
     private val members = mutableListOf<Member>()
-    private var chat = Chat("", listOf(creator))
+    private var chat = Chat.getChat()
 
     //GETTERS
     fun getCreator() = creator
     fun getNameGroup() = name
+    fun getGroupId() = idGroup
     fun getAbout() = about
-    fun getId() = id
     fun getMembers() = members
     fun getChat()= chat
     //GETTERS
 
     fun updateChat(newChat: Chat){
-        if(chat.getConversationId() != "" && newChat.getConversationId() == chat.getConversationId())
-            chat = newChat
+        chat = newChat
     }
 
-    fun startGroup (newGroupId: String,newChatId: String, name: String, about: String,newCreator: String){ // updates the ID
-        if(id == "" && creator == ""){
-            id = newGroupId
-            this.name = name
+    fun startGroup (newName: String, about: String,newCreator: String){ // updates the ID
+        if(name == "" && creator == "" && idGroup == ""){
+            this.name = newName
             this.about = about
+            idGroup = (name.replace("\\s".toRegex(),"")).toLowerCase() // cAFe Group -> cafegroup
             creator = newCreator
-            chat.updateData(newChatId, listOf(creator))
+            chat.startChat(listOf(creator),"Group-Chat")
         }
     }
 

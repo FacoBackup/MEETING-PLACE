@@ -1,6 +1,7 @@
 package br.meetingplace.services.thread
 
-import br.meetingplace.data.threads.mainThread.ThreadContent
+import br.meetingplace.data.threads.ThreadData
+
 
 class MainThread(){
 
@@ -15,7 +16,7 @@ class MainThread(){
     private var id = ""
 
     //SETTERS
-    fun startThread(content: ThreadContent, id: String, userName: String, userId: String){ // Updates the creator to the logged user
+    fun startThread(content: ThreadData, id: String, userName: String, userId: String){ // Updates the creator to the logged user
             creator = userId
             footer = userName
             header = content.title
