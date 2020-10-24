@@ -16,7 +16,8 @@ class Chat private constructor(){
     }
 
     fun startChat(owners: List<String>, id: String){
-        if(this.id == "" && owners.isEmpty()){
+
+        if(this.id == "" && this.owners.isEmpty()){
             this.owners.addAll(owners)
             this.id = id
         }

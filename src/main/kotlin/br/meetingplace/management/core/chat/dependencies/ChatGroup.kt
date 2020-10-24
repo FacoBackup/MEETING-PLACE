@@ -25,7 +25,7 @@ class ChatGroup private constructor(): ChatInterface, ReadWriteUser, ReadWriteLo
         val msg = Message(data.message, generateId(), loggedUser, true)
         val notification = Inbox("${user.social.getUserName()} from ${receiver.getGroupId()} sent a new message.", "Group Message.")
 
-        if (verifyUser(user) && verifyGroup(receiver)) {
+        if (verifyLoggedUser(user) && verifyGroup(receiver)) {
             val groupMembers = receiver.getMembers()
             val updatedChat = receiver.getChat()
             val chat = receiver.getChat()
@@ -54,7 +54,7 @@ class ChatGroup private constructor(): ChatInterface, ReadWriteUser, ReadWriteLo
         val user = readUser(loggedUser)
         val receiver = readGroup(data.idReceiver)
 
-        if(verifyUser(user) && verifyGroup(receiver)){
+        if(verifyLoggedUser(user) && verifyGroup(receiver)){
             val chat = receiver.getChat()
             chat.favoriteMessage(data)
             receiver.updateChat(chat)
@@ -67,7 +67,7 @@ class ChatGroup private constructor(): ChatInterface, ReadWriteUser, ReadWriteLo
         val user = readUser(loggedUser)
         val receiver = readGroup(data.idReceiver)
 
-        if(verifyUser(user) && verifyGroup(receiver)){
+        if(verifyLoggedUser(user) && verifyGroup(receiver)){
             val chat = receiver.getChat()
             chat.unFavoriteMessage(data)
             receiver.updateChat(chat)
@@ -80,7 +80,7 @@ class ChatGroup private constructor(): ChatInterface, ReadWriteUser, ReadWriteLo
         val user = readUser(loggedUser)
         val receiver = readGroup(data.idReceiver)
 
-        if(verifyUser(user) && verifyGroup(receiver)){
+        if(verifyLoggedUser(user) && verifyGroup(receiver)){
             val chat = receiver.getChat()
             if(chat.verifyMessage(data.idMessage)){
                 chat.quoteMessage(data, generateId())
@@ -99,7 +99,7 @@ class ChatGroup private constructor(): ChatInterface, ReadWriteUser, ReadWriteLo
         val user = readUser(loggedUser)
         val receiver = readGroup(data.idReceiver)
 
-        if(verifyUser(user) && verifyGroup(receiver)){
+        if(verifyLoggedUser(user) && verifyGroup(receiver)){
             val chat = receiver.getChat()
             if(chat.verifyMessage(data.idMessage)){
                 chat.deleteMessage(data)

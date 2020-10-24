@@ -29,7 +29,7 @@ abstract class Profile: ReadWriteUser, ReadWriteLoggedUser, Verify{
         val external = readUser(data.external)
         val notification = Inbox("${user.social.getUserName()} is now following you.", "New follower.")
 
-        if(external.getAge() != -1 && verifyUser(user) && verifyUser(external) && !verifyFollower(external, user)){
+        if(external.getAge() != -1 && verifyLoggedUser(user) && verifyUser(external) && !verifyFollower(external, user)){
             external.social.updateInbox(notification)
             external.social.updateFollowers(logged,false)
             user.social.updateFollowing(data.external,false)
@@ -44,7 +44,7 @@ abstract class Profile: ReadWriteUser, ReadWriteLoggedUser, Verify{
         val user = readUser(logged)
         val external = readUser(data.external)
 
-        if(external.getAge() != -1 && verifyUser(user) && verifyUser(external) && verifyFollower(external, user)){
+        if(external.getAge() != -1 && verifyLoggedUser(user) && verifyUser(external) && verifyFollower(external, user)){
             external.social.updateFollowers(logged,true)
             user.social.updateFollowing(data.external,true)
             writeUser(user, logged)

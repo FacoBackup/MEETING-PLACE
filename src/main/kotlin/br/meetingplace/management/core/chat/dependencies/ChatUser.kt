@@ -27,37 +27,43 @@ class ChatUser private constructor(): ChatInterface, ReadWriteUser, ReadWriteLog
         val idChat = getChatId(loggedUser, receiver.getEmail())
         val chat = readChat(idChat)
 
-        if(verifyUser(user) && verifyUser(receiver) && verifyChat(chat)) {
-                val notification = Inbox("${user.social.getUserName()} started a conversation with you.", "Message.")
-                val newChat = Chat.getChat()
-                newChat.startChat(listOf(loggedUser, receiver.getEmail()), idChat)
-                val msg = Message(data.message, generateId(), loggedUser,true)
-                newChat.addMessage(msg)
+        println(chat.getConversationId())
+        if(verifyLoggedUser(user) && verifyUser(receiver)) {
+            println(verifyChat(chat))
+            when (verifyChat(chat)) {
+                true -> { //The chat exists
+                    println("exists")
+                    val msg = Message(data.message, generateId(), loggedUser, true)
+                    val notification = Inbox("${user.social.getUserName()} sent a new message.", "Message.")
+                    val existingChat = readChat(idChat)
 
-                user.social.updateMyChats(idChat)
-                receiver.social.updateMyChats(idChat)
-                receiver.social.updateInbox(notification)
+                    chat.addMessage(msg)
+                    writeChat(existingChat, idChat)
 
-                writeChat(newChat, idChat)
-                writeUser(user, user.getEmail())
-                writeUser(receiver, receiver.getEmail())
+                    receiver.social.updateMyChats(idChat)
+                    receiver.social.updateInbox(notification)
+                    user.social.updateMyChats(idChat)
+                    writeUser(user, user.getEmail())
+                    writeUser(receiver, receiver.getEmail())
+
+                }
+                false -> { //The chat doesn't exist
+
+                    val notification = Inbox("${user.social.getUserName()} started a conversation with you.", "Message.")
+                    chat.startChat(listOf(loggedUser, receiver.getEmail()), idChat)
+                    val msg = Message(data.message, generateId(), loggedUser, true)
+                    chat.addMessage(msg)
+
+                    user.social.updateMyChats(idChat)
+                    receiver.social.updateMyChats(idChat)
+                    receiver.social.updateInbox(notification)
+
+                    writeChat(chat, idChat)
+                    writeUser(user, user.getEmail())
+                    writeUser(receiver, receiver.getEmail())
+                }
             }
-            else{ //the conversation exists
-
-                val msg = Message(data.message, generateId(), loggedUser,true)
-                val notification = Inbox("${user.social.getUserName()} sent a new message.", "Message.")
-                val existingChat = readChat(idChat)
-
-                chat.addMessage(msg)
-                writeChat(existingChat, idChat)
-
-                receiver.social.updateMyChats(idChat)
-                receiver.social.updateInbox(notification)
-                user.social.updateMyChats(idChat)
-                writeUser(user, user.getEmail())
-                writeUser(receiver, receiver.getEmail())
-
-            }
+        }
     }//CREATE
 
     override fun favoriteMessage(data: ChatOperations){
@@ -67,7 +73,7 @@ class ChatUser private constructor(): ChatInterface, ReadWriteUser, ReadWriteLog
         val idChat = getChatId(loggedUser, data.idReceiver)
         val chat = readChat(idChat)
 
-        if(verifyChat(chat) && verifyUser(user) && verifyUser(receiver)){
+        if(verifyChat(chat) && verifyLoggedUser(user) && verifyUser(receiver)){
             chat.favoriteMessage(data)
             writeChat(chat, idChat)
         }
@@ -80,7 +86,7 @@ class ChatUser private constructor(): ChatInterface, ReadWriteUser, ReadWriteLog
         val idChat = getChatId(loggedUser, data.idReceiver)
         val chat = readChat(idChat)
 
-        if(verifyChat(chat) && verifyUser(user) && verifyUser(receiver)){
+        if(verifyChat(chat) && verifyLoggedUser(user) && verifyUser(receiver)){
             chat.unFavoriteMessage(data)
             writeChat(chat, idChat)
         }
@@ -94,7 +100,7 @@ class ChatUser private constructor(): ChatInterface, ReadWriteUser, ReadWriteLog
         val chat = readChat(idChat)
         val notification = Inbox("${user.social.getUserName()} sent a new message.", "Message.")
 
-        if(verifyChat(chat) && verifyUser(user) && verifyUser(receiver) && chat.verifyMessage(data.idMessage) ){
+        if(verifyChat(chat) && verifyLoggedUser(user) && verifyUser(receiver) && chat.verifyMessage(data.idMessage) ){
             chat.quoteMessage(data, generateId())
             writeChat(chat, idChat)
             receiver.social.updateInbox(notification)
@@ -110,7 +116,7 @@ class ChatUser private constructor(): ChatInterface, ReadWriteUser, ReadWriteLog
         val idChat =  getChatId(loggedUser, data.idSource)
         val chat = readChat(idChat)
 
-        if(verifyChat(chat) && verifyUser(user) && verifyUser(receiver) && verifyUser(source) ){
+        if(verifyChat(chat) && verifyLoggedUser(user) && verifyUser(receiver) && verifyUser(source) ){
             data.message = chat.shareMessage(data)
             val sharedMessage = ChatMessage(data.message, data.idReceiver,true)
             ChatOperator().sendMessage(sharedMessage)
@@ -124,7 +130,7 @@ class ChatUser private constructor(): ChatInterface, ReadWriteUser, ReadWriteLog
         val idChat = getChatId(loggedUser, data.idReceiver)
         val chat = readChat(idChat)
 
-        if (verifyUser(user) && verifyUser(receiver) && verifyChat(chat)){
+        if (verifyLoggedUser(user) && verifyUser(receiver) && verifyChat(chat)){
             chat.deleteMessage(data)
             writeChat(chat, idChat)
             writeUser(user, user.getEmail())

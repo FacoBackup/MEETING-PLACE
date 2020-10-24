@@ -21,7 +21,7 @@ class Sub private constructor(): ThreadInterface, Verify, ReadWriteLoggedUser, R
         val loggedUser = readLoggedUser().email
         val user = readUser(loggedUser)
 
-        if(verifyUser(user) && type == ThreadType.SUB){
+        if(verifyLoggedUser(user) && type == ThreadType.SUB){
             val thread = readThread(data.idThread!!)
             if(thread.getId() != ""){
                 val subThread = SubThread(mutableListOf(),mutableListOf(), loggedUser, data.title, data.body, user.social.getUserName(), generateId())
@@ -36,7 +36,7 @@ class Sub private constructor(): ThreadInterface, Verify, ReadWriteLoggedUser, R
         val thread = readThread(data.idThread)
         val user = readUser(loggedUser)
 
-        if(verifyUser(user) && data.idSubThread != null && verifyThread(thread) && type == ThreadType.SUB){
+        if(verifyLoggedUser(user) && data.idSubThread != null && verifyThread(thread) && type == ThreadType.SUB){
             val subThread = thread.getSubThreadById(data.idSubThread)
 
             when (ThreadChecker.getChecker().checkLikeDislike(subThread)) {
@@ -61,7 +61,7 @@ class Sub private constructor(): ThreadInterface, Verify, ReadWriteLoggedUser, R
         val thread = readThread(data.idThread)
         val user = readUser(loggedUser)
 
-        if(verifyUser(user) && verifyThread(thread) && data.idSubThread != null && type == ThreadType.SUB){
+        if(verifyLoggedUser(user) && verifyThread(thread) && data.idSubThread != null && type == ThreadType.SUB){
 
             val subThread = thread.getSubThreadById(data.idSubThread)
             val notification = Inbox("${user.social.getUserName()} liked your reply.", "Thread.")
@@ -97,8 +97,7 @@ class Sub private constructor(): ThreadInterface, Verify, ReadWriteLoggedUser, R
         val loggedUser = readLoggedUser().email
         val user = readUser(loggedUser)
         val thread = readThread(data.idThread)
-        println("here")
-        if(verifyUser(user) && thread.getId() != "" && data.idSubThread != null && type == ThreadType.SUB){
+        if(verifyLoggedUser(user) && thread.getId() != "" && data.idSubThread != null && type == ThreadType.SUB){
 
             thread.removeSubThread(data.idSubThread,loggedUser)
             writeThread(thread,thread.getId())

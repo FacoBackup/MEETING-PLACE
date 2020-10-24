@@ -18,7 +18,7 @@ abstract class Group: ReadWriteUser, ReadWriteLoggedUser, ReadWriteGroup, Verify
         val loggedUser = readLoggedUser().email
         val user = readUser(loggedUser)
 
-        if(verifyUser(user)){
+        if(verifyLoggedUser(user)){
             val newGroup = Group()
 
             newGroup.startGroup(data.name, data.about, loggedUser)
@@ -33,7 +33,7 @@ abstract class Group: ReadWriteUser, ReadWriteLoggedUser, ReadWriteGroup, Verify
         val user = readUser(loggedUser)
 
         val myGroups = mutableListOf<Group>()
-        if(verifyUser(user)){
+        if(verifyLoggedUser(user)){
             val myGroupsIds = user.social.getMyGroups()
             for (i in 0 until myGroupsIds.size){
                 val group = readGroup(myGroupsIds[i])
@@ -50,7 +50,7 @@ abstract class Group: ReadWriteUser, ReadWriteLoggedUser, ReadWriteGroup, Verify
         val user = readUser(loggedUser)
 
         val memberIn = mutableListOf<Group>()
-        if(verifyUser(user)){
+        if(verifyLoggedUser(user)){
             val groupsIds = user.social.getMemberIn()
             for (i in 0 until groupsIds.size){
                 val group = readGroup(groupsIds[i])
@@ -68,7 +68,7 @@ abstract class Group: ReadWriteUser, ReadWriteLoggedUser, ReadWriteGroup, Verify
         val external = readUser(data.externalMember)
         val receiver = readGroup(data.groupId)
 
-        if(verifyUser(user) && verifyUser(external) && verifyGroup(receiver) && receiver.verifyMember(loggedUser) && !receiver.verifyMember(data.externalMember)){
+        if(verifyLoggedUser(user) && verifyUser(external) && verifyGroup(receiver) && receiver.verifyMember(loggedUser) && !receiver.verifyMember(data.externalMember)){
             val toBeAdded = Member(data.externalMember, 0)
             val notification = Inbox("You're now a member of ${receiver.getNameGroup()}", "Group.")
 
@@ -87,7 +87,7 @@ abstract class Group: ReadWriteUser, ReadWriteLoggedUser, ReadWriteGroup, Verify
         val external = readUser(data.externalMember)
         val receiver = readGroup(data.groupId)
 
-        if(verifyUser(user) && verifyUser(external) && verifyGroup(receiver) && receiver.verifyMember(loggedUser) && !receiver.verifyMember(data.externalMember)){
+        if(verifyLoggedUser(user) && verifyUser(external) && verifyGroup(receiver) && receiver.verifyMember(loggedUser) && !receiver.verifyMember(data.externalMember)){
             val toBeRemoved = Member(data.externalMember, 0)
 
             receiver.updateMember(toBeRemoved, true)
@@ -102,7 +102,7 @@ abstract class Group: ReadWriteUser, ReadWriteLoggedUser, ReadWriteGroup, Verify
         val user = readUser(loggedUser)
         val receiver = readGroup(data.idGroup)
 
-        if(verifyUser(user) && verifyGroup(receiver) && receiver.getCreator() == loggedUser) {
+        if(verifyLoggedUser(user) && verifyGroup(receiver) && receiver.getCreator() == loggedUser) {
             val members = receiver.getMembers()
             for(i in 0 until members.size){
                 val member = readUser(members[i].userEmail)

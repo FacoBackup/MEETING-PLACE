@@ -57,7 +57,7 @@ class ThreadOperations: Verify, ReadWriteUser, ReadWriteThread{
         val user = readUser(loggedUser)
         val myThreads = mutableListOf<MainThread>()
 
-        if(verifyUser(user)){
+        if(verifyLoggedUser(user)){
             val myThreadsIds = user.social.getMyThreads()
 
             for (i in 0 until myThreadsIds.size){
@@ -75,7 +75,7 @@ class ThreadOperations: Verify, ReadWriteUser, ReadWriteThread{
         val user = readUser(loggedUser)
         val myTimeline = mutableListOf<MainThread>()
 
-        if(verifyUser(user)){
+        if(verifyLoggedUser(user)){
             val followingIds = user.social.getFollowing()
 
             for (i in 0 until followingIds.size){

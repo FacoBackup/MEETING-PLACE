@@ -7,11 +7,19 @@ import br.meetingplace.services.group.Group
 import br.meetingplace.services.thread.MainThread
 
 interface Verify: ReadWriteLoggedUser {
+
     fun verifyUser(user: User): Boolean {
+        val logged = readLoggedUser()
+
+        return user.getEmail() != "" && user.getAge() >= 16 && user.social.getUserName() != "" && user.getPassword() != ""
+    }
+
+    fun verifyLoggedUser(user: User): Boolean {
         val logged = readLoggedUser()
 
         return logged.email != "" && logged.password != "" && logged.email == user.getEmail() && user.getAge() >= 16 && user.social.getUserName() != "" && logged.password == user.getPassword()
     }
+
 
     fun verifyThread(thread: MainThread): Boolean {
         return thread.getId() != ""

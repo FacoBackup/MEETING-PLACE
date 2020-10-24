@@ -14,7 +14,10 @@ class Login private constructor(): ReadWriteLoggedUser, ReadWriteUser, Verify{
 
     fun login(newUser: LoginByEmail){ //CASE SENSITIVE
         val logged = readLoggedUser()
+        newUser.email = newUser.email.toLowerCase()
         val user = readUser(newUser.email)
+
+
         if(user.getAge() >= 16 && logged.email == "" && newUser.password == user.getPassword() && newUser.email == user.getEmail()){
             logged.email = user.getEmail()
             logged.password = user.getPassword()
