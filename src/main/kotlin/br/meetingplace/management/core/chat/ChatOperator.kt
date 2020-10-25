@@ -7,9 +7,10 @@ import br.meetingplace.management.core.chat.dependencies.ChatGroup
 import br.meetingplace.management.core.chat.dependencies.ChatUser
 import br.meetingplace.management.core.chat.dependencies.Group
 import br.meetingplace.management.core.operators.fileOperators.rw.ReadWriteChat
+import br.meetingplace.management.core.operators.fileOperators.rw.ReadWriteCommunity
 import br.meetingplace.services.chat.Chat
 
-class ChatOperator: Group(), ReadWriteChat{
+class ChatOperator: Group(), ReadWriteChat, ReadWriteCommunity{
     private val userOp =  ChatUser.getChatUserOperator()
     private val groupOp= ChatGroup.getChatGroupOperator()
 
@@ -27,13 +28,21 @@ class ChatOperator: Group(), ReadWriteChat{
         }
         return -1
     }
+
     fun sendMessage(data: ChatMessage){
         when(verifyType(data.idReceiver)){
             0->{
                userOp.sendMessage(data)
             }
             1->{
-                groupOp.sendMessage(data)
+                if(data.idCommunity.isNullOrBlank())
+                    groupOp.sendMessage(data)
+                else{
+                    val community = readCommunity(data.idCommunity)
+                    if(verifyCommunity(community) && community.groups.checkGroupApproval(data.idReceiver))
+                        groupOp.sendMessage(data)
+                }
+
             }
         }
 
@@ -44,7 +53,13 @@ class ChatOperator: Group(), ReadWriteChat{
                 userOp.favoriteMessage(data)
             }
             1->{
-                groupOp.favoriteMessage(data)
+                if(data.idCommunity.isNullOrBlank())
+                    groupOp.favoriteMessage(data)
+                else{
+                    val community = readCommunity(data.idCommunity)
+                    if(verifyCommunity(community) && community.groups.checkGroupApproval(data.idReceiver))
+                        groupOp.favoriteMessage(data)
+                }
             }
         }
     }
@@ -54,37 +69,64 @@ class ChatOperator: Group(), ReadWriteChat{
                 userOp.unFavoriteMessage(data)
             }
             1->{
-                groupOp.unFavoriteMessage(data)
+                if(data.idCommunity.isNullOrBlank())
+                    groupOp.unFavoriteMessage(data)
+                else{
+                    val community = readCommunity(data.idCommunity)
+                    if(verifyCommunity(community) && community.groups.checkGroupApproval(data.idReceiver))
+                        groupOp.unFavoriteMessage(data)
+                }
             }
         }
     }
+
     fun quoteMessage(data: ChatComplexOperations){
         when(verifyType(data.idReceiver)){
             0->{
                 userOp.quoteMessage(data)
             }
             1->{
-                groupOp.quoteMessage(data)
+                if(data.idCommunity.isNullOrBlank())
+                    groupOp.quoteMessage(data)
+                else{
+                    val community = readCommunity(data.idCommunity)
+                    if(verifyCommunity(community) && community.groups.checkGroupApproval(data.idReceiver))
+                        groupOp.quoteMessage(data)
+                }
             }
         }
     }
+
     fun shareMessage(data: ChatComplexOperations){
         when(verifyType(data.idReceiver)){
             0->{
                 userOp.shareMessage(data)
             }
             1->{
-                groupOp.shareMessage(data)
+                if(data.idCommunity.isNullOrBlank())
+                    groupOp.shareMessage(data)
+                else{
+                    val community = readCommunity(data.idCommunity)
+                    if(verifyCommunity(community) && community.groups.checkGroupApproval(data.idReceiver))
+                        groupOp.shareMessage(data)
+                }
             }
         }
     }
+
     fun deleteMessage(data: ChatOperations){
         when(verifyType(data.idReceiver)){
             0->{
                 userOp.deleteMessage(data)
             }
             1->{
-                groupOp.deleteMessage(data)
+                if(data.idCommunity.isNullOrBlank())
+                    groupOp.deleteMessage(data)
+                else{
+                    val community = readCommunity(data.idCommunity)
+                    if(verifyCommunity(community) && community.groups.checkGroupApproval(data.idReceiver))
+                        groupOp.deleteMessage(data)
+                }
             }
         }
     }

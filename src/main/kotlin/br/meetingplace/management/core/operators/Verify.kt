@@ -3,6 +3,7 @@ package br.meetingplace.management.core.operators
 import br.meetingplace.entitie.User
 import br.meetingplace.management.core.operators.fileOperators.rw.ReadWriteLoggedUser
 import br.meetingplace.services.chat.Chat
+import br.meetingplace.services.community.Community
 import br.meetingplace.services.group.Group
 import br.meetingplace.services.thread.MainThread
 
@@ -41,5 +42,8 @@ interface Verify: ReadWriteLoggedUser {
                 return true
         }
         return false
+    }
+    fun verifyCommunity(community: Community): Boolean{
+        return community.getId() != "" && community.getName() != ""
     }
 }

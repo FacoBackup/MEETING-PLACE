@@ -20,7 +20,14 @@ class CommunityThreads private constructor(){
     fun getIdReports() = idReports
     //GETTERS
 
-    fun updateGroupsInValidation(thread: String, approve: Boolean?){
+    fun checkThreadApproval(id: String): Boolean{
+        return id in approvedThreads
+    }
+    fun removeApprovedThread(thread: String){
+        if(thread in approvedThreads)
+            approvedThreads.remove(thread)
+    }
+    fun updateThreadsInValidation(thread: String, approve: Boolean?){
         when(approve){
             true->{//APPROVE
                 if(thread in threadsInValidation){

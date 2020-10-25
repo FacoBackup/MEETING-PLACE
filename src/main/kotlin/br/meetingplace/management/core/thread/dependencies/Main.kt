@@ -18,7 +18,7 @@ class Main private constructor(): ThreadInterface, Verify, ReadWriteLoggedUser, 
         fun getMainThreadOperator() = op
     }
 
-    override fun create(data: ThreadData){
+    override fun create(data: ThreadData): String?{
         val loggedUser = readLoggedUser().email
         val user = readUser(loggedUser)
         if(verifyLoggedUser(user)){
@@ -27,7 +27,11 @@ class Main private constructor(): ThreadInterface, Verify, ReadWriteLoggedUser, 
             writeThread(thread, thread.getId())
             user.social.updateMyThreads(thread.getId(),true)
             writeUser(user, user.getEmail())
+            return if(!data.idCommunity.isNullOrBlank())
+                thread.getId()
+            else null
         }
+        return null
     } //CREATE
 
     override fun like(data: ThreadOperationsData){

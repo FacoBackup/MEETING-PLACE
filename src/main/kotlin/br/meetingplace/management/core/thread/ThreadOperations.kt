@@ -3,39 +3,133 @@ package br.meetingplace.management.core.thread
 import br.meetingplace.data.threads.ThreadData
 import br.meetingplace.data.threads.ThreadOperationsData
 import br.meetingplace.management.core.operators.Verify
+import br.meetingplace.management.core.operators.fileOperators.rw.ReadWriteCommunity
 import br.meetingplace.management.core.operators.fileOperators.rw.ReadWriteThread
 import br.meetingplace.management.core.operators.fileOperators.rw.ReadWriteUser
 import br.meetingplace.management.core.thread.dependencies.Main
 import br.meetingplace.management.core.thread.dependencies.Sub
 import br.meetingplace.services.thread.MainThread
 
-class ThreadOperations: Verify, ReadWriteUser, ReadWriteThread{
-    fun create(data: ThreadData){
-        if(data.idThread != null)
-            Sub.getSubThreadOperator().create(data)
-        else
-            Main.getMainThreadOperator().create(data)
+class ThreadOperations: Verify, ReadWriteUser, ReadWriteThread, ReadWriteCommunity{
+
+    private fun verifyType(op: ThreadOperationsData?, data: ThreadData?): Int{
+        return if(op != null && data == null){
+            if(op.idSubThread.isNullOrBlank())
+                0 //MAIN
+            else
+                1 //SUB
+        }
+        else if(data != null && op == null){
+            if(data.idThread != null)
+                1 //SUB
+            else
+                0 //MAIN
+        }
+        else -1
     }
+
+    fun create(data: ThreadData){ //NEEDS WORK HERE
+        when(verifyType(null,data)){
+            0->{ //MAIN
+                if(data.idCommunity.isNullOrBlank())
+                    Main.getMainThreadOperator().create(data)
+                else{
+                    val community = readCommunity(data.idCommunity)
+                    if(verifyCommunity(community)){ //NEEDS THE THREAD ID TO WORK
+                        val idThread = Main.getMainThreadOperator().create(data)
+                        //the verification for data.idCommunity != null already occurred, so don't mind the !!
+                        community.threads.updateThreadsInValidation(idThread!!, null)
+                    }
+                }
+
+            }
+            1->{ //SUB
+                if(data.idCommunity.isNullOrBlank())
+                    Sub.getSubThreadOperator().create(data)
+                else{
+                    val community = readCommunity(data.idCommunity)
+                    if(verifyCommunity(community) && community.threads.checkThreadApproval(data.idCommunity))
+                        Sub.getSubThreadOperator().create(data)
+                }
+            }
+        }
+    }
+
     fun like(data: ThreadOperationsData){
-        if(data.idSubThread == null)
-            Main.getMainThreadOperator().like(data)
-        else
-            Sub.getSubThreadOperator().like(data)
+
+        when(verifyType(data,null)){
+            0->{ //MAIN
+                if(data.idCommunity.isNullOrBlank())
+                    Main.getMainThreadOperator().like(data)
+                else{
+                    val community = readCommunity(data.idCommunity)
+                    if(verifyCommunity(community) && community.threads.checkThreadApproval(data.idCommunity))
+                        Main.getMainThreadOperator().like(data)
+                }
+            }
+            1->{ //SUB
+                if(data.idCommunity.isNullOrBlank())
+                    Sub.getSubThreadOperator().like(data)
+                else{
+                    val community = readCommunity(data.idCommunity)
+                    if(verifyCommunity(community) && community.threads.checkThreadApproval(data.idCommunity))
+                        Sub.getSubThreadOperator().like(data)
+                }
+            }
+        }
     }
+
     fun dislike(data: ThreadOperationsData){
-        if(data.idSubThread == null)
-            Main.getMainThreadOperator().dislike(data)
-        else
-            Sub.getSubThreadOperator().dislike(data)
+        when(verifyType(data,null)){
+            0->{ //MAIN
+                if(data.idCommunity.isNullOrBlank())
+                    Main.getMainThreadOperator().dislike(data)
+                else{
+                    val community = readCommunity(data.idCommunity)
+                    if(verifyCommunity(community) && community.threads.checkThreadApproval(data.idCommunity))
+                        Main.getMainThreadOperator().dislike(data)
+                }
+            }
+            1->{ //SUB
+                if(data.idCommunity.isNullOrBlank())
+                    Sub.getSubThreadOperator().dislike(data)
+                else{
+                    val community = readCommunity(data.idCommunity)
+                    if(verifyCommunity(community) && community.threads.checkThreadApproval(data.idCommunity))
+                        Sub.getSubThreadOperator().dislike(data)
+                }
+            }
+        }
     }
+
     fun delete(data: ThreadOperationsData){
-
-        if(data.idSubThread == null)
-            Main.getMainThreadOperator().delete(data)
-        else
-            Sub.getSubThreadOperator().delete(data)
+        when(verifyType(data,null)){
+            0->{ //MAIN
+                if(data.idCommunity.isNullOrBlank())
+                    Main.getMainThreadOperator().delete(data)
+                else{
+                    val community = readCommunity(data.idCommunity)
+                    if(verifyCommunity(community) && community.threads.checkThreadApproval(data.idCommunity)){
+                        community.threads.removeApprovedThread(data.idThread)
+                        Main.getMainThreadOperator().delete(data)
+                    }
+                    else if(verifyCommunity(community) && !community.threads.checkThreadApproval(data.idCommunity)){
+                        community.threads.updateThreadsInValidation(data.idThread, false)
+                        Main.getMainThreadOperator().delete(data)
+                    }
+                }
+            }
+            1->{ //SUB
+                if(data.idCommunity.isNullOrBlank())
+                    Sub.getSubThreadOperator().delete(data)
+                else{
+                    val community = readCommunity(data.idCommunity)
+                    if(verifyCommunity(community) && community.threads.checkThreadApproval(data.idCommunity))
+                        Sub.getSubThreadOperator().delete(data)
+                }
+            }
+        }
     }
-
 
     fun getMyThreads(): MutableList<MainThread> {
         val loggedUser = readLoggedUser().email

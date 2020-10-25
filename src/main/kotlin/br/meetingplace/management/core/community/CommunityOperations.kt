@@ -13,12 +13,10 @@ class CommunityOperations: ReadWriteUser, ReadWriteLoggedUser, ReadWriteThread, 
         val asGroup = readGroup(data.idService)
         val asThread = readThread(data.idService)
 
-        return if(asGroup.getGroupId() == "" && asThread.getId() != ""){ //IS A THREAD
+        return if(asGroup.getGroupId() == "" && asThread.getId() != "") //IS A THREAD
             0
-        }
-        else if(asGroup.getGroupId() != "" && asThread.getId() == ""){ // IS A GROUP
+        else if(asGroup.getGroupId() != "" && asThread.getId() == "")// IS A GROUP
             1
-        }
         else // IS NONE OF THE ABOVE
             -1
     }
@@ -31,36 +29,36 @@ class CommunityOperations: ReadWriteUser, ReadWriteLoggedUser, ReadWriteThread, 
 
     }
 
-    fun follow(data: Follower){
-
-    }
-
-    fun unfollow(data: Follower){
-
-    }
-
-    fun createThread(){
-
-    }
-
-    fun deleteThread(){
-
-    }
-
-    fun approveThread(){
-
-    }
-
-    fun createGroup(){
-
-    }
-
-    fun deleteGroup(){
-
-    }
-
-    fun approveGroup(){
-
-    }
+//    fun follow(data: Follower){
+//
+//    }
+//
+//    fun unfollow(data: Follower){
+//
+//    }
+//
+//    fun createThread(){
+//
+//    }
+//
+//    fun deleteThread(){
+//
+//    }
+//
+//    fun approveThread(){
+//
+//    }
+//
+//    fun createGroup(){
+//
+//    }
+//
+//    fun deleteGroup(){
+//
+//    }
+//
+//    fun approveGroup(){
+//
+//    }
 
 }

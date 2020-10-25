@@ -20,6 +20,15 @@ class CommunityGroups private constructor() {
     fun getIdReports() = idReports
     //GETTERS
 
+    fun checkGroupApproval(id: String): Boolean{
+        return id in approvedGroups
+    }
+
+    fun removeApprovedGroup(group: String){
+        if(group in approvedGroups)
+            approvedGroups.remove(group)
+    }
+
     fun updateGroupsInValidation(group: String,approve: Boolean?){
         when(approve){
             true->{//APPROVE

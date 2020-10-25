@@ -10,8 +10,15 @@ class Community{
     private var about= ""
     private val followers = mutableListOf<String>()
     private val moderators = mutableListOf<String>()
-    private val threads = CommunityThreads.getThreads()
-    private val groups = CommunityGroups.getGroups()
+    val threads = CommunityThreads.getThreads()
+    val groups = CommunityGroups.getGroups()
+
+    //GETTERS
+    fun getName() = name
+    fun getId() = id
+    fun getAbout() = about
+    fun getModerators() = moderators
+    //GETTERS
 
     fun startCommunity(name: String, id: String, about: String, creator: String){
         if(this.name == "" && moderators.isEmpty()){
