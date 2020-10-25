@@ -17,7 +17,7 @@ class Sub private constructor(): ThreadInterface, Verify, ReadWriteLoggedUser, R
         fun getSubThreadOperator() = op
     }
 
-    override fun create(data: ThreadData){
+    override fun create(data: ThreadData): String?{
         val loggedUser = readLoggedUser().email
         val user = readUser(loggedUser)
 
@@ -29,6 +29,7 @@ class Sub private constructor(): ThreadInterface, Verify, ReadWriteLoggedUser, R
                 writeThread(thread, thread.getId())
             }
         }
+        return null
     }// CREATE
 
     override fun dislike(data: ThreadOperationsData) {
