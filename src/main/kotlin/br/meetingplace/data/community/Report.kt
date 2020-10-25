@@ -1,6 +1,7 @@
-package br.meetingplace.services.community.data
+package br.meetingplace.data.community
 
 data class Report(val reportId: String, val creator: String, val idService: String, val reason: String, var finished: Boolean, val response: String){}
+
 //example:
 //idService = threadId
 //service = Thread

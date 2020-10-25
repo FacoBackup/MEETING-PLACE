@@ -17,6 +17,7 @@ import br.meetingplace.management.core.Login
 import br.meetingplace.management.core.chat.ChatOperator
 import br.meetingplace.management.core.thread.ThreadOperations
 import br.meetingplace.management.core.user.UserOperations
+import br.meetingplace.services.community.Community
 import io.ktor.application.*
 import io.ktor.features.*
 import io.ktor.gson.*
@@ -30,6 +31,7 @@ val userSystem= UserOperations()
 val threadSystem=  ThreadOperations()
 val chatSystem = ChatOperator() // controls chat and groups
 val login = Login.getLoginSystem()
+
 fun main (){
 
     embeddedServer(Netty, 3000) {
@@ -43,6 +45,11 @@ fun main (){
             get("/user"){
                 call.respond(userSystem.getMyUser())
             }
+
+            get("/comunidade"){
+                call.respond(Community())
+            }
+
 
             get("/logged") {
                 call.respond(userSystem.readLoggedUser().email)

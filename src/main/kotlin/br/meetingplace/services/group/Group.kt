@@ -23,11 +23,11 @@ class Group(){
         chat = newChat
     }
 
-    fun startGroup (newName: String, about: String,newCreator: String){ // updates the ID
+    fun startGroup (newName: String,newId: String ,about: String,newCreator: String){ // updates the ID
         if(name == "" && creator == "" && idGroup == ""){
             this.name = newName
             this.about = about
-            idGroup = (name.replace("\\s".toRegex(),"")).toLowerCase() // cAFe Group -> cafegroup
+            idGroup = newId
             creator = newCreator
             chat.startChat(listOf(creator),"Group-Chat")
         }

@@ -1,20 +1,27 @@
 package br.meetingplace.services.community
 
-import br.meetingplace.services.community.data.Report
+import br.meetingplace.services.community.communityServices.CommunityGroups
+import br.meetingplace.services.community.communityServices.CommunityThreads
+import br.meetingplace.data.community.Report
 import br.meetingplace.services.thread.MainThread
 
 class Community{
     private var name= "" // THE NAME IS THE IDENTIFIER
+    private var id = ""
     private var about= ""
-    private val approvedThreads = mutableListOf<String>()
-    private val approvedGroups = mutableListOf<String>()
     private val followers = mutableListOf<String>()
     private val moderators = mutableListOf<String>()
-    private val toBeApprovedGroup= mutableListOf<String>()
-    private val toBeApprovedThreads= mutableListOf<String>()
+    private val threads = CommunityThreads.getThreads()
+    private val groups = CommunityGroups.getGroups()
 
-    private val reports = mutableListOf<Report>()
-    private val reportIds = mutableListOf<String>()
+    fun startCommunity(name: String, id: String, about: String, creator: String){
+        if(this.name == "" && moderators.isEmpty()){
+            this.name = name
+            this.about = about
+            this.id = id
+            moderators.add(creator)
+        }
+    }
 
     fun updateFollower(userEmail: String, remove:Boolean){
         when (remove){
@@ -40,16 +47,16 @@ class Community{
             }
         }
     }
-
+    /*
     fun updateApprovedThread(thread: MainThread, requester: String,remove: Boolean){
         when (remove){
             true->{
                 if(requester == thread.getCreator() || requester in moderators)
-                    approvedThreads.remove(thread.getId())
+                    threads.remove(thread.getId())
             }
             false-> {
                 if(requester in moderators)
-                    approvedThreads.add(thread.getId())
+                    threads.add(thread.getId())
             }
         }
     }
@@ -70,7 +77,7 @@ class Community{
      */
     fun addReport(report: Report){
         if(report.reportId !in reportIds && !report.finished && report.creator in followers &&
-            (report.idService in approvedThreads || report.idService in approvedGroups || report.idService in followers)){
+            (report.idService in threads || report.idService in groups || report.idService in followers)){
 
             reports.add(report)
             reportIds.add(report.reportId)
@@ -105,4 +112,6 @@ class Community{
             -1
         } else -1
     }
+
+     */
 }

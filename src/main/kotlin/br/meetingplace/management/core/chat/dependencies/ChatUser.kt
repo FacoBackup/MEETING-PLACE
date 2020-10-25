@@ -118,7 +118,7 @@ class ChatUser private constructor(): ChatInterface, ReadWriteUser, ReadWriteLog
 
         if(verifyChat(chat) && verifyLoggedUser(user) && verifyUser(receiver) && verifyUser(source) ){
             data.message = chat.shareMessage(data)
-            val sharedMessage = ChatMessage(data.message, data.idReceiver,true)
+            val sharedMessage = ChatMessage(data.message, data.idReceiver,true, null)
             ChatOperator().sendMessage(sharedMessage)
         }
     } //UPDATE->CREATE

@@ -14,14 +14,20 @@ import br.meetingplace.services.group.Member
 import br.meetingplace.services.notification.Inbox
 
 abstract class Group: ReadWriteUser, ReadWriteLoggedUser, ReadWriteGroup, Verify, Generator {
+
+    private fun getGroupId(groupName: String): String{
+        val loggedUser = readLoggedUser().email
+        return (groupName.replace("\\s".toRegex(),"") + (loggedUser.replaceAfter("@", "")).removeSuffix("@")).toLowerCase()
+    }
+
     fun createGroup(data: GroupData){
         val loggedUser = readLoggedUser().email
         val user = readUser(loggedUser)
 
-        if(verifyLoggedUser(user)){
+        if(verifyLoggedUser(user) && data.groupName.isBlank()){
             val newGroup = Group()
-
-            newGroup.startGroup(data.name, data.about, loggedUser)
+            val id = getGroupId(data.groupName)
+            newGroup.startGroup(data.groupName, id,data.about, loggedUser)
             user.social.updateMyGroups(newGroup.getGroupId(),false)
             writeGroup(newGroup, newGroup.getGroupId())
             writeUser(user, loggedUser)
@@ -66,7 +72,8 @@ abstract class Group: ReadWriteUser, ReadWriteLoggedUser, ReadWriteGroup, Verify
         val loggedUser = readLoggedUser().email
         val user = readUser(loggedUser)
         val external = readUser(data.externalMember)
-        val receiver = readGroup(data.groupId)
+        val groupId = getGroupId(data.groupName)
+        val receiver = readGroup(groupId)
 
         if(verifyLoggedUser(user) && verifyUser(external) && verifyGroup(receiver) && receiver.verifyMember(loggedUser) && !receiver.verifyMember(data.externalMember)){
             val toBeAdded = Member(data.externalMember, 0)
@@ -85,7 +92,8 @@ abstract class Group: ReadWriteUser, ReadWriteLoggedUser, ReadWriteGroup, Verify
         val loggedUser = readLoggedUser().email
         val user = readUser(loggedUser)
         val external = readUser(data.externalMember)
-        val receiver = readGroup(data.groupId)
+        val groupId = getGroupId(data.groupName)
+        val receiver = readGroup(groupId)
 
         if(verifyLoggedUser(user) && verifyUser(external) && verifyGroup(receiver) && receiver.verifyMember(loggedUser) && !receiver.verifyMember(data.externalMember)){
             val toBeRemoved = Member(data.externalMember, 0)
@@ -100,7 +108,8 @@ abstract class Group: ReadWriteUser, ReadWriteLoggedUser, ReadWriteGroup, Verify
     fun deleteGroup(data: GroupOperationsData){
         val loggedUser = readLoggedUser().email
         val user = readUser(loggedUser)
-        val receiver = readGroup(data.idGroup)
+        val groupId = getGroupId(data.groupName)
+        val receiver = readGroup(groupId)
 
         if(verifyLoggedUser(user) && verifyGroup(receiver) && receiver.getCreator() == loggedUser) {
             val members = receiver.getMembers()
