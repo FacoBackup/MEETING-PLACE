@@ -1,6 +1,5 @@
 package br.meetingplace
 
-import br.meetingplace.data.*
 import br.meetingplace.data.chat.ChatComplexOperations
 import br.meetingplace.data.chat.ChatMessage
 import br.meetingplace.data.chat.ChatOperations
@@ -10,7 +9,7 @@ import br.meetingplace.data.group.GroupOperationsData
 import br.meetingplace.data.group.MemberInput
 import br.meetingplace.data.threads.ThreadData
 import br.meetingplace.data.threads.ThreadOperationsData
-import br.meetingplace.data.user.Follower
+import br.meetingplace.data.Data
 import br.meetingplace.data.user.LoginByEmail
 import br.meetingplace.data.user.SocialProfileData
 import br.meetingplace.data.user.UserData
@@ -19,7 +18,6 @@ import br.meetingplace.management.core.chat.ChatOperator
 import br.meetingplace.management.core.community.CommunityOperations
 import br.meetingplace.management.core.thread.ThreadOperations
 import br.meetingplace.management.core.user.UserOperations
-import br.meetingplace.services.community.Community
 import io.ktor.application.*
 import io.ktor.features.*
 import io.ktor.gson.*
@@ -54,11 +52,11 @@ fun main (){
                 call.respond(communitySystem.create(data))
             }
             post("/community/follow"){
-                val data = call.receive<Follower>()
+                val data = call.receive<Data>()
                 call.respond(communitySystem.follow(data))
             }
             post("/community/unfollow"){
-                val data = call.receive<Follower>()
+                val data = call.receive<Data>()
                 call.respond(communitySystem.unfollow(data))
             }
             get("/user"){
@@ -100,11 +98,11 @@ fun main (){
 //                call.respond(core.createProfessionalProfile(user))
 //            }
             post("/follow"){
-                val follow = call.receive<Follower>()
+                val follow = call.receive<Data>()
                 call.respond(userSystem.follow(follow))
             }
             post("/unfollow"){
-                val follow = call.receive<Follower>()
+                val follow = call.receive<Data>()
                 call.respond(userSystem.unfollow(follow))
             }
 

@@ -48,15 +48,4 @@ class Community private constructor(){
             }
         }
     }
-
-    fun updateThreadRequest(thread: MainThread, requester: String,remove: Boolean){
-        when (remove){
-            true->{
-
-            }
-            false-> {
-
-            }
-        }
-    }
 }

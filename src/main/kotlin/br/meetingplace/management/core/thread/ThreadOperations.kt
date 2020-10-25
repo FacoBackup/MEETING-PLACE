@@ -149,7 +149,7 @@ class ThreadOperations: Verify, ReadWriteUser, ReadWriteThread, ReadWriteCommuni
         return myThreads
     }//READ
 
-    fun getMyTimeline(): MutableList<MainThread> {
+    fun getMyTimeline(): MutableList<MainThread> { //NEEDS WORK HERE
         val loggedUser = readLoggedUser().email
         val user = readUser(loggedUser)
         val myTimeline = mutableListOf<MainThread>()
@@ -168,6 +168,20 @@ class ThreadOperations: Verify, ReadWriteUser, ReadWriteThread, ReadWriteCommuni
                     }
                 }
             }
+
+            val communities = user.social.getCommunitiesIFollow()
+            for(i in 0 until communities.size){
+                val community = readCommunity(communities[i])
+                if(verifyCommunity(community)){
+                    val threads = community.threads.getIdThreads()
+                    for(j in 0 until threads.size){
+                        val thread = readThread(threads[i])
+                        if(verifyThread(thread))
+                            myTimeline.add(thread)
+                    }
+                }
+            }
+
             return myTimeline
         }
         return myTimeline
