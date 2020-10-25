@@ -4,8 +4,8 @@ import br.meetingplace.data.threads.ThreadData
 import br.meetingplace.data.threads.ThreadOperationsData
 
 interface ThreadInterface {
-    fun like(data: ThreadOperationsData, type: ThreadType)
-    fun dislike(data: ThreadOperationsData, type: ThreadType)
-    fun create(data: ThreadData, type: ThreadType)
-    fun delete(data: ThreadOperationsData, type: ThreadType)
+    fun create(data: ThreadData)
+    fun like(data: ThreadOperationsData)
+    fun dislike(data: ThreadOperationsData)
+    fun delete(data: ThreadOperationsData)
 }

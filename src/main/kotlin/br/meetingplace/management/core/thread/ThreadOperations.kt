@@ -7,48 +7,33 @@ import br.meetingplace.management.core.operators.fileOperators.rw.ReadWriteThrea
 import br.meetingplace.management.core.operators.fileOperators.rw.ReadWriteUser
 import br.meetingplace.management.core.thread.dependencies.Main
 import br.meetingplace.management.core.thread.dependencies.Sub
-import br.meetingplace.management.core.thread.dependencies.ThreadType
 import br.meetingplace.services.thread.MainThread
 
 class ThreadOperations: Verify, ReadWriteUser, ReadWriteThread{
     fun create(data: ThreadData){
-        var type = ThreadType.MAIN
-        println(data.idThread)
-
-        if(data.idThread != null){
-            type = ThreadType.SUB
-            Sub.getSubThreadOperator().create(data, type)
-        }
+        if(data.idThread != null)
+            Sub.getSubThreadOperator().create(data)
         else
-            Main.getMainThreadOperator().create(data, type)
+            Main.getMainThreadOperator().create(data)
     }
     fun like(data: ThreadOperationsData){
-        var type = ThreadType.SUB
-        if(data.idSubThread == null){
-            type = ThreadType.MAIN
-            Main.getMainThreadOperator().like(data, type)
-        }
+        if(data.idSubThread == null)
+            Main.getMainThreadOperator().like(data)
         else
-            Sub.getSubThreadOperator().like(data, type)
+            Sub.getSubThreadOperator().like(data)
     }
     fun dislike(data: ThreadOperationsData){
-        var type = ThreadType.SUB
-        if(data.idSubThread == null){
-            type = ThreadType.MAIN
-            Main.getMainThreadOperator().dislike(data, type)
-        }
+        if(data.idSubThread == null)
+            Main.getMainThreadOperator().dislike(data)
         else
-            Sub.getSubThreadOperator().dislike(data, type)
+            Sub.getSubThreadOperator().dislike(data)
     }
     fun delete(data: ThreadOperationsData){
-        var type = ThreadType.SUB
-        if(data.idSubThread == null){
-            type = ThreadType.MAIN
-            Main.getMainThreadOperator().delete(data, type)
-        }
 
+        if(data.idSubThread == null)
+            Main.getMainThreadOperator().delete(data)
         else
-            Sub.getSubThreadOperator().delete(data, type)
+            Sub.getSubThreadOperator().delete(data)
     }
 
 

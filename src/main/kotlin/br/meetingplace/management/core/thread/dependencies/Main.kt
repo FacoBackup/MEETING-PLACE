@@ -18,10 +18,10 @@ class Main private constructor(): ThreadInterface, Verify, ReadWriteLoggedUser, 
         fun getMainThreadOperator() = op
     }
 
-    override fun create(data: ThreadData, type: ThreadType){
+    override fun create(data: ThreadData){
         val loggedUser = readLoggedUser().email
         val user = readUser(loggedUser)
-        if(verifyLoggedUser(user) && type == ThreadType.MAIN){
+        if(verifyLoggedUser(user)){
             val thread = MainThread()
             thread.startThread(data,generateId(), user.social.getUserName(), loggedUser)
             writeThread(thread, thread.getId())
@@ -30,12 +30,12 @@ class Main private constructor(): ThreadInterface, Verify, ReadWriteLoggedUser, 
         }
     } //CREATE
 
-    override fun like(data: ThreadOperationsData, type: ThreadType){
+    override fun like(data: ThreadOperationsData){
         val loggedUser = readLoggedUser().email
         val user = readUser(loggedUser)
         val thread = readThread(data.idThread)
 
-        if(verifyThread(thread) && verifyLoggedUser(user) && data.idSubThread == null && type == ThreadType.MAIN) {
+        if(verifyThread(thread) && verifyLoggedUser(user) && data.idSubThread == null) {
 
             val notification = Inbox("${user.social.getUserName()} liked your thread.", "Thread.")
             val userCreator = readUser(thread.getCreator())
@@ -67,12 +67,12 @@ class Main private constructor(): ThreadInterface, Verify, ReadWriteLoggedUser, 
         }
     }//UPDATE
 
-    override fun dislike(data: ThreadOperationsData, type: ThreadType) {
+    override fun dislike(data: ThreadOperationsData) {
         val loggedUser = readLoggedUser().email
         val user = readUser(loggedUser)
         val thread = readThread(data.idThread)
 
-        if(verifyLoggedUser(user) && verifyThread(thread) && data.idSubThread == null  && type == ThreadType.MAIN) {
+        if(verifyLoggedUser(user) && verifyThread(thread) && data.idSubThread == null) {
 
             val checker = ThreadChecker.getChecker()
             when (checker.checkLikeDislike(thread)) {
@@ -92,12 +92,12 @@ class Main private constructor(): ThreadInterface, Verify, ReadWriteLoggedUser, 
         }
     } //UPDATE
 
-    override fun delete(data: ThreadOperationsData, type: ThreadType){
+    override fun delete(data: ThreadOperationsData){
         val loggedUser = readLoggedUser().email
         val user = readUser(loggedUser)
         val thread = readThread(data.idThread)
 
-        if(verifyThread(thread) && verifyLoggedUser(user) && data.idSubThread == null && type == ThreadType.MAIN) {
+        if(verifyThread(thread) && verifyLoggedUser(user) && data.idSubThread == null ) {
 
             DeleteFile.getDeleteFileOperator().deleteThread(thread)
             user.social.updateMyThreads(data.idThread,false) //FALSE IS TO REMOVE THREAD
