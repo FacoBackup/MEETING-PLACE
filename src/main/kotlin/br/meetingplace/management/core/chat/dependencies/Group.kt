@@ -18,14 +18,14 @@ abstract class Group: ReadWriteUser, ReadWriteLoggedUser, ReadWriteGroup, Verify
 
     private fun getGroupId(groupName: String): String{
         val loggedUser = readLoggedUser().email
-        return (groupName.replace("\\s".toRegex(),"") + (loggedUser.replaceAfter("@", "")).removeSuffix("@")).toLowerCase()
+        return (groupName.replace("\\s".toRegex(),"") +"_" +(loggedUser.replaceAfter("@", "")).removeSuffix("@")).toLowerCase()
     }
 
     fun createGroup(data: GroupData){
         val loggedUser = readLoggedUser().email
         val user = readUser(loggedUser)
 
-        if(verifyLoggedUser(user) && data.groupName.isBlank()){
+        if(verifyLoggedUser(user) && data.groupName.isNotEmpty()){
             val newGroup = Group()
             var id = getGroupId(data.groupName)
 

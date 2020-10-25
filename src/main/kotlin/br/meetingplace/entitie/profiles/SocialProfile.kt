@@ -8,6 +8,8 @@ class SocialProfile(
     private var nationality: String,
     private var about: String){
 
+    private var moderatorIn = mutableListOf<String>()
+    private var communitiesIFollow = mutableListOf<String>()
     private var myThreads = mutableListOf<String>()
     private var myChats = mutableListOf<String>()
     private var myGroups = mutableListOf<String>()
@@ -15,7 +17,6 @@ class SocialProfile(
     private var followers = mutableListOf<String>()
     private var following = mutableListOf<String>()
     private var inbox = mutableListOf<Inbox>()
-    //UPDATE
 
     fun clearNotifications(){
         inbox.clear()
@@ -92,9 +93,36 @@ class SocialProfile(
         }
 
     }
-    //UPDATE
+
+    fun updateModeratorIn(id: String,leave:Boolean){
+        when(leave){
+            true->{
+                if(id in moderatorIn)
+                    moderatorIn.remove(id)
+            }
+            false->{
+                if(id !in moderatorIn)
+                    moderatorIn.add(id)
+            }
+        }
+    }
+
+    fun updateCommunitiesIFollow(id: String,unfollow:Boolean){
+        when(unfollow){
+            true->{
+                if(id in communitiesIFollow)
+                    communitiesIFollow.remove(id)
+            }
+            false->{
+                if(id !in communitiesIFollow)
+                    communitiesIFollow.add(id)
+            }
+        }
+    }
 
     //GETTERS
+    fun getModeratorIn() = moderatorIn
+    fun getCommunitiesIFollow() = communitiesIFollow
     fun getMyGroups () = myGroups
     fun getMemberIn() = memberIn
     fun getFollowing() = following

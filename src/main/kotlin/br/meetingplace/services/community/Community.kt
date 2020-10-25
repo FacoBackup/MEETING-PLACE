@@ -4,7 +4,12 @@ import br.meetingplace.services.community.communityServices.CommunityGroups
 import br.meetingplace.services.community.communityServices.CommunityThreads
 import br.meetingplace.services.thread.MainThread
 
-class Community{
+class Community private constructor(){
+
+    companion object{
+        private val op = Community()
+        fun getCommunity ()= op
+    }
     private var name= "" // THE NAME IS THE IDENTIFIER
     private var id = ""
     private var about= ""

@@ -4,6 +4,7 @@ import br.meetingplace.data.*
 import br.meetingplace.data.chat.ChatComplexOperations
 import br.meetingplace.data.chat.ChatMessage
 import br.meetingplace.data.chat.ChatOperations
+import br.meetingplace.data.community.CommunityData
 import br.meetingplace.data.group.GroupData
 import br.meetingplace.data.group.GroupOperationsData
 import br.meetingplace.data.group.MemberInput
@@ -15,6 +16,7 @@ import br.meetingplace.data.user.SocialProfileData
 import br.meetingplace.data.user.UserData
 import br.meetingplace.management.core.Login
 import br.meetingplace.management.core.chat.ChatOperator
+import br.meetingplace.management.core.community.CommunityOperations
 import br.meetingplace.management.core.thread.ThreadOperations
 import br.meetingplace.management.core.user.UserOperations
 import br.meetingplace.services.community.Community
@@ -31,7 +33,7 @@ val userSystem= UserOperations()
 val threadSystem=  ThreadOperations()
 val chatSystem = ChatOperator() // controls chat and groups
 val login = Login.getLoginSystem()
-
+val communitySystem = CommunityOperations()
 fun main (){
 
     embeddedServer(Netty, 3000) {
@@ -41,15 +43,27 @@ fun main (){
                     setPrettyPrinting()
                 }
             }
-
+            get("/communities"){
+                call.respond(communitySystem.communitiesIFollow())
+            }
+            get("/moderator"){
+                call.respond(communitySystem.moderatorIn())
+            }
+            post("/community/create"){
+                val data = call.receive<CommunityData>()
+                call.respond(communitySystem.create(data))
+            }
+            post("/community/follow"){
+                val data = call.receive<Follower>()
+                call.respond(communitySystem.follow(data))
+            }
+            post("/community/unfollow"){
+                val data = call.receive<Follower>()
+                call.respond(communitySystem.unfollow(data))
+            }
             get("/user"){
                 call.respond(userSystem.getMyUser())
             }
-
-            get("/comunidade"){
-                call.respond(Community())
-            }
-
 
             get("/logged") {
                 call.respond(userSystem.readLoggedUser().email)
