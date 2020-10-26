@@ -44,8 +44,12 @@ class CommunityOperations: ReadWriteUser, ReadWriteLoggedUser, ReadWriteThread, 
         val user = readUser(loggedUser)
         val community = readCommunity(data.ID)
 
-        if (verifyLoggedUser(user) && verifyCommunity(community))
+        if (verifyLoggedUser(user) && verifyCommunity(community)){
             user.social.updateCommunitiesIFollow(data.ID, false)
+            writeUser(user, loggedUser)
+            writeCommunity(community, community.getId())
+        }
+
     }
 
     fun unfollow(data: Data){
@@ -53,8 +57,12 @@ class CommunityOperations: ReadWriteUser, ReadWriteLoggedUser, ReadWriteThread, 
         val user = readUser(loggedUser)
         val community = readCommunity(data.ID)
 
-        if (verifyLoggedUser(user) && verifyCommunity(community))
+        if (verifyLoggedUser(user) && verifyCommunity(community)){
             user.social.updateCommunitiesIFollow(data.ID, true)
+            writeUser(user, loggedUser)
+            writeCommunity(community, community.getId())
+        }
+
     }
 
 
@@ -64,8 +72,11 @@ class CommunityOperations: ReadWriteUser, ReadWriteLoggedUser, ReadWriteThread, 
         val community = readCommunity(data.community)
         val thread = readThread(data.id)
 
-        if(verifyLoggedUser(user) && verifyCommunity(community) && verifyThread(thread) && user.getEmail() in community.getModerators())
+        if(verifyLoggedUser(user) && verifyCommunity(community) && verifyThread(thread) && user.getEmail() in community.getModerators()){
             community.threads.updateThreadsInValidation(data.id,true)
+            writeCommunity(community, community.getId())
+        }
+
     }
 
     fun approveGroup(data: ApprovalData){
@@ -74,8 +85,11 @@ class CommunityOperations: ReadWriteUser, ReadWriteLoggedUser, ReadWriteThread, 
         val community = readCommunity(data.community)
         val group = readGroup(data.id)
 
-        if(verifyLoggedUser(user) && verifyCommunity(community) && verifyGroup(group) && user.getEmail() in community.getModerators())
+        if(verifyLoggedUser(user) && verifyCommunity(community) && verifyGroup(group) && user.getEmail() in community.getModerators()){
             community.groups.updateGroupsInValidation(data.id,true)
+            writeCommunity(community, community.getId())
+        }
+
     }
 
 

@@ -29,27 +29,40 @@ class ThreadOperations: Verify, ReadWriteUser, ReadWriteThread, ReadWriteCommuni
     }
 
     fun create(data: ThreadData){ //NEEDS WORK HERE
-        when(verifyType(null,data)){
-            0->{ //MAIN
-                if(data.idCommunity.isNullOrBlank())
-                    Main.getMainThreadOperator().create(data)
-                else{
-                    val community = readCommunity(data.idCommunity)
-                    if(verifyCommunity(community)){ //NEEDS THE THREAD ID TO WORK
-                        val idThread = Main.getMainThreadOperator().create(data)
-                        //the verification for data.idCommunity != null already occurred, so don't mind the !!
-                        community.threads.updateThreadsInValidation(idThread!!, null)
+        val loggedUser = readLoggedUser().email
+        val user = readUser(loggedUser)
+
+        if(verifyLoggedUser(user)){
+            when(verifyType(null,data)){
+                0->{ //MAIN
+                    println(data.idCommunity)
+                    if(data.idCommunity.isNullOrBlank())
+                        Main.getMainThreadOperator().create(data)
+                    else{
+                        val community = readCommunity(data.idCommunity)
+                        if(verifyCommunity(community) ){ //NEEDS THE THREAD ID TO WORK
+                            val idThread = Main.getMainThreadOperator().create(data)
+                            //the verification for data.idCommunity != null already occurred, so don't mind the !!
+                            println(loggedUser)
+                            println("here")
+                            if(loggedUser !in community.getModerators())
+                                community.threads.updateThreadsInValidation(idThread!!, null)
+                            else
+                                community.threads.updateThreadsInValidation(idThread!!, true)
+
+                            writeCommunity(community, community.getId())
+                            println("done")
+                        }
                     }
                 }
-
-            }
-            1->{ //SUB
-                if(data.idCommunity.isNullOrBlank())
-                    Sub.getSubThreadOperator().create(data)
-                else{
-                    val community = readCommunity(data.idCommunity)
-                    if(verifyCommunity(community) && community.threads.checkThreadApproval(data.idCommunity))
+                1->{ //SUB
+                    if(data.idCommunity.isNullOrBlank())
                         Sub.getSubThreadOperator().create(data)
+                    else{
+                        val community = readCommunity(data.idCommunity)
+                        if(verifyCommunity(community) && community.threads.checkThreadApproval(data.idCommunity))
+                            Sub.getSubThreadOperator().create(data)
+                    }
                 }
             }
         }
@@ -112,10 +125,12 @@ class ThreadOperations: Verify, ReadWriteUser, ReadWriteThread, ReadWriteCommuni
                     if(verifyCommunity(community) && community.threads.checkThreadApproval(data.idCommunity)){
                         community.threads.removeApprovedThread(data.idThread)
                         Main.getMainThreadOperator().delete(data)
+                        writeCommunity(community, community.getId())
                     }
                     else if(verifyCommunity(community) && !community.threads.checkThreadApproval(data.idCommunity)){
                         community.threads.updateThreadsInValidation(data.idThread, false)
                         Main.getMainThreadOperator().delete(data)
+                        writeCommunity(community, community.getId())
                     }
                 }
             }
@@ -126,6 +141,7 @@ class ThreadOperations: Verify, ReadWriteUser, ReadWriteThread, ReadWriteCommuni
                     val community = readCommunity(data.idCommunity)
                     if(verifyCommunity(community) && community.threads.checkThreadApproval(data.idCommunity))
                         Sub.getSubThreadOperator().delete(data)
+                    writeCommunity(community, community.getId())
                 }
             }
         }

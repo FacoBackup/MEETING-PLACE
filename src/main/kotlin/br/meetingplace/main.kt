@@ -59,6 +59,7 @@ fun main (){
                 val data = call.receive<Data>()
                 call.respond(communitySystem.unfollow(data))
             }
+
             get("/user"){
                 call.respond(userSystem.getMyUser())
             }

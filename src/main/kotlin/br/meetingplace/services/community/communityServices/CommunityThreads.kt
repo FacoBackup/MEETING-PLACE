@@ -30,16 +30,16 @@ class CommunityThreads private constructor(){
     fun updateThreadsInValidation(thread: String, approve: Boolean?){
         when(approve){
             true->{//APPROVE
-                if(thread in threadsInValidation){
-                    approvedThreads.add(thread)
-                    threadsInValidation.remove(thread)
-                }
+                approvedThreads.add(thread)
+                threadsInValidation.remove(thread)
             }
             false->{ // DELETE
                 if(thread in threadsInValidation)
                     threadsInValidation.remove(thread)
             }
             null->{ //ADD
+                println(thread)
+                println(thread !in threadsInValidation)
                 if(thread !in threadsInValidation && thread != "")
                     threadsInValidation.add(thread)
             }
