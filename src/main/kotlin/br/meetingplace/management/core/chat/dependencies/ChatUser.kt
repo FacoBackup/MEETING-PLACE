@@ -111,15 +111,16 @@ class ChatUser private constructor(): ChatInterface, ReadWriteUser, ReadWriteLog
     override fun shareMessage(data: ChatComplexOperations){
         val loggedUser = readLoggedUser().email
         val user = readUser(loggedUser)
-        val source = readUser(data.idSource)
         val receiver = readUser(data.idReceiver)
         val idChat =  getChatId(loggedUser, data.idSource)
         val chat = readChat(idChat)
 
-        if(verifyChat(chat) && verifyLoggedUser(user) && verifyUser(receiver) && verifyUser(source) ){
+        if(verifyChat(chat) && verifyLoggedUser(user) && verifyUser(receiver)){
             data.message = chat.shareMessage(data)
-            val sharedMessage = ChatMessage(data.message, data.idReceiver,true, null)
-            ChatOperator().sendMessage(sharedMessage)
+            if(data.message != ""){
+                val sharedMessage = ChatMessage("|Shared| ${data.message}", data.idReceiver,true, data.creator,data.idCommunity)
+                sendMessage(sharedMessage)
+            }
         }
     } //UPDATE->CREATE
 

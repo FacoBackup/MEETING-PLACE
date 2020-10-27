@@ -11,7 +11,7 @@ import br.meetingplace.management.core.operators.fileOperators.rw.ReadWriteUser
 import br.meetingplace.services.chat.Message
 import br.meetingplace.services.notification.Inbox
 
-class ChatGroup private constructor(): ChatInterface, ReadWriteUser, ReadWriteLoggedUser, ReadWriteGroup, Verify, Generator{
+class ChatGroup private constructor(): ChatInterface, ReadWriteUser, ReadWriteLoggedUser, ReadWriteGroup, Verify, Generator, IDs{
 
     companion object{
         private val op = ChatGroup()
@@ -21,17 +21,17 @@ class ChatGroup private constructor(): ChatInterface, ReadWriteUser, ReadWriteLo
     override fun sendMessage(data: ChatMessage) {
         val loggedUser = readLoggedUser().email
         val user = readUser(loggedUser)
-        val receiver = readGroup(data.idReceiver)
+        val group = readGroup(getGroupId(data.idReceiver, data.creator))
         val msg = Message(data.message, generateId(), loggedUser, true)
-        val notification = Inbox("${user.social.getUserName()} from ${receiver.getGroupId()} sent a new message.", "Group Message.")
+        val notification = Inbox("${user.social.getUserName()} from ${group.getGroupId()} sent a new message.", "Group Message.")
 
-        if (verifyLoggedUser(user) && verifyGroup(receiver)) {
-            val groupMembers = receiver.getMembers()
-            val updatedChat = receiver.getChat()
-            val chat = receiver.getChat()
+        if (verifyLoggedUser(user) && verifyGroup(group)) {
+            val groupMembers = group.getMembers()
+            val updatedChat = group.getChat()
+            val chat = group.getChat()
             chat.addMessage(msg)
-            receiver.updateChat(updatedChat)
-            writeGroup(receiver,receiver.getGroupId())
+            group.updateChat(updatedChat)
+            writeGroup(group,group.getGroupId())
 
             for (i in 0 until groupMembers.size) {
                 val member = readUser(groupMembers[i].userEmail)
@@ -40,8 +40,8 @@ class ChatGroup private constructor(): ChatInterface, ReadWriteUser, ReadWriteLo
                     writeUser(member, member.getEmail())
                 }//member exists
             }//for
-            val creator = readUser(receiver.getCreator())
-            if(loggedUser != receiver.getCreator() && verifyUser(creator)){
+            val creator = readUser(group.getCreator())
+            if(loggedUser != group.getCreator() && verifyUser(creator)){
 
                 creator.social.updateInbox(notification)
                 writeUser(creator, creator.getEmail())
@@ -52,59 +52,70 @@ class ChatGroup private constructor(): ChatInterface, ReadWriteUser, ReadWriteLo
     override fun favoriteMessage(data: ChatOperations){
         val loggedUser = readLoggedUser().email
         val user = readUser(loggedUser)
-        val receiver = readGroup(data.idReceiver)
+        val group = readGroup(getGroupId(data.idReceiver, data.creator))
 
-        if(verifyLoggedUser(user) && verifyGroup(receiver)){
-            val chat = receiver.getChat()
+        if(verifyLoggedUser(user) && verifyGroup(group)){
+            val chat = group.getChat()
             chat.favoriteMessage(data)
-            receiver.updateChat(chat)
-            writeGroup(receiver, receiver.getGroupId())
+            group.updateChat(chat)
+            writeGroup(group, group.getGroupId())
         }
     }//UPDATE
 
     override fun unFavoriteMessage(data: ChatOperations){
         val loggedUser = readLoggedUser().email
         val user = readUser(loggedUser)
-        val receiver = readGroup(data.idReceiver)
+        val group = readGroup(getGroupId(data.idReceiver, data.creator))
 
-        if(verifyLoggedUser(user) && verifyGroup(receiver)){
-            val chat = receiver.getChat()
+        if(verifyLoggedUser(user) && verifyGroup(group)){
+            val chat = group.getChat()
             chat.unFavoriteMessage(data)
-            receiver.updateChat(chat)
-            writeGroup(receiver, receiver.getGroupId())
+            group.updateChat(chat)
+            writeGroup(group, group.getGroupId())
         }
     }//UPDATE
 
     override fun quoteMessage(data: ChatComplexOperations){ // NEEDS WORK HERE
         val loggedUser = readLoggedUser().email
         val user = readUser(loggedUser)
-        val receiver = readGroup(data.idReceiver)
+        val group = readGroup(getGroupId(data.idReceiver, data.creator))
 
-        if(verifyLoggedUser(user) && verifyGroup(receiver)){
-            val chat = receiver.getChat()
+        if(verifyLoggedUser(user) && verifyGroup(group)){
+            val chat = group.getChat()
             if(chat.verifyMessage(data.idMessage)){
                 chat.quoteMessage(data, generateId())
-                receiver.updateChat(chat)
-                writeGroup(receiver,receiver.getGroupId())
+                group.updateChat(chat)
+                writeGroup(group,group.getGroupId())
             }
         }
     }//UPDATE
 
     override fun shareMessage(data: ChatComplexOperations) {
-        TODO("Not yet implemented")
+        val loggedUser = readLoggedUser().email
+        val user = readUser(loggedUser)
+        val group = readGroup(getGroupId(data.idReceiver, data.creator))
+
+        if(verifyLoggedUser(user) && verifyGroup(group)){
+            val chat = group.getChat()
+            val messageContent = chat.shareMessage(data)
+            if(messageContent != ""){
+                val sharedMessage = ChatMessage("|Shared| $messageContent", data.idReceiver, true, data.creator,data.idCommunity)
+                sendMessage(sharedMessage)
+            }
+        }
     }
 
     override fun deleteMessage(data: ChatOperations){
         val loggedUser = readLoggedUser().email
         val user = readUser(loggedUser)
-        val receiver = readGroup(data.idReceiver)
+        val group = readGroup(getGroupId(data.idReceiver, data.creator))
 
-        if(verifyLoggedUser(user) && verifyGroup(receiver)){
-            val chat = receiver.getChat()
+        if(verifyLoggedUser(user) && verifyGroup(group)){
+            val chat = group.getChat()
             if(chat.verifyMessage(data.idMessage)){
                 chat.deleteMessage(data)
-                receiver.updateChat(chat)
-                writeGroup(receiver, receiver.getGroupId())
+                group.updateChat(chat)
+                writeGroup(group, group.getGroupId())
             }
         }
     }//DELETE

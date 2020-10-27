@@ -32,10 +32,9 @@ class CommunityGroups private constructor() {
     fun updateGroupsInValidation(group: String,approve: Boolean?){
         when(approve){
             true->{//APPROVE
-                if(group in groupsInValidation){
-                    approvedGroups.add(group)
+                approvedGroups.add(group)
+                if(group in groupsInValidation)
                     groupsInValidation.remove(group)
-                }
             }
             false->{ // DELETE
                 if(group in groupsInValidation)

@@ -4,11 +4,12 @@ import br.meetingplace.data.community.CommunityData
 import br.meetingplace.data.community.ReportData
 import br.meetingplace.data.Data
 import br.meetingplace.data.community.ApprovalData
+import br.meetingplace.management.core.chat.dependencies.IDs
 import br.meetingplace.management.core.operators.Verify
 import br.meetingplace.management.core.operators.fileOperators.rw.*
 import br.meetingplace.services.community.Community
 
-class CommunityOperations: ReadWriteUser, ReadWriteLoggedUser, ReadWriteThread, ReadWriteGroup, ReadWriteCommunity,Verify{
+class CommunityOperations: ReadWriteUser, ReadWriteLoggedUser, ReadWriteThread, ReadWriteGroup, ReadWriteCommunity,Verify, IDs{
     private fun verifyReportType(data: ReportData): Int{
         val asGroup = readGroup(data.idService)
         val asThread = readThread(data.idService)
@@ -25,6 +26,7 @@ class CommunityOperations: ReadWriteUser, ReadWriteLoggedUser, ReadWriteThread, 
     fun create(data: CommunityData){
         val loggedUser = readLoggedUser().email
         val user = readUser(loggedUser)
+
         if (verifyLoggedUser(user)){
             val newCommunity = Community.getCommunity()
             val id = data.name.replace("\\s".toRegex(),"").toLowerCase()
@@ -76,7 +78,6 @@ class CommunityOperations: ReadWriteUser, ReadWriteLoggedUser, ReadWriteThread, 
             community.threads.updateThreadsInValidation(data.id,true)
             writeCommunity(community, community.getId())
         }
-
     }
 
     fun approveGroup(data: ApprovalData){

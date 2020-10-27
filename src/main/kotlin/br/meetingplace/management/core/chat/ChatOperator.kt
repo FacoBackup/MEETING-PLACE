@@ -6,18 +6,22 @@ import br.meetingplace.data.chat.ChatOperations
 import br.meetingplace.management.core.chat.dependencies.ChatGroup
 import br.meetingplace.management.core.chat.dependencies.ChatUser
 import br.meetingplace.management.core.chat.dependencies.Group
+import br.meetingplace.management.core.chat.dependencies.IDs
 import br.meetingplace.management.core.operators.fileOperators.rw.ReadWriteChat
 import br.meetingplace.management.core.operators.fileOperators.rw.ReadWriteCommunity
 import br.meetingplace.services.chat.Chat
 
-class ChatOperator: Group(), ReadWriteChat, ReadWriteCommunity{
+class ChatOperator: Group(), ReadWriteChat, ReadWriteCommunity, IDs {
     private val userOp =  ChatUser.getChatUserOperator()
     private val groupOp= ChatGroup.getChatGroupOperator()
 
-    private fun verifyType(id: String?): Int{
+    private fun verifyType(id: String?, creator: String?): Int{
         if(!id.isNullOrBlank()){
             val receiverAsUser = readUser(id)
-            val receiverAsGroup = readGroup(id)
+            var receiverAsGroup = readGroup(getGroupId(id,""))
+
+            if(!creator.isNullOrBlank())
+                receiverAsGroup = readGroup(getGroupId(id,creator))
 
             return if(receiverAsGroup.getGroupId() == "" && receiverAsUser.getEmail() != "") // is a user
                 0
@@ -30,7 +34,8 @@ class ChatOperator: Group(), ReadWriteChat, ReadWriteCommunity{
     }
 
     fun sendMessage(data: ChatMessage){
-        when(verifyType(data.idReceiver)){
+
+        when(verifyType(data.idReceiver,data.creator)){
             0->{
                userOp.sendMessage(data)
             }
@@ -48,7 +53,7 @@ class ChatOperator: Group(), ReadWriteChat, ReadWriteCommunity{
 
     }
     fun favoriteMessage(data: ChatOperations){
-        when(verifyType(data.idReceiver)){
+        when(verifyType(data.idReceiver,data.creator)){
             0->{
                 userOp.favoriteMessage(data)
             }
@@ -64,7 +69,7 @@ class ChatOperator: Group(), ReadWriteChat, ReadWriteCommunity{
         }
     }
     fun unFavoriteMessage(data: ChatOperations){
-        when(verifyType(data.idReceiver)){
+        when(verifyType(data.idReceiver,data.creator)){
             0->{
                 userOp.unFavoriteMessage(data)
             }
@@ -81,7 +86,7 @@ class ChatOperator: Group(), ReadWriteChat, ReadWriteCommunity{
     }
 
     fun quoteMessage(data: ChatComplexOperations){
-        when(verifyType(data.idReceiver)){
+        when(verifyType(data.idReceiver,data.creator)){
             0->{
                 userOp.quoteMessage(data)
             }
@@ -98,7 +103,7 @@ class ChatOperator: Group(), ReadWriteChat, ReadWriteCommunity{
     }
 
     fun shareMessage(data: ChatComplexOperations){
-        when(verifyType(data.idReceiver)){
+        when(verifyType(data.idReceiver,data.creator)){
             0->{
                 userOp.shareMessage(data)
             }
@@ -115,7 +120,7 @@ class ChatOperator: Group(), ReadWriteChat, ReadWriteCommunity{
     }
 
     fun deleteMessage(data: ChatOperations){
-        when(verifyType(data.idReceiver)){
+        when(verifyType(data.idReceiver,data.creator)){
             0->{
                 userOp.deleteMessage(data)
             }

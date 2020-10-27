@@ -31,7 +31,8 @@ class CommunityThreads private constructor(){
         when(approve){
             true->{//APPROVE
                 approvedThreads.add(thread)
-                threadsInValidation.remove(thread)
+                if(thread in threadsInValidation)
+                    threadsInValidation.remove(thread)
             }
             false->{ // DELETE
                 if(thread in threadsInValidation)

@@ -10,6 +10,7 @@ import br.meetingplace.data.group.MemberInput
 import br.meetingplace.data.threads.ThreadData
 import br.meetingplace.data.threads.ThreadOperationsData
 import br.meetingplace.data.Data
+import br.meetingplace.data.community.ApprovalData
 import br.meetingplace.data.user.LoginByEmail
 import br.meetingplace.data.user.SocialProfileData
 import br.meetingplace.data.user.UserData
@@ -59,6 +60,15 @@ fun main (){
                 val data = call.receive<Data>()
                 call.respond(communitySystem.unfollow(data))
             }
+            post("/community/approve/group"){
+                val data = call.receive<ApprovalData>()
+                call.respond(communitySystem.approveGroup(data))
+            }
+            post("/community/approve/thread"){
+                val data = call.receive<ApprovalData>()
+                call.respond(communitySystem.approveThread(data))
+            }
+
 
             get("/user"){
                 call.respond(userSystem.getMyUser())

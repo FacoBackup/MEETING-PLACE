@@ -14,12 +14,7 @@ import br.meetingplace.services.group.Group
 import br.meetingplace.services.group.Member
 import br.meetingplace.services.notification.Inbox
 
-abstract class Group: ReadWriteUser, ReadWriteLoggedUser, ReadWriteGroup, Verify, Generator, ReadWriteCommunity{
-
-    private fun getGroupId(groupName: String): String{
-        val loggedUser = readLoggedUser().email
-        return (groupName.replace("\\s".toRegex(),"") +"_" +(loggedUser.replaceAfter("@", "")).removeSuffix("@")).toLowerCase()
-    }
+abstract class Group: ReadWriteUser, ReadWriteLoggedUser, ReadWriteGroup, Verify, Generator, ReadWriteCommunity, IDs{
 
     fun createGroup(data: GroupData){
         val loggedUser = readLoggedUser().email
@@ -27,7 +22,7 @@ abstract class Group: ReadWriteUser, ReadWriteLoggedUser, ReadWriteGroup, Verify
 
         if(verifyLoggedUser(user) && data.groupName.isNotEmpty()){
             val newGroup = Group()
-            var id = getGroupId(data.groupName)
+            var id = getGroupId(data.groupName, loggedUser)
 
             when(data.idCommunity.isNullOrBlank()){
                 true->{
@@ -37,7 +32,7 @@ abstract class Group: ReadWriteUser, ReadWriteLoggedUser, ReadWriteGroup, Verify
                     writeUser(user, loggedUser)
                 }
                 false->{
-                    val community = readCommunity(data.idCommunity)
+                    val community = readCommunity(getCommunityId(data.idCommunity))
                     if(verifyCommunity(community)){
                         val communityMods = community.getModerators()
                         val notification = Inbox("$loggedUser wants to create a new group in ${community.getName()}.", "Community Group")
@@ -48,11 +43,19 @@ abstract class Group: ReadWriteUser, ReadWriteLoggedUser, ReadWriteGroup, Verify
                                 mod.social.updateInbox(notification)
                         }
 
-                        id= id+"_"+data.idCommunity
+                        id= getCommunityGroupId(community.getId(), data.groupName)
+
                         newGroup.startGroup(data.groupName, id,data.about, loggedUser)
                         user.social.updateMyGroups(newGroup.getGroupId(),false)
-                        community.groups.updateGroupsInValidation(newGroup.getGroupId(), null)
 
+                        if(loggedUser !in communityMods)
+                            community.groups.updateGroupsInValidation(newGroup.getGroupId(), null)
+                        else{
+                            println("added")
+                            community.groups.updateGroupsInValidation(newGroup.getGroupId(), true)
+                        }
+
+                        println("done")
                         writeGroup(newGroup, newGroup.getGroupId())
                         writeUser(user, loggedUser)
                         writeCommunity(community, community.getId())
@@ -100,21 +103,36 @@ abstract class Group: ReadWriteUser, ReadWriteLoggedUser, ReadWriteGroup, Verify
         val loggedUser = readLoggedUser().email
         val user = readUser(loggedUser)
         val external = readUser(data.externalMember)
-        var id = data.groupName
-        if(!data.idCommunity.isNullOrBlank())
-            id= id+"_"+data.idCommunity
-        val groupId = getGroupId(id)
-        val receiver = readGroup(groupId)
 
-        if(verifyLoggedUser(user) && verifyUser(external) && verifyGroup(receiver) && receiver.verifyMember(loggedUser) && !receiver.verifyMember(data.externalMember)){
+        if(verifyLoggedUser(user) && verifyUser(external)){
             val toBeAdded = Member(data.externalMember, 0)
-            val notification = Inbox("You're now a member of ${receiver.getNameGroup()}", "Group.")
+            when(data.idCommunity.isNullOrBlank()){
+                true->{
+                    val groupId = getGroupId(data.groupName, data.creator)
+                    val receiver = readGroup(groupId)
+                    val notification = Inbox("You're now a member of ${receiver.getNameGroup()}", "Group.")
+                    if(verifyUser(external) && verifyGroup(receiver) && receiver.verifyMember(loggedUser) && !receiver.verifyMember(data.externalMember))
+                    receiver.updateMember(toBeAdded, false)
+                    external.social.updateMemberIn(receiver.getGroupId(), false)
+                    external.social.updateInbox(notification)
+                    writeUser(external, external.getEmail())
+                    writeGroup(receiver, receiver.getGroupId())
+                }
+                false->{
+                    val groupId = getCommunityGroupId(data.idCommunity,getGroupId(data.groupName, data.creator))
+                    val receiver = readGroup(groupId)
+                    val community = readCommunity(getCommunityId(data.idCommunity))
+                    val notification = Inbox("You're now a member of ${receiver.getNameGroup()}", "Group.")
+                    if(verifyCommunity(community) && (loggedUser == receiver.getCreator() || loggedUser in community.getModerators())){
 
-            receiver.updateMember(toBeAdded, false)
-            external.social.updateMemberIn(receiver.getGroupId(), false)
-            external.social.updateInbox(notification)
-            writeUser(external, external.getEmail())
-            writeGroup(receiver, receiver.getGroupId())
+                        receiver.updateMember(toBeAdded, false)
+                        external.social.updateMemberIn(receiver.getGroupId(), false)
+                        external.social.updateInbox(notification)
+                        writeUser(external, external.getEmail())
+                        writeGroup(receiver, receiver.getGroupId())
+                    }
+                }
+            }
         }
 
     } //UPDATE
@@ -123,53 +141,77 @@ abstract class Group: ReadWriteUser, ReadWriteLoggedUser, ReadWriteGroup, Verify
         val loggedUser = readLoggedUser().email
         val user = readUser(loggedUser)
         val external = readUser(data.externalMember)
-        var id = data.groupName
-        if(!data.idCommunity.isNullOrBlank())
-            id= id+"_"+data.idCommunity
-        val groupId = getGroupId(id)
-        val receiver = readGroup(groupId)
 
-        if(verifyLoggedUser(user) && verifyUser(external) && verifyGroup(receiver) && receiver.verifyMember(loggedUser) && !receiver.verifyMember(data.externalMember)){
+        if(verifyLoggedUser(user) && verifyUser(external)){
             val toBeRemoved = Member(data.externalMember, 0)
-
-            receiver.updateMember(toBeRemoved, true)
-            external.social.updateMemberIn(receiver.getGroupId(), true)
-            writeUser(external, external.getEmail())
-            writeGroup(receiver, receiver.getGroupId())
+            when(data.idCommunity.isNullOrBlank()){
+                true->{
+                    val groupId = getGroupId(data.groupName, data.creator)
+                    val receiver = readGroup(groupId)
+                    if(verifyUser(external) && verifyGroup(receiver) && receiver.verifyMember(loggedUser) && !receiver.verifyMember(data.externalMember))
+                        receiver.updateMember(toBeRemoved, true)
+                    external.social.updateMemberIn(receiver.getGroupId(), true)
+                    writeUser(external, external.getEmail())
+                    writeGroup(receiver, receiver.getGroupId())
+                }
+                false->{
+                    val groupId = getCommunityGroupId(data.idCommunity,getGroupId(data.groupName, data.creator))
+                    val receiver = readGroup(groupId)
+                    val community = readCommunity(getCommunityId(data.idCommunity))
+                    if(verifyCommunity(community) && (loggedUser == receiver.getCreator() || loggedUser in community.getModerators())){
+                        receiver.updateMember(toBeRemoved, true)
+                        external.social.updateMemberIn(receiver.getGroupId(), true)
+                        writeUser(external, external.getEmail())
+                        writeGroup(receiver, receiver.getGroupId())
+                    }
+                }
+            }
         }
     } //UPDATE
 
     fun deleteGroup(data: GroupOperationsData){ //NEEDS WORK FOR COMMUNITY
         val loggedUser = readLoggedUser().email
         val user = readUser(loggedUser)
-        var id = data.groupName
-        if(!data.idCommunity.isNullOrBlank())
-            id= id+"_"+data.idCommunity
-        val groupId = getGroupId(id)
-        val receiver = readGroup(groupId)
 
-        if(verifyLoggedUser(user) && verifyGroup(receiver) && receiver.getCreator() == loggedUser) {
-            val members = receiver.getMembers()
-            for(i in 0 until members.size){
-                val member = readUser(members[i].userEmail)
-                if(verifyUser(member)) {
-                    member.social.updateMemberIn(receiver.getGroupId(),true)
-                    writeUser(member, member.getEmail())
-                }
-            }
 
+        if(verifyLoggedUser(user)) {
             when(data.idCommunity.isNullOrBlank()){
                 true->{
-                    user.social.updateMyGroups(receiver.getGroupId(),true)
-                    DeleteFile.getDeleteFileOperator().deleteGroup(receiver)
-                    writeUser(user, loggedUser)
+                    val groupId = getGroupId(data.groupName, loggedUser)
+                    val receiver = readGroup(groupId)
+                    if(verifyGroup(receiver) && receiver.getCreator() == loggedUser){
+
+                        val members = receiver.getMembers()
+                        for(i in 0 until members.size){
+                            val member = readUser(members[i].userEmail)
+                            if(verifyUser(member)) {
+                                member.social.updateMemberIn(receiver.getGroupId(),true)
+                                writeUser(member, member.getEmail())
+                            }
+                        }
+
+                        user.social.updateMyGroups(groupId,true)
+                        DeleteFile.getDeleteFileOperator().deleteGroup(receiver)
+                        writeUser(user, loggedUser)
+                    }
                 }
                 false->{
-                    val community = readCommunity(data.idCommunity)
+                    val community = readCommunity(getCommunityId(data.idCommunity))
+                    val groupId = getCommunityGroupId(data.idCommunity,data.groupName)
+                    val receiver = readGroup(groupId)
                     if(verifyCommunity(community) && (loggedUser == receiver.getCreator() || loggedUser in community.getModerators())){
-
                        when(community.groups.checkGroupApproval(receiver.getGroupId())){
                            true->{
+
+                               val members = receiver.getMembers()
+                               for(i in 0 until members.size){
+                                   val member = readUser(members[i].userEmail)
+                                   if(verifyUser(member)) {
+                                       member.social.updateMemberIn(receiver.getGroupId(),true)
+                                       writeUser(member, member.getEmail())
+                                   }
+                               }
+
                                community.groups.removeApprovedGroup(receiver.getGroupId())
                                user.social.updateMyGroups(receiver.getGroupId(),true)
                                DeleteFile.getDeleteFileOperator().deleteGroup(receiver)
@@ -177,6 +219,15 @@ abstract class Group: ReadWriteUser, ReadWriteLoggedUser, ReadWriteGroup, Verify
                                writeCommunity(community, community.getId())
                            }
                            false->{
+
+                               val members = receiver.getMembers()
+                               for(i in 0 until members.size){
+                                   val member = readUser(members[i].userEmail)
+                                   if(verifyUser(member)) {
+                                       member.social.updateMemberIn(receiver.getGroupId(),true)
+                                       writeUser(member, member.getEmail())
+                                   }
+                               }
                                community.groups.updateGroupsInValidation(receiver.getGroupId(), false)
                                user.social.updateMyGroups(receiver.getGroupId(),true)
                                DeleteFile.getDeleteFileOperator().deleteGroup(receiver)
@@ -184,7 +235,6 @@ abstract class Group: ReadWriteUser, ReadWriteLoggedUser, ReadWriteGroup, Verify
                                writeCommunity(community, community.getId())
                            }
                        }
-
                     }
                 }
             }
