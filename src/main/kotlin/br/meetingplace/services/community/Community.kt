@@ -19,6 +19,7 @@ class Community private constructor(){
     val groups = CommunityGroups.getGroups()
 
     //GETTERS
+    fun getFollowers () = followers
     fun getName() = name
     fun getId() = id
     fun getAbout() = about
