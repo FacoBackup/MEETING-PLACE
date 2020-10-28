@@ -1,6 +1,6 @@
 package br.meetingplace.management.dependencies.fileOperators
 
-import br.meetingplace.entitie.User
+import br.meetingplace.services.entitie.User
 import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteGroup
 import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteThread
 import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteUser

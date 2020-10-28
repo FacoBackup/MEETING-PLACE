@@ -14,11 +14,11 @@ import br.meetingplace.data.community.ApprovalData
 import br.meetingplace.data.user.LoginByEmail
 import br.meetingplace.data.user.SocialProfileData
 import br.meetingplace.data.user.UserData
-import br.meetingplace.management.Login
-import br.meetingplace.management.chat.ChatFactory
-import br.meetingplace.management.community.CommunityFactory
-import br.meetingplace.management.thread.ThreadFactory
-import br.meetingplace.management.user.UserFactory
+import br.meetingplace.management.services.Login
+import br.meetingplace.management.services.chat.dependencies.ChatOperator
+import br.meetingplace.management.services.community.dependencies.CommunityOperator
+import br.meetingplace.management.services.thread.dependencies.ThreadFactory
+import br.meetingplace.management.services.user.dependencies.user.UserFactory
 import io.ktor.application.*
 import io.ktor.features.*
 import io.ktor.gson.*
@@ -30,9 +30,9 @@ import io.ktor.server.netty.*
 
 val userSystem= UserFactory()
 val threadSystem=  ThreadFactory()
-val chatSystem = ChatFactory() // controls chat and groups
+val chatSystem = ChatOperator() // controls chat and groups
 val login = Login.getLoginSystem()
-val communitySystem = CommunityFactory()
+val communitySystem = CommunityOperator()
 fun main (){
 
     embeddedServer(Netty, 3000) {
@@ -76,11 +76,11 @@ fun main (){
 
             post("/user/create"){
                 val user = call.receive<UserData>()
-                call.respond(userSystem.createUser(user))
+                call.respond(userSystem.create(user))
             }
 
             post("/delete"){
-                call.respond(userSystem.deleteUser())
+                call.respond(userSystem.delete())
             }
 
             post("/login"){
