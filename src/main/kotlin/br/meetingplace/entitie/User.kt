@@ -17,17 +17,18 @@ open class User(
         if(age >= 16 && email != "" && social.getUserName() == "")
             social = profile
     }
-
+/*
     fun professionalProfile(profile: ProfessionalProfile){
         if(age >= 18 && email != ""){
-            /*
-            professional.userName = profile.userName
+                       professional.userName = profile.userName
             professional.about = profile.about
             professional.gender = profile.gender
-            professional.nacionality = profile.nacionality
-            */
+            professional.nationality = profile.nationality
+
         }
     }
+ */
+
     //Setters
 
     //Update

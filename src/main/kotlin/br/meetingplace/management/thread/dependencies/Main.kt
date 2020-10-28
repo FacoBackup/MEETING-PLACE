@@ -24,12 +24,14 @@ class Main private constructor(): ThreadInterface, Verify, ReadWriteLoggedUser, 
         if(verifyLoggedUser(user)){
             val thread = MainThread()
             thread.startThread(data,generateId(), user.social.getUserName(), loggedUser)
-            writeThread(thread, thread.getId())
 
-            if(data.idCommunity.isNullOrBlank()){
-                user.social.updateMyThreads(thread.getId(),true)
-                writeUser(user, user.getEmail())
-            }
+            if(!data.idCommunity.isNullOrBlank())
+                thread.updateCommunity(data.idCommunity)
+
+            writeThread(thread, thread.getId())
+            user.social.updateMyThreads(thread.getId(),true)
+            writeUser(user, user.getEmail())
+
 
             return if(!data.idCommunity.isNullOrBlank())
                 thread.getId()

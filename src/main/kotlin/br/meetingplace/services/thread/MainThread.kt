@@ -1,6 +1,7 @@
 package br.meetingplace.services.thread
 
 import br.meetingplace.data.threads.ThreadData
+import br.meetingplace.services.community.Community
 
 
 class MainThread(){
@@ -14,8 +15,14 @@ class MainThread(){
     private var subThread = mutableListOf<SubThread>()
     private var subThreadId = mutableListOf<String>()
     private var id = ""
-
+    private var community: String? = null
     //SETTERS
+
+    fun updateCommunity(idCommunity: String){
+        if(idCommunity.isNotBlank() && community == null)
+            community = idCommunity
+    }
+
     fun startThread(content: ThreadData, id: String, userName: String, userId: String){ // Updates the creator to the logged user
             creator = userId
             footer = userName

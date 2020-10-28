@@ -43,15 +43,11 @@ class ThreadFactory: Verify, ReadWriteUser, ReadWriteThread, ReadWriteCommunity 
                         if(verifyCommunity(community) ){ //NEEDS THE THREAD ID TO WORK
                             val idThread = Main.getMainThreadOperator().create(data)
                             //the verification for data.idCommunity != null already occurred, so don't mind the !!
-                            println(loggedUser)
-                            println("here")
                             if(loggedUser !in community.getModerators())
                                 community.threads.updateThreadsInValidation(idThread!!, null)
                             else
                                 community.threads.updateThreadsInValidation(idThread!!, true)
-
                             writeCommunity(community, community.getId())
-                            println("done")
                         }
                     }
                 }

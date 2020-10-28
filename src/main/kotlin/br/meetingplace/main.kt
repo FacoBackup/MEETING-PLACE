@@ -16,7 +16,7 @@ import br.meetingplace.data.user.SocialProfileData
 import br.meetingplace.data.user.UserData
 import br.meetingplace.management.Login
 import br.meetingplace.management.chat.ChatFactory
-import br.meetingplace.management.community.CommunityOperations
+import br.meetingplace.management.community.CommunityFactory
 import br.meetingplace.management.thread.ThreadFactory
 import br.meetingplace.management.user.UserFactory
 import io.ktor.application.*
@@ -32,7 +32,7 @@ val userSystem= UserFactory()
 val threadSystem=  ThreadFactory()
 val chatSystem = ChatFactory() // controls chat and groups
 val login = Login.getLoginSystem()
-val communitySystem = CommunityOperations()
+val communitySystem = CommunityFactory()
 fun main (){
 
     embeddedServer(Netty, 3000) {
@@ -43,22 +43,14 @@ fun main (){
                 }
             }
             get("/communities"){
-                call.respond(communitySystem.communitiesIFollow())
+                call.respond(userSystem.communitiesIFollow())
             }
             get("/moderator"){
-                call.respond(communitySystem.moderatorIn())
+                call.respond(userSystem.moderatorIn())
             }
             post("/community/create"){
                 val data = call.receive<CommunityData>()
                 call.respond(communitySystem.create(data))
-            }
-            post("/community/follow"){
-                val data = call.receive<Data>()
-                call.respond(communitySystem.follow(data))
-            }
-            post("/community/unfollow"){
-                val data = call.receive<Data>()
-                call.respond(communitySystem.unfollow(data))
             }
             post("/community/approve/group"){
                 val data = call.receive<ApprovalData>()
@@ -113,8 +105,8 @@ fun main (){
                 call.respond(userSystem.follow(follow))
             }
             post("/unfollow"){
-                val follow = call.receive<Data>()
-                call.respond(userSystem.unfollow(follow))
+                val unfollow = call.receive<Data>()
+                call.respond(userSystem.unfollow(unfollow))
             }
 
             //MESSAGES USERS

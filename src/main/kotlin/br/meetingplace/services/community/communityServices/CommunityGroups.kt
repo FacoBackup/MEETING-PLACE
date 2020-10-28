@@ -10,14 +10,10 @@ class CommunityGroups private constructor() {
     }
     private val approvedGroups = mutableListOf<String>() //OK
     private val groupsInValidation = mutableListOf<String>() //NEEDS WORK HERE
-    private val reportedGroups = mutableListOf<Report>() // OK
-    private val idReports = mutableListOf<String>() // OK
 
     //GETTERS
     fun getApprovedGroups() = approvedGroups
     fun getGroupsInValidation ()= groupsInValidation
-    fun getReportedGroups () = reportedGroups
-    fun getIdReports() = idReports
     //GETTERS
 
     fun checkGroupApproval(id: String): Boolean{
@@ -46,23 +42,4 @@ class CommunityGroups private constructor() {
             }
         }
     }
-
-    fun updateReport(data: Report,delete: Boolean){
-        when(delete){
-            true->{
-                if(data.reportId in idReports){
-                    reportedGroups.remove(data)
-                    idReports.remove(data.reportId)
-                }
-            }
-            false->{
-                if(data.reportId !in idReports && data.idService in approvedGroups){
-                    reportedGroups.add(data)
-                    idReports.add(data.reportId)
-                }
-            }
-        }
-    }
-
-
 }
