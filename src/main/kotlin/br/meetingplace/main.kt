@@ -17,8 +17,8 @@ import br.meetingplace.data.user.UserData
 import br.meetingplace.management.services.Login
 import br.meetingplace.management.services.chat.dependencies.ChatOperator
 import br.meetingplace.management.services.community.dependencies.CommunityOperator
-import br.meetingplace.management.services.thread.dependencies.ThreadFactory
-import br.meetingplace.management.services.user.dependencies.user.UserFactory
+import br.meetingplace.management.services.thread.core.ThreadCore
+import br.meetingplace.management.services.user.core.UserCore
 import io.ktor.application.*
 import io.ktor.features.*
 import io.ktor.gson.*
@@ -28,8 +28,8 @@ import io.ktor.routing.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 
-val userSystem= UserFactory()
-val threadSystem=  ThreadFactory()
+val userSystem= UserCore.getCore()
+val threadSystem=  ThreadCore.getCore()
 val chatSystem = ChatOperator() // controls chat and groups
 val login = Login.getLoginSystem()
 val communitySystem = CommunityOperator()
@@ -94,7 +94,7 @@ fun main (){
 
             post("/create/social"){
                 val user = call.receive<SocialProfileData>()
-                call.respond(userSystem.createSocialProfile(user))
+                call.respond(userSystem.createProfile(user))
             }
 //            post("/user/create/professional"){
 //                val user = call.receive<ProfessionalProfile>()
@@ -141,10 +141,10 @@ fun main (){
 
 //            THREADS
             get("/user/see/threads"){
-                call.respond(threadSystem.getMyThreads())
+                call.respond(userSystem.getMyThreads())
             }
             get("/user/see/timeline"){
-                call.respond(threadSystem.getMyTimeline())
+                call.respond(userSystem.getMyTimeline())
             }
 
             post("/thread/create"){

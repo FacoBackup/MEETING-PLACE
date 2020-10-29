@@ -13,7 +13,7 @@ class ProfileOperator private constructor(): ProfileInterface, ReadWriteUser, Re
         fun getProfileOperator() = Class
     }
 
-    override fun create(newProfile: SocialProfileData){
+    override fun createProfile(newProfile: SocialProfileData){
         val logged = readLoggedUser().email
         val user = readUser(logged)
         if(user.getAge() >=16 && logged != "" && user.getEmail() != ""){
