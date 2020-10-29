@@ -1,4 +1,4 @@
-package br.meetingplace.services.entitie.profiles
+package br.meetingplace.services.entitie.profiles.social
 
 import br.meetingplace.services.notification.Inbox
 

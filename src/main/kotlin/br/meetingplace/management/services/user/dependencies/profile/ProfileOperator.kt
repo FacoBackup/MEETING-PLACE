@@ -1,7 +1,7 @@
 package br.meetingplace.management.services.user.dependencies.profile
 
 import br.meetingplace.data.user.SocialProfileData
-import br.meetingplace.services.entitie.profiles.SocialProfile
+import br.meetingplace.services.entitie.profiles.social.SocialProfile
 import br.meetingplace.management.dependencies.Verify
 import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteLoggedUser
 import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteUser

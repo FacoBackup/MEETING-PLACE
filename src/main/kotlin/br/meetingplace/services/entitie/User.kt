@@ -1,7 +1,7 @@
 package br.meetingplace.services.entitie
 
-import br.meetingplace.services.entitie.profiles.ProfessionalProfile
-import br.meetingplace.services.entitie.profiles.SocialProfile
+import br.meetingplace.services.entitie.profiles.professional.ProfessionalProfile
+import br.meetingplace.services.entitie.profiles.social.SocialProfile
 
 open class User(
     private var realName: String, // only can create a professional profile if age > 18 and social if age > 16
@@ -28,7 +28,6 @@ open class User(
         }
     }
  */
-
     //Setters
 
     //Update

@@ -1,12 +1,16 @@
 package br.meetingplace.management.services.chat.dependencies.reader
 
 import br.meetingplace.data.Data
+import br.meetingplace.management.dependencies.Verify
+import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteChat
+import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteLoggedUser
+import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteUser
 
-class ChatReader: ChatReaderInterface{
+class ChatReader: ChatReaderInterface, ReadWriteLoggedUser, ReadWriteUser, ReadWriteChat, Verify{
+
     override fun seeChat(data: Data) {
         TODO("Not yet implemented")
     }
-
     override fun seeGroupChat(data: Data) {
         TODO("Not yet implemented")
     }
