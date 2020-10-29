@@ -15,8 +15,8 @@ import br.meetingplace.data.user.LoginByEmail
 import br.meetingplace.data.user.SocialProfileData
 import br.meetingplace.data.user.UserData
 import br.meetingplace.management.services.Login
-import br.meetingplace.management.services.chat.dependencies.ChatOperator
-import br.meetingplace.management.services.community.dependencies.CommunityOperator
+import br.meetingplace.management.services.chat.core.ChatCore
+import br.meetingplace.management.services.community.core.CommunityCore
 import br.meetingplace.management.services.thread.core.ThreadCore
 import br.meetingplace.management.services.user.core.UserCore
 import io.ktor.application.*
@@ -30,9 +30,9 @@ import io.ktor.server.netty.*
 
 val userSystem= UserCore.getCore()
 val threadSystem=  ThreadCore.getCore()
-val chatSystem = ChatOperator() // controls chat and groups
+val chatSystem = ChatCore.getCore() // controls chat and groups
 val login = Login.getLoginSystem()
-val communitySystem = CommunityOperator()
+val communitySystem = CommunityCore.getClass()
 fun main (){
 
     embeddedServer(Netty, 3000) {
@@ -109,10 +109,10 @@ fun main (){
                 call.respond(userSystem.unfollow(unfollow))
             }
 
-            //MESSAGES USERS
-            get("/my/messages") {
-                call.respond(chatSystem.getMyChats())
-            }
+//            //MESSAGES USERS
+//            get("/my/messages") {
+//                call.respond(chatSystem.getMyChats())
+//            }
             post("/message/send"){
                 val chat = call.receive<ChatMessage>()
                 call.respond(chatSystem.sendMessage(chat))

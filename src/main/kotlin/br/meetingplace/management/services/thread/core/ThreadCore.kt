@@ -7,9 +7,8 @@ import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteCommuni
 import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteThread
 import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteUser
 import br.meetingplace.management.services.thread.dependencies.LikeInterface
-import br.meetingplace.management.services.thread.dependencies.mainThread.MainThreadFactoryFactory
-import br.meetingplace.management.services.thread.dependencies.subThread.SubThreadFactoryFactory
-import br.meetingplace.management.services.thread.dependencies.ThreadFactoryInterface
+import br.meetingplace.management.services.thread.dependencies.mainThread.MainThreadFactory
+import br.meetingplace.management.services.thread.dependencies.subThread.SubThreadFactory
 import br.meetingplace.management.services.thread.dependencies.mainThread.LikeMainThread
 import br.meetingplace.management.services.thread.dependencies.subThread.LikeSubThread
 import br.meetingplace.services.community.Community
@@ -21,8 +20,8 @@ class ThreadCore private constructor():LikeInterface,Verify, ReadWriteUser, Read
         fun getCore() = Class
     }
 
-    private val main = MainThreadFactoryFactory.getThreadFactory()
-    private val sub = SubThreadFactoryFactory.getThreadFactory()
+    private val main = MainThreadFactory.getThreadFactory()
+    private val sub = SubThreadFactory.getThreadFactory()
 
     fun create(data: ThreadData) { //NEEDS WORK HERE
         val loggedUser = readLoggedUser().email
