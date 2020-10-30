@@ -15,7 +15,7 @@ class UserFactory private constructor(): UserInterface, ReadWriteLoggedUser, Rea
 
     companion object{
         private val Class = UserFactory()
-        fun getFactory()= Class
+        fun getClass()= Class
     }
 
     override fun create(newUser: UserData){

@@ -7,12 +7,11 @@ import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteChat
 import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteGroup
 import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteLoggedUser
 import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteUser
-import br.meetingplace.management.services.search.dependecies.group.GroupSearchInterface
 import br.meetingplace.services.chat.Chat
 import br.meetingplace.services.entitie.User
 import br.meetingplace.services.group.Group
 
-class ChatReader private constructor(): GroupSearchInterface, ChatReaderInterface, ReadWriteGroup, ReadWriteLoggedUser, ReadWriteUser, ReadWriteChat, IDs,Verify{
+class ChatReader private constructor(): ChatReaderInterface, ReadWriteGroup, ReadWriteLoggedUser, ReadWriteUser, ReadWriteChat, IDs,Verify{
 
     companion object{
         private val Class = ChatReader()

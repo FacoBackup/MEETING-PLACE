@@ -22,6 +22,7 @@ class CommunityReader: ReadWriteLoggedUser, ReadWriteUser,ReadWriteThread, ReadW
 
         return listOf()
     }
+
     override fun seeFollowers(data: Data): List<String>{
         val loggedUser = readLoggedUser().email
         val user = readUser(loggedUser)
@@ -32,7 +33,8 @@ class CommunityReader: ReadWriteLoggedUser, ReadWriteUser,ReadWriteThread, ReadW
 
         return listOf()
     }
-    override fun seeModerator(data: Data): List<String>{
+    
+    override fun seeModerators(data: Data): List<String>{
         val loggedUser = readLoggedUser().email
         val user = readUser(loggedUser)
         val community = readCommunity(getCommunityId(data.ID))
@@ -42,14 +44,13 @@ class CommunityReader: ReadWriteLoggedUser, ReadWriteUser,ReadWriteThread, ReadW
 
         return listOf()
     }
+    
     override fun seeThreads(data: Data): List<MainThread>{
         val loggedUser = readLoggedUser().email
         val user = readUser(loggedUser)
         val community = readCommunity(getCommunityId(data.ID))
         lateinit var threads: List<String>
-
-
-
+        
         if(verifyLoggedUser(user) && verifyCommunity(community) && user.getEmail() in community.getModerators()){
             threads = community.getIdThreads()
 

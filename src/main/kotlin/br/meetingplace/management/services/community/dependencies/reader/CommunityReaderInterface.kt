@@ -7,7 +7,7 @@ import br.meetingplace.services.thread.MainThread
 interface CommunityReaderInterface {
     fun seeReports(data: Data): List<Report>
     fun seeFollowers(data: Data): List<String>
-    fun seeModerator(data: Data): List<String>
+    fun seeModerators(data: Data): List<String>
     fun seeThreads(data: Data): List<MainThread>
     fun seeGroups(data: Data): List<String>
 }

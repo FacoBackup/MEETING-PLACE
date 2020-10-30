@@ -45,12 +45,6 @@ fun main (){
                     setPrettyPrinting()
                 }
             }
-            get("/communities"){
-                call.respond(userSystem.communitiesIFollow())
-            }
-            get("/moderator"){
-                call.respond(userSystem.moderatorIn())
-            }
             post("/community/create"){
                 val data = call.receive<CommunityData>()
                 call.respond(communitySystem.create(data))
@@ -63,14 +57,12 @@ fun main (){
                 val data = call.receive<ApprovalData>()
                 call.respond(communitySystem.approveThread(data))
             }
-
-
             get("/user"){
                 call.respond(userSystem.getMyUser())
             }
 
             get("/logged") {
-                call.respond(userSystem.readLoggedUser().email)
+                call.respond(userSystem.getMyUser().getEmail())
             }
 
             post("/user/clear/notifications"){

@@ -9,11 +9,11 @@ import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteUser
 import br.meetingplace.services.entitie.User
 import br.meetingplace.services.notification.Inbox
 
-class FollowOperator private constructor(): FollowInterface, Verify, ReadWriteUser, ReadWriteThread, ReadWriteCommunity, IDs {
+class Follow private constructor(): FollowInterface, Verify, ReadWriteUser, ReadWriteThread, ReadWriteCommunity, IDs {
 
     companion object{
-        private val Class = FollowOperator()
-        fun getFollowOperator() = Class
+        private val Class = Follow()
+        fun getClass() = Class
     }
 
     private fun verifyType(data: Data): Int{

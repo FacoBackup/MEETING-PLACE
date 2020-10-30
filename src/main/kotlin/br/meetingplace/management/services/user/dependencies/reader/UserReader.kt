@@ -1,4 +1,4 @@
-package br.meetingplace.management.services.user.dependencies.user
+package br.meetingplace.management.services.user.dependencies.reader
 
 import br.meetingplace.management.dependencies.Verify
 import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteCommunity
@@ -9,46 +9,19 @@ import br.meetingplace.services.community.Community
 import br.meetingplace.services.entitie.User
 import br.meetingplace.services.thread.MainThread
 
-abstract class UserReader:  Verify, ReadWriteLoggedUser, ReadWriteUser, ReadWriteThread, ReadWriteCommunity {
+class UserReader private constructor():  Verify, ReadWriteLoggedUser, ReadWriteUser, ReadWriteThread, ReadWriteCommunity, UserReaderInterface {
 
-    fun getMyUser(): User {
+    companion object{
+        private val Class = UserReader()
+        fun getClass() = Class
+    }
+
+    override fun getMyUser(): User {
         val logged = readLoggedUser().email
         return readUser(logged)
     }//READ
 
-    fun communitiesIFollow(): List<Community>{
-        val loggedUser = readLoggedUser().email
-        val user = readUser(loggedUser)
-        val communities = mutableListOf<Community>()
-        lateinit var communityList: List<String>
-        if (verifyLoggedUser(user)){
-            communityList = user.getCommunitiesIFollow()
-            for(element in communityList){
-                val data = readCommunity(element)
-                if(verifyCommunity(data))
-                    communities.add(data)
-            }
-        }
-        return communities
-    }
-
-    fun moderatorIn(): List<Community>{
-        val loggedUser = readLoggedUser().email
-        val user = readUser(loggedUser)
-        val communities = mutableListOf<Community>()
-        lateinit var communityList: List<String>
-        if (verifyLoggedUser(user)){
-            communityList = user.getModeratorIn()
-            for(element in communityList){
-                val data = readCommunity(element)
-                if(verifyCommunity(data))
-                    communities.add(data)
-            }
-        }
-        return communities
-    }
-
-    fun getMyThreads(): MutableList<MainThread> {
+    override fun getMyThreads(): MutableList<MainThread> {
         val loggedUser = readLoggedUser().email
         val user = readUser(loggedUser)
         val myThreads = mutableListOf<MainThread>()
@@ -67,7 +40,7 @@ abstract class UserReader:  Verify, ReadWriteLoggedUser, ReadWriteUser, ReadWrit
         return myThreads
     }//READ
 
-    fun getMyTimeline(): MutableList<MainThread> { //NEEDS WORK HERE
+    override fun getMyTimeline(): MutableList<MainThread> { //NEEDS WORK HERE
         val loggedUser = readLoggedUser().email
         val user = readUser(loggedUser)
         val myTimeline = mutableListOf<MainThread>()

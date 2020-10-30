@@ -1,16 +1,15 @@
 package br.meetingplace.management.services.user.dependencies.profile
 
 import br.meetingplace.data.user.SocialProfileData
-import br.meetingplace.services.entitie.profiles.social.SocialProfile
 import br.meetingplace.management.dependencies.Verify
 import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteLoggedUser
 import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteUser
 
-class ProfileOperator private constructor(): ProfileInterface, ReadWriteUser, ReadWriteLoggedUser, Verify{
+class Profile private constructor(): ProfileInterface, ReadWriteUser, ReadWriteLoggedUser, Verify{
 
     companion object{
-        private val Class = ProfileOperator()
-        fun getProfileOperator() = Class
+        private val Class = Profile()
+        fun getClass() = Class
     }
 
     override fun createProfile(newProfile: SocialProfileData){
