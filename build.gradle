@@ -6,7 +6,7 @@ plugins {
 }
 
 group 'br.meetingplace'
-version 'alpha0'
+version 'alpha-1.01'
 
 repositories {
     jcenter()
@@ -22,3 +22,9 @@ dependencies {
 
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
+
+mainClassName = 'br.meetingplace.MainKt'
+task stage{
+    dependsOn installDist
+}
+
