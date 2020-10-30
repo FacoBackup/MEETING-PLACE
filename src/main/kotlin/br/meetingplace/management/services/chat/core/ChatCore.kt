@@ -32,7 +32,6 @@ class ChatCore private constructor(): BaseChatInterface, ChatFeaturesInterface, 
     }
 
     override fun sendMessage(data: ChatMessage){
-
         when(verifyType(data.idReceiver,data.creator)){
             ChatType.USER_CHAT->{
                userBaseChat.sendMessage(data)
@@ -123,6 +122,7 @@ class ChatCore private constructor(): BaseChatInterface, ChatFeaturesInterface, 
                 userBaseChat.deleteMessage(data)
             }
             ChatType.GROUP_CHAT->{
+                println("step 1")
                 if(data.idCommunity.isNullOrBlank())
                     groupBaseChat.deleteMessage(data)
                 else{
@@ -146,13 +146,13 @@ class ChatCore private constructor(): BaseChatInterface, ChatFeaturesInterface, 
     private fun verifyType(id: String?, creator: String?): ChatType?{
         if(!id.isNullOrBlank()){
             val receiverAsUser = readUser(id)
-            val receiverAsGroup = readGroup(getGroupId(id,if(!creator.isNullOrBlank()) creator else ""))
+            val receiverAsGroup = readGroup(getGroupId(id,if(!creator.isNullOrBlank()) creator else readLoggedUser().email))
 
-            return if(receiverAsGroup.getGroupId() == "" && receiverAsUser.getEmail() != "") // is a user
+            return if(receiverAsGroup.getGroupId().isBlank() && receiverAsUser.getEmail().isNotBlank())
                 ChatType.USER_CHAT
-            else if(receiverAsGroup.getGroupId() != "" && receiverAsUser.getEmail() == "") // is a group
+            else if(receiverAsGroup.getGroupId().isNotBlank() && receiverAsUser.getEmail().isBlank())
                 ChatType.GROUP_CHAT
-            else // is nothing
+            else
                 null
         }
         return null

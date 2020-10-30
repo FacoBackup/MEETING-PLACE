@@ -22,7 +22,7 @@ class GroupChatFeatures private constructor(): ChatFeaturesInterface, ReadWriteL
     override fun favoriteMessage(data: ChatOperations){
         val loggedUser = readLoggedUser().email
         val user = readUser(loggedUser)
-        val group = readGroup(getGroupId(data.idReceiver, data.creator))
+        val group = readGroup(getGroupId(data.idReceiver,if(!data.creator.isNullOrBlank()) data.creator else loggedUser))
 
         if(verifyLoggedUser(user) && verifyGroup(group)){
             val chat = group.getChat()
@@ -35,7 +35,7 @@ class GroupChatFeatures private constructor(): ChatFeaturesInterface, ReadWriteL
     override fun unFavoriteMessage(data: ChatOperations){
         val loggedUser = readLoggedUser().email
         val user = readUser(loggedUser)
-        val group = readGroup(getGroupId(data.idReceiver, data.creator))
+        val group = readGroup(getGroupId(data.idReceiver,if(!data.creator.isNullOrBlank()) data.creator else loggedUser))
 
         if(verifyLoggedUser(user) && verifyGroup(group)){
             val chat = group.getChat()
@@ -48,7 +48,7 @@ class GroupChatFeatures private constructor(): ChatFeaturesInterface, ReadWriteL
     override fun quoteMessage(data: ChatComplexOperations){ // NEEDS WORK HERE
         val loggedUser = readLoggedUser().email
         val user = readUser(loggedUser)
-        val group = readGroup(getGroupId(data.idReceiver, data.creator))
+        val group = readGroup(getGroupId(data.idReceiver,if(!data.creator.isNullOrBlank()) data.creator else loggedUser))
 
         if(verifyLoggedUser(user) && verifyGroup(group)){
             val chat = group.getChat()
@@ -63,7 +63,7 @@ class GroupChatFeatures private constructor(): ChatFeaturesInterface, ReadWriteL
     override fun shareMessage(data: ChatComplexOperations) {
         val loggedUser = readLoggedUser().email
         val user = readUser(loggedUser)
-        val group = readGroup(getGroupId(data.idReceiver, data.creator))
+        val group = readGroup(getGroupId(data.idReceiver,if(!data.creator.isNullOrBlank()) data.creator else loggedUser))
 
         if(verifyLoggedUser(user) && verifyGroup(group)){
             val chat = group.getChat()

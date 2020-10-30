@@ -23,15 +23,14 @@ class ThreadCore private constructor():LikeInterface,Verify, ReadWriteUser, Read
     private val main = MainThreadFactory.getThreadFactory()
     private val sub = SubThreadFactory.getThreadFactory()
 
-    fun create(data: ThreadData) { //NEEDS WORK HERE
+    fun create(data: ThreadData) {
         val loggedUser = readLoggedUser().email
         val user = readUser(loggedUser)
         lateinit var community: Community
 
         if(verifyLoggedUser(user)){
-
             when(verifyType(null,data)){
-                ThreadType.MAIN->{ //MAIN
+                ThreadType.MAIN->{
                     if(data.idCommunity.isNullOrBlank())
                         main.create(data)
                     else{
@@ -48,7 +47,7 @@ class ThreadCore private constructor():LikeInterface,Verify, ReadWriteUser, Read
                     }
                 }
 
-                ThreadType.SUB->{ //SUB
+                ThreadType.SUB->{
                     if(data.idCommunity.isNullOrBlank())
                         sub.create(data)
                     else{

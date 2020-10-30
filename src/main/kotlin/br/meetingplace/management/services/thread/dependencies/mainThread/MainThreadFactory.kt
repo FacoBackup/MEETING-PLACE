@@ -22,7 +22,6 @@ class MainThreadFactory private constructor(): ThreadFactoryInterface, Verify, R
         val loggedUser = readLoggedUser().email
         val user = readUser(loggedUser)
         lateinit var thread: MainThread
-
         if(verifyLoggedUser(user)){
             thread = MainThread()
             //the verifyLoggedUser method insures that the userName is not null so don't mind the !!
