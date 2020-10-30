@@ -51,12 +51,13 @@ class UserChatFeatures private constructor(): ChatFeaturesInterface, ReadWriteUs
         val receiver = readUser(data.idReceiver)
         val idChat = getChatId(loggedUser, data.idReceiver)
         val chat = readChat(idChat)
-        val notification = Inbox("${user.social.getUserName()} sent a new message.", "Message.")
+        lateinit var notification: Inbox
 
         if(verifyChat(chat) && verifyLoggedUser(user) && verifyUser(receiver) && chat.verifyMessage(data.idMessage) ){
+            notification = Inbox("${user.getUserName()} sent a new message.", "Message.")
             chat.quoteMessage(data, generateId())
             writeChat(chat, idChat)
-            receiver.social.updateInbox(notification)
+            receiver.updateInbox(notification)
             writeUser(receiver, receiver.getEmail())
         }
     }//UPDATE
@@ -67,12 +68,13 @@ class UserChatFeatures private constructor(): ChatFeaturesInterface, ReadWriteUs
         val receiver = readUser(data.idReceiver)
         val idChat =  getChatId(loggedUser, data.idSource)
         val chat = readChat(idChat)
+        lateinit var sharedMessage: ChatMessage
 
         if(verifyChat(chat) && verifyLoggedUser(user) && verifyUser(receiver)){
             data.message = chat.shareMessage(data)
             if(data.message != ""){
-                val sharedMessage = ChatMessage("|Shared| ${data.message}", data.idReceiver,true, data.creator,data.idCommunity)
-                ChatCore.getCore().sendMessage(sharedMessage)
+                sharedMessage = ChatMessage("|Shared| ${data.message}", data.idReceiver,true, data.creator,data.idCommunity)
+                ChatCore.getClass().sendMessage(sharedMessage)
             }
         }
     } //UPDATE->CREATE

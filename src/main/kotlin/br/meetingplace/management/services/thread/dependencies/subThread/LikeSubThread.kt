@@ -7,6 +7,7 @@ import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteLoggedU
 import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteThread
 import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteUser
 import br.meetingplace.management.services.thread.dependencies.LikeInterface
+import br.meetingplace.services.entitie.User
 import br.meetingplace.services.notification.Inbox
 import br.meetingplace.services.thread.SubThread
 
@@ -21,31 +22,34 @@ class LikeSubThread private constructor(): LikeInterface, ReadWriteCommunity, Re
         val loggedUser = readLoggedUser().email
         val thread = readThread(data.idThread)
         val user = readUser(loggedUser)
+        lateinit var notification: Inbox
+        lateinit var subThread: SubThread
+        lateinit var creator: User
 
         if(verifyLoggedUser(user) && verifyThread(thread) && data.idSubThread != null){
 
-            val subThread = thread.getSubThreadById(data.idSubThread)
-            val notification = Inbox("${user.social.getUserName()} liked your reply.", "Thread.")
-            val userCreator = readUser(subThread.creator)
+            subThread = thread.getSubThreadById(data.idSubThread)
+            notification = Inbox("${user.getUserName()} liked your reply.", "Thread.")
+            creator = readUser(subThread.creator)
 
-            if(verifyUser(userCreator)){
+            if(verifyUser(creator)){
                 when (checkLikeDislike(subThread)) {
                     0->{
                         thread.removeLikeSubThread(loggedUser,data.idSubThread)
                         writeThread(thread,thread.getId())
                     }
                     1 -> {
-                        if(user.getEmail() != userCreator.getEmail()){
-                            userCreator.social.updateInbox(notification)
-                            writeUser(userCreator, userCreator.getEmail())
+                        if(user.getEmail() != creator.getEmail()){
+                            creator.updateInbox(notification)
+                            writeUser(creator, creator.getEmail())
                         }
                         thread.dislikeToLikeSubThread(loggedUser,data.idSubThread)
                         writeThread(thread,thread.getId())
                     } // like to dislike
                     2 -> {
-                        if(user.getEmail() != userCreator.getEmail()){
-                            userCreator.social.updateInbox(notification)
-                            writeUser(userCreator, userCreator.getEmail())
+                        if(user.getEmail() != creator.getEmail()){
+                            creator.updateInbox(notification)
+                            writeUser(creator, creator.getEmail())
                         }
                         thread.likeSubThread(loggedUser,data.idSubThread)
                         writeThread(thread,thread.getId())
@@ -60,9 +64,9 @@ class LikeSubThread private constructor(): LikeInterface, ReadWriteCommunity, Re
         val loggedUser = readLoggedUser().email
         val thread = readThread(data.idThread)
         val user = readUser(loggedUser)
-
+        lateinit var subThread: SubThread
         if(verifyLoggedUser(user) && data.idSubThread != null && verifyThread(thread)){
-            val subThread = thread.getSubThreadById(data.idSubThread)
+            subThread = thread.getSubThreadById(data.idSubThread)
 
             when (checkLikeDislike(subThread)) {
                 0 -> {

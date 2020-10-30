@@ -1,12 +1,19 @@
 package br.meetingplace.services.entitie.profiles.social
 
+import br.meetingplace.services.entitie.profiles.social.interfaces.*
 import br.meetingplace.services.notification.Inbox
 
-class SocialProfile(
-    private var userName: String,
-    private var gender: String,
-    private var nationality: String,
-    private var about: String){
+class SocialProfile private constructor(): SocialChats, SocialCommunities, SocialFollowers, SocialGroups, SocialThreads,SocialOperators{
+
+    companion object{
+        private val Class = SocialProfile ()
+        fun getClass () = Class
+    }
+
+    private var userName: String? = null
+    private var gender: String? = null
+    private var nationality: String? = null
+    private var about: String? = null
 
     private var moderatorIn = mutableListOf<String>()
     private var communitiesIFollow = mutableListOf<String>()
@@ -18,10 +25,21 @@ class SocialProfile(
     private var following = mutableListOf<String>()
     private var inbox = mutableListOf<Inbox>()
 
-    fun clearNotifications(){
+    override fun createSocialProfile(userName: String, about: String, nationality: String, gender: String){
+        if (this.userName.isNullOrBlank()){
+
+            this.userName = userName
+            this.about = about
+            this.nationality = nationality
+            this.gender = gender
+        }
+    }
+
+    override fun clearNotifications(){
         inbox.clear()
     }
-    fun updateMyGroups(idGroup: String, delete: Boolean){
+
+    override fun updateMyGroups(idGroup: String, delete: Boolean){
         when (delete){
             true->{
                 if(idGroup in myGroups)
@@ -33,7 +51,7 @@ class SocialProfile(
             }
         }
     }
-    fun updateMemberIn(idGroup: String, leave: Boolean){
+    override fun updateMemberIn(idGroup: String, leave: Boolean){
         when (leave){
             true->{
                 if(idGroup in memberIn)
@@ -45,7 +63,7 @@ class SocialProfile(
             }
         }
     }
-    fun updateFollowers(userEmail: String, remove: Boolean){
+    override fun updateFollowers(userEmail: String, remove: Boolean){
         when (remove){
             true ->{
                 if (userEmail in followers)
@@ -58,7 +76,7 @@ class SocialProfile(
         }
 
     }
-    fun updateFollowing(userEmail: String, remove: Boolean){
+    override fun updateFollowing(userEmail: String, remove: Boolean){
         when (remove){
             true ->{
                 if (userEmail in following)
@@ -70,17 +88,17 @@ class SocialProfile(
             }
         }
     }
-    fun updateAbout(newAbout: String){
+    override fun updateAbout(newAbout: String){
         about = newAbout
     }
-    fun updateInbox(notification: Inbox){
+    override fun updateInbox(notification: Inbox){
         inbox.add(notification)
     }
-    fun updateMyChats (id: String) {
+    override fun updateMyChats (id: String) {
         if (id !in myChats)
             myChats.add(id)
     }
-    fun updateMyThreads (id: String, add: Boolean) {
+    override fun updateMyThreads (id: String, add: Boolean) {
         when(add){
             true-> {
                 if (id !in myThreads)
@@ -94,7 +112,7 @@ class SocialProfile(
 
     }
 
-    fun updateModeratorIn(id: String,leave:Boolean){
+    override fun updateModeratorIn(id: String,leave:Boolean){
         when(leave){
             true->{
                 if(id in moderatorIn)
@@ -107,7 +125,7 @@ class SocialProfile(
         }
     }
 
-    fun updateCommunitiesIFollow(id: String,unfollow:Boolean){
+    override fun updateCommunitiesIFollow(id: String,unfollow:Boolean){
         when(unfollow){
             true->{
                 if(id in communitiesIFollow)
@@ -121,14 +139,14 @@ class SocialProfile(
     }
 
     //GETTERS
-    fun getModeratorIn() = moderatorIn
-    fun getCommunitiesIFollow() = communitiesIFollow
-    fun getMyGroups () = myGroups
-    fun getMemberIn() = memberIn
-    fun getFollowing() = following
-    fun getFollowers() = followers
-    fun getMyChats () = myChats
-    fun getMyThreads () = myThreads
-    fun getUserName() = userName
+    override fun getModeratorIn() = moderatorIn
+    override fun getCommunitiesIFollow() = communitiesIFollow
+    override fun getMyGroups () = myGroups
+    override fun getMemberIn() = memberIn
+    override fun getFollowing() = following
+    override fun getFollowers() = followers
+    override fun getMyChats () = myChats
+    override fun getMyThreads () = myThreads
+    override fun getUserName() = userName
     //GETTERS
 }

@@ -21,15 +21,18 @@ class MainThreadFactory private constructor(): ThreadFactoryInterface, Verify, R
     override fun create(data: ThreadData): String?{
         val loggedUser = readLoggedUser().email
         val user = readUser(loggedUser)
+        lateinit var thread: MainThread
+
         if(verifyLoggedUser(user)){
-            val thread = MainThread()
-            thread.startThread(data,generateId(), user.social.getUserName(), loggedUser)
+            thread = MainThread()
+            //the verifyLoggedUser method insures that the userName is not null so don't mind the !!
+            thread.startThread(data,generateId(), user.getUserName()!!, loggedUser)
 
             if(!data.idCommunity.isNullOrBlank())
                 thread.updateCommunity(data.idCommunity)
 
             writeThread(thread, thread.getId())
-            user.social.updateMyThreads(thread.getId(),true)
+            user.updateMyThreads(thread.getId(),true)
             writeUser(user, user.getEmail())
 
 
@@ -48,7 +51,7 @@ class MainThreadFactory private constructor(): ThreadFactoryInterface, Verify, R
         if(verifyThread(thread) && verifyLoggedUser(user) && data.idSubThread == null ) {
 
             DeleteFile.getDeleteFileOperator().deleteThread(thread)
-            user.social.updateMyThreads(data.idThread,false) //FALSE IS TO REMOVE THREAD
+            user.updateMyThreads(data.idThread,false) //FALSE IS TO REMOVE THREAD
             writeUser(user, user.getEmail())
         }
     }//DELETE

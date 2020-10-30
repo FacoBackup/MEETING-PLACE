@@ -15,7 +15,7 @@ class UserCore private constructor(): FollowInterface, UserInterface, ProfileInt
 
     companion object{
         private val Class = UserCore()
-        fun getCore() = Class
+        fun getClass() = Class
     }
 
     //USER

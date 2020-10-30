@@ -17,15 +17,14 @@ class ProfileOperator private constructor(): ProfileInterface, ReadWriteUser, Re
         val logged = readLoggedUser().email
         val user = readUser(logged)
         if(user.getAge() >=16 && logged != "" && user.getEmail() != ""){
-            val social = SocialProfile(newProfile.ProfileName, newProfile.gender, newProfile.nationality, newProfile.about)
-            user.createSocialProfile(social)
+            user.createSocialProfile(newProfile.ProfileName, newProfile.gender, newProfile.nationality, newProfile.about)
             writeUser(user, logged)
         }
     } //CREATE
     override fun clearNotifications(){
         val logged = readLoggedUser().email
         val user = readUser(logged)
-        user.social.clearNotifications()
+        user.clearNotifications()
         writeUser(user, logged)
     } //UPDATE
 

@@ -8,6 +8,7 @@ import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteLoggedU
 import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteThread
 import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteUser
 import br.meetingplace.management.services.thread.dependencies.ThreadFactoryInterface
+import br.meetingplace.services.thread.MainThread
 import br.meetingplace.services.thread.SubThread
 
 class SubThreadFactory private constructor(): ThreadFactoryInterface, Verify, ReadWriteLoggedUser, ReadWriteUser, ReadWriteThread, Generator {
@@ -20,11 +21,15 @@ class SubThreadFactory private constructor(): ThreadFactoryInterface, Verify, Re
     override fun create(data: ThreadData): String?{
         val loggedUser = readLoggedUser().email
         val user = readUser(loggedUser)
+        lateinit var subThread: SubThread
+        lateinit var thread: MainThread
 
         if(verifyLoggedUser(user)){
-            val thread = readThread(data.idThread!!)
+            thread = readThread(data.idThread!!)
             if(thread.getId() != ""){
-                val subThread = SubThread(mutableListOf(),mutableListOf(), loggedUser, data.title, data.body, user.social.getUserName(), generateId())
+                //the verifyLoggedUser method insures that the userName is not null so don't mind the !!
+                subThread = SubThread(mutableListOf(),mutableListOf(), loggedUser, data.title, data.body, user.getUserName()!!, generateId())
+
                 thread.addSubThread(subThread)
                 writeThread(thread, thread.getId())
             }
@@ -36,8 +41,8 @@ class SubThreadFactory private constructor(): ThreadFactoryInterface, Verify, Re
         val loggedUser = readLoggedUser().email
         val user = readUser(loggedUser)
         val thread = readThread(data.idThread)
-        if(verifyLoggedUser(user) && thread.getId() != "" && data.idSubThread != null){
 
+        if(verifyLoggedUser(user) && thread.getId() != "" && data.idSubThread != null){
             thread.removeSubThread(data.idSubThread,loggedUser)
             writeThread(thread,thread.getId())
         }

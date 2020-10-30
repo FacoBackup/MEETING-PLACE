@@ -30,27 +30,27 @@ class UserFactory private constructor(): UserInterface, ReadWriteLoggedUser, Rea
     override fun delete(){
         val logged = readLoggedUser().email
         val user = readUser(logged)
-        lateinit var followers: MutableList<String>
-        lateinit var following: MutableList<String>
+        lateinit var followers: List<String>
+        lateinit var following: List<String>
         lateinit var userExternal: User
 
         if(verifyUser(user)){
 
-            followers = user.social.getFollowers()
-            following = user.social.getFollowing()
+            followers = user.getFollowers()
+            following = user.getFollowing()
 
-            for(i in 0 until followers.size){
-                userExternal = readUser(followers[i])
+            for(element in followers){
+                userExternal = readUser(element)
                 if(userExternal.getAge() != -1) {
-                    userExternal.social.updateFollowing(logged, true)
+                    userExternal.updateFollowing(logged, true)
                     writeUser(userExternal, userExternal.getEmail())
                 }
             }
 
-            for(i in 0 until following.size){
-                userExternal = readUser(following[i])
+            for(element in following){
+                userExternal = readUser(element)
                 if(userExternal.getAge() != -1){
-                    userExternal.social.updateFollowers(logged,true)
+                    userExternal.updateFollowers(logged,true)
                     writeUser(userExternal,userExternal.getEmail())
                 }
             }
@@ -70,7 +70,7 @@ class UserFactory private constructor(): UserInterface, ReadWriteLoggedUser, Rea
         val user = readUser(loggedUser)
 
         if(verifyLoggedUser(user)){
-            val myThreads = user.social.getMyThreads()
+            val myThreads = user.getMyThreads()
             for(i in 0 until myThreads.size){
                 val thread = readThread(myThreads[i])
                 if(verifyThread(thread))

@@ -32,16 +32,16 @@ class ChatUser private constructor(): BaseChatInterface, ReadWriteUser, ReadWrit
             when (verifyChat(chat)) {
                 true -> { //The chat exists
                     msg = Message(data.message, generateId(), loggedUser, true)
-                    notification = Inbox("${user.social.getUserName()} sent a new message.", "Message.")
+                    notification = Inbox("${user.getUserName()} sent a new message.", "Message.")
 
                     val existingChat = readChat(idChat)
 
                     chat.addMessage(msg)
                     writeChat(existingChat, idChat)
 
-                    receiver.social.updateMyChats(idChat)
-                    receiver.social.updateInbox(notification)
-                    user.social.updateMyChats(idChat)
+                    receiver.updateMyChats(idChat)
+                    receiver.updateInbox(notification)
+                    user.updateMyChats(idChat)
 
                     writeUser(user, user.getEmail())
                     writeUser(receiver, receiver.getEmail())

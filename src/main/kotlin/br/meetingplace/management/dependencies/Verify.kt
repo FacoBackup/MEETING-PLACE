@@ -11,13 +11,13 @@ import br.meetingplace.services.thread.MainThread
 interface Verify: ReadWriteLoggedUser {
 
     fun verifyUser(user: User): Boolean {
-        return user.getEmail().isNotBlank() && user.getAge() >= 16 && user.social.getUserName().isNotBlank() && user.getPassword().isNotBlank()
+        return !user.getUserName().isNullOrBlank() && user.getPassword().isNotBlank() && user.getEmail().isNotBlank() && user.getAge() >= 16
     }
 
     fun verifyLoggedUser(user: User): Boolean {
         val logged = readLoggedUser()
 
-        return logged.email.isNotBlank() && logged.password.isNotBlank()&& logged.email == user.getEmail() && user.getAge() >= 16 && user.social.getUserName().isNotBlank() && logged.password == user.getPassword()
+        return !user.getUserName().isNullOrBlank() && logged.email.isNotBlank() && logged.password.isNotBlank()&& logged.email == user.getEmail() && logged.password == user.getPassword()  && user.getAge() >= 16
     }
 
 
@@ -37,7 +37,7 @@ interface Verify: ReadWriteLoggedUser {
         val logged = readLoggedUser().email
 
         if(user.getAge() != -1 && external.getAge() != -1 && logged.isNotBlank()){
-            if(logged in external.social.getFollowers())
+            if(logged in external.getFollowers())
                 return true
         }
         return false

@@ -27,21 +27,18 @@ class ChatFactory: Verify, ReadWriteUser, ReadWriteChat, ReadWriteLoggedUser, Ge
         lateinit var notification: Inbox
 
         if(verifyChat(chat))
-        notification = Inbox("${user.social.getUserName()} started a conversation with you.", "Message.")
+        notification = Inbox("${user.getUserName()} started a conversation with you.", "Message.")
         chat.startChat(listOf(loggedUser, receiver.getEmail()), idChat)
         msg = Message(data.message, generateId(), loggedUser, true)
         chat.addMessage(msg)
 
-        user.social.updateMyChats(idChat)
-        receiver.social.updateMyChats(idChat)
-        receiver.social.updateInbox(notification)
+        user.updateMyChats(idChat)
+        receiver.updateMyChats(idChat)
+        receiver.updateInbox(notification)
 
         writeChat(chat, idChat)
         writeUser(user, user.getEmail())
         writeUser(receiver, receiver.getEmail())
     }
 
-    fun deleteChat() {
-        TODO("Not yet implemented")
-    }
 }

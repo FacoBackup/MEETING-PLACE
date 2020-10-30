@@ -17,7 +17,7 @@ class ThreadCore private constructor():LikeInterface,Verify, ReadWriteUser, Read
 
     companion object{
         private val Class = ThreadCore()
-        fun getCore() = Class
+        fun getClass() = Class
     }
 
     private val main = MainThreadFactory.getThreadFactory()
@@ -31,7 +31,7 @@ class ThreadCore private constructor():LikeInterface,Verify, ReadWriteUser, Read
         if(verifyLoggedUser(user)){
 
             when(verifyType(null,data)){
-                0->{ //MAIN
+                ThreadType.MAIN->{ //MAIN
                     if(data.idCommunity.isNullOrBlank())
                         main.create(data)
                     else{
@@ -48,7 +48,7 @@ class ThreadCore private constructor():LikeInterface,Verify, ReadWriteUser, Read
                     }
                 }
 
-                1->{ //SUB
+                ThreadType.SUB->{ //SUB
                     if(data.idCommunity.isNullOrBlank())
                         sub.create(data)
                     else{
@@ -65,7 +65,7 @@ class ThreadCore private constructor():LikeInterface,Verify, ReadWriteUser, Read
         lateinit var community: Community
 
         when(verifyType(data,null)){
-            0->{ //MAIN
+            ThreadType.MAIN->{ //MAIN
                 if(data.idCommunity.isNullOrBlank())
                     main.delete(data)
                 else{
@@ -82,7 +82,7 @@ class ThreadCore private constructor():LikeInterface,Verify, ReadWriteUser, Read
                     }
                 }
             }
-            1->{ //SUB
+            ThreadType.SUB->{ //SUB
                 if(data.idCommunity.isNullOrBlank())
                     sub.delete(data)
                 else{
@@ -99,7 +99,7 @@ class ThreadCore private constructor():LikeInterface,Verify, ReadWriteUser, Read
         lateinit var community: Community
 
         when(verifyType(data,null)){
-            0->{ //MAIN
+            ThreadType.MAIN->{ //MAIN
                 if(data.idCommunity.isNullOrBlank())
                     LikeMainThread.getLikeOperator().like(data)
                 else{
@@ -108,7 +108,7 @@ class ThreadCore private constructor():LikeInterface,Verify, ReadWriteUser, Read
                         LikeMainThread.getLikeOperator().like(data)
                 }
             }
-            1->{ //SUB
+            ThreadType.SUB->{ //SUB
                 if(data.idCommunity.isNullOrBlank())
                     LikeSubThread.getLikeOperator().like(data)
                 else{
@@ -124,7 +124,7 @@ class ThreadCore private constructor():LikeInterface,Verify, ReadWriteUser, Read
         lateinit var community: Community
 
         when(verifyType(data,null)){
-            0->{ //MAIN
+            ThreadType.MAIN->{ //MAIN
                 if(data.idCommunity.isNullOrBlank())
                     LikeMainThread.getLikeOperator().dislike(data)
                 else{
@@ -133,7 +133,7 @@ class ThreadCore private constructor():LikeInterface,Verify, ReadWriteUser, Read
                         LikeMainThread.getLikeOperator().dislike(data)
                 }
             }
-            1->{ //SUB
+            ThreadType.SUB->{ //SUB
                 if(data.idCommunity.isNullOrBlank())
                     LikeSubThread.getLikeOperator().dislike(data)
                 else{
@@ -147,19 +147,19 @@ class ThreadCore private constructor():LikeInterface,Verify, ReadWriteUser, Read
 
 
 
-    private fun verifyType(op: ThreadOperationsData?, data: ThreadData?): Int{
+    private fun verifyType(op: ThreadOperationsData?, data: ThreadData?): ThreadType?{
         return if(op != null && data == null){
             if(op.idSubThread.isNullOrBlank())
-                0 //MAIN
+                ThreadType.MAIN
             else
-                1 //SUB
+                ThreadType.SUB
         }
         else if(data != null && op == null){
             if(data.idThread != null)
-                1 //SUB
+                ThreadType.SUB
             else
-                0 //MAIN
+                ThreadType.MAIN
         }
-        else -1
+        else null
     }
 }

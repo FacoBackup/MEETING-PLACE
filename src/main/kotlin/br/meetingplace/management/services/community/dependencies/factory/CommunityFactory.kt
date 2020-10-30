@@ -22,7 +22,7 @@ class CommunityFactory private constructor(): ReadWriteUser, ReadWriteLoggedUser
             val newCommunity = Community.getCommunity()
             val id = data.name.replace("\\s".toRegex(),"").toLowerCase()
             newCommunity.startCommunity(data.name, id, data.about, loggedUser)
-            user.social.updateModeratorIn(id,false)
+            user.updateModeratorIn(id,false)
             writeCommunity(newCommunity, id)
             writeUser(user, user.getEmail())
         }

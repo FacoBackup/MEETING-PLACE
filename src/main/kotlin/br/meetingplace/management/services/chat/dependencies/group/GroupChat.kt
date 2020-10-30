@@ -24,7 +24,7 @@ class GroupChat private constructor(): BaseChatInterface, ReadWriteUser, ReadWri
         val user = readUser(loggedUser)
         val group = readGroup(getGroupId(data.idReceiver, data.creator))
         val msg = Message(data.message, generateId(), loggedUser, true)
-        val notification = Inbox("${user.social.getUserName()} from ${group.getGroupId()} sent a new message.", "Group Message.")
+        val notification = Inbox("${user.getUserName()} from ${group.getGroupId()} sent a new message.", "Group Message.")
 
         if (verifyLoggedUser(user) && verifyGroup(group)) {
             val groupMembers = group.getMembers()
@@ -37,14 +37,14 @@ class GroupChat private constructor(): BaseChatInterface, ReadWriteUser, ReadWri
             for (i in 0 until groupMembers.size) {
                 val member = readUser(groupMembers[i].userEmail)
                 if (verifyUser(member) && groupMembers[i].userEmail != loggedUser) {
-                    member.social.updateInbox(notification)
+                    member.updateInbox(notification)
                     writeUser(member, member.getEmail())
                 }//member exists
             }//for
             val creator = readUser(group.getCreator())
             if(loggedUser != group.getCreator() && verifyUser(creator)){
 
-                creator.social.updateInbox(notification)
+                creator.updateInbox(notification)
                 writeUser(creator, creator.getEmail())
             }
         }

@@ -7,6 +7,7 @@ import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteLoggedU
 import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteThread
 import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteUser
 import br.meetingplace.management.services.thread.dependencies.LikeInterface
+import br.meetingplace.services.entitie.User
 import br.meetingplace.services.notification.Inbox
 import br.meetingplace.services.thread.MainThread
 
@@ -21,11 +22,13 @@ class LikeMainThread private constructor(): LikeInterface, ReadWriteCommunity, R
         val loggedUser = readLoggedUser().email
         val user = readUser(loggedUser)
         val thread = readThread(data.idThread)
+        lateinit var notification: Inbox
+        lateinit var creator: User
 
         if(verifyThread(thread) && verifyLoggedUser(user) && data.idSubThread == null) {
 
-            val notification = Inbox("${user.social.getUserName()} liked your thread.", "Thread.")
-            val userCreator = readUser(thread.getCreator())
+            notification = Inbox("${user.getUserName()} liked your thread.", "Thread.")
+            creator = readUser(thread.getCreator())
 
             when (checkLikeDislike(thread)) {
                 0->{
@@ -34,17 +37,17 @@ class LikeMainThread private constructor(): LikeInterface, ReadWriteCommunity, R
                 }
                 1-> {// DISLIKED to LIKED
                     if(thread.getCreator() != loggedUser){
-                        userCreator.social.updateInbox(notification)
-                        writeUser(userCreator, userCreator.getEmail())
+                        creator.updateInbox(notification)
+                        writeUser(creator, creator.getEmail())
                     }
-                    userCreator.social.updateInbox(notification)
+                    creator.updateInbox(notification)
                     thread.dislikeToLike(loggedUser)
                     writeThread(thread,thread.getId())
                 }
                 2 -> {// 2 hasn't liked yet
                     if(thread.getCreator() != loggedUser){
-                        userCreator.social.updateInbox(notification)
-                        writeUser(userCreator, userCreator.getEmail())
+                        creator.updateInbox(notification)
+                        writeUser(creator, creator.getEmail())
                     }
                     thread.like(loggedUser)
                     writeThread(thread,thread.getId())

@@ -20,11 +20,11 @@ abstract class UserReader:  Verify, ReadWriteLoggedUser, ReadWriteUser, ReadWrit
         val loggedUser = readLoggedUser().email
         val user = readUser(loggedUser)
         val communities = mutableListOf<Community>()
-
+        lateinit var communityList: List<String>
         if (verifyLoggedUser(user)){
-            val communityList = user.social.getCommunitiesIFollow()
-            for(i in 0 until communityList.size){
-                val data = readCommunity(communityList[i])
+            communityList = user.getCommunitiesIFollow()
+            for(element in communityList){
+                val data = readCommunity(element)
                 if(verifyCommunity(data))
                     communities.add(data)
             }
@@ -36,11 +36,11 @@ abstract class UserReader:  Verify, ReadWriteLoggedUser, ReadWriteUser, ReadWrit
         val loggedUser = readLoggedUser().email
         val user = readUser(loggedUser)
         val communities = mutableListOf<Community>()
-
+        lateinit var communityList: List<String>
         if (verifyLoggedUser(user)){
-            val communityList = user.social.getModeratorIn()
-            for(i in 0 until communityList.size){
-                val data = readCommunity(communityList[i])
+            communityList = user.getModeratorIn()
+            for(element in communityList){
+                val data = readCommunity(element)
                 if(verifyCommunity(data))
                     communities.add(data)
             }
@@ -52,12 +52,13 @@ abstract class UserReader:  Verify, ReadWriteLoggedUser, ReadWriteUser, ReadWrit
         val loggedUser = readLoggedUser().email
         val user = readUser(loggedUser)
         val myThreads = mutableListOf<MainThread>()
+        lateinit var myThreadIds: List<String>
 
         if(verifyLoggedUser(user)){
-            val myThreadsIds = user.social.getMyThreads()
+            myThreadIds = user.getMyThreads()
 
-            for (i in 0 until myThreadsIds.size){
-                val thread = readThread(myThreadsIds[i])
+            for (element in myThreadIds){
+                val thread = readThread(element)
                 if (verifyThread(thread))
                     myThreads.add(thread)
             }
@@ -72,22 +73,22 @@ abstract class UserReader:  Verify, ReadWriteLoggedUser, ReadWriteUser, ReadWrit
         val myTimeline = mutableListOf<MainThread>()
 
         if(verifyLoggedUser(user)){
-            val followingIds = user.social.getFollowing()
+            val followingIds = user.getFollowing()
 
-            for (i in 0 until followingIds.size){
-                val following = readUser(followingIds[i])
+            for (element in followingIds){
+                val following = readUser(element)
                 if( verifyUser(following)){
-                    val followingThreads = following.social.getMyThreads()
-                    for (j in 0 until followingThreads.size){
-                        val thread = readThread(followingThreads[j])
+                    val followingThreads = following.getMyThreads()
+                    for (element in followingThreads){
+                        val thread = readThread(element)
                         if (verifyThread(thread))
                             myTimeline.add(thread)
                     }
                 }
             }
 
-            val communities = user.social.getCommunitiesIFollow()
-            for(i in 0 until communities.size){
+            val communities = user.getCommunitiesIFollow()
+            for(i in communities.indices){
                 val community = readCommunity(communities[i])
                 if(verifyCommunity(community)){
                     val threads = community.threads.getIdThreads()

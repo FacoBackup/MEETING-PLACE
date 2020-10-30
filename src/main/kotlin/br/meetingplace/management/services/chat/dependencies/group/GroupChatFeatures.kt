@@ -12,10 +12,10 @@ import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteUser
 import br.meetingplace.management.services.chat.core.ChatCore
 import br.meetingplace.management.services.chat.dependencies.ChatFeaturesInterface
 
-class GroupFeatures private constructor(): ChatFeaturesInterface, ReadWriteLoggedUser, ReadWriteUser, ReadWriteGroup, Verify, IDs, Generator {
+class GroupChatFeatures private constructor(): ChatFeaturesInterface, ReadWriteLoggedUser, ReadWriteUser, ReadWriteGroup, Verify, IDs, Generator {
 
     companion object{
-        private val Class = GroupFeatures()
+        private val Class = GroupChatFeatures()
         fun getClass()= Class
     }
 
@@ -70,7 +70,7 @@ class GroupFeatures private constructor(): ChatFeaturesInterface, ReadWriteLogge
             val messageContent = chat.shareMessage(data)
             if(messageContent != ""){
                 val sharedMessage = ChatMessage("|Shared| $messageContent", data.idReceiver, true, data.creator,data.idCommunity)
-                ChatCore.getCore().sendMessage(sharedMessage)
+                ChatCore.getClass().sendMessage(sharedMessage)
             }
         }
     }

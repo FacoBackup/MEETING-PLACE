@@ -17,6 +17,7 @@ import br.meetingplace.data.user.UserData
 import br.meetingplace.management.services.Login
 import br.meetingplace.management.services.chat.core.ChatCore
 import br.meetingplace.management.services.community.core.CommunityCore
+import br.meetingplace.management.services.group.core.GroupCore
 import br.meetingplace.management.services.thread.core.ThreadCore
 import br.meetingplace.management.services.user.core.UserCore
 import io.ktor.application.*
@@ -28,14 +29,16 @@ import io.ktor.routing.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 
-val userSystem= UserCore.getCore()
-val threadSystem=  ThreadCore.getCore()
-val chatSystem = ChatCore.getCore() // controls chat and groups
+val userSystem= UserCore.getClass()
+val threadSystem=  ThreadCore.getClass()
+val chatSystem = ChatCore.getClass() // controls chat and groups
+val groupSystem = GroupCore.getClass()
 val login = Login.getLoginSystem()
 val communitySystem = CommunityCore.getClass()
-fun main (){
 
-    embeddedServer(Netty, 3000) {
+fun main (){
+    val port = System.getenv("PORT")?.toInt() ?: 3000
+    embeddedServer(Netty, port) {
         routing {
             install(ContentNegotiation) {
                 gson {
@@ -169,22 +172,22 @@ fun main (){
 
             //GROUPS
             get("/my/groups"){
-                call.respond(chatSystem.readMyGroups())
+                call.respond(groupSystem.readMyGroups())
             }
             get("/in/groups"){
-                call.respond(chatSystem.readMemberIn())
+                call.respond(groupSystem.readMemberIn())
             }
             post("/group/create"){
                 val group = call.receive<GroupData>()
-                call.respond(chatSystem.createGroup(group))
+                call.respond(groupSystem.create(group))
             }
             post("/group/member"){
                 val member = call.receive<MemberInput>()
-                call.respond(chatSystem.addMember(member))
+                call.respond(groupSystem.addMember(member))
             }
             post("/group/member/remove"){
                 val member = call.receive<MemberInput>()
-                call.respond(chatSystem.removeMember(member))
+                call.respond(groupSystem.removeMember(member))
             }
             post("/group/message"){
                 val chatGroup = call.receive<ChatMessage>()
@@ -208,7 +211,7 @@ fun main (){
             }
             post("/group/delete"){
                 val group = call.receive<GroupOperationsData>()
-                call.respond(chatSystem.deleteGroup(group))
+                call.respond(groupSystem.delete(group))
             }
             //GROUPS
         }

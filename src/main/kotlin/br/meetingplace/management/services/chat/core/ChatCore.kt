@@ -5,53 +5,39 @@ import br.meetingplace.data.chat.ChatComplexOperations
 import br.meetingplace.data.chat.ChatMessage
 import br.meetingplace.data.chat.ChatOperations
 import br.meetingplace.management.dependencies.IDs
+import br.meetingplace.management.dependencies.Verify
 import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteChat
 import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteCommunity
+import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteGroup
+import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteUser
 import br.meetingplace.management.services.chat.dependencies.BaseChatInterface
 import br.meetingplace.management.services.chat.dependencies.ChatFeaturesInterface
 import br.meetingplace.management.services.chat.dependencies.group.GroupChat
-import br.meetingplace.management.services.chat.dependencies.group.GroupFeatures
+import br.meetingplace.management.services.chat.dependencies.group.GroupChatFeatures
 import br.meetingplace.management.services.chat.dependencies.reader.ChatReaderInterface
-import br.meetingplace.management.services.group.Group
 import br.meetingplace.management.services.chat.dependencies.user.ChatUser
 import br.meetingplace.management.services.chat.dependencies.user.UserChatFeatures
-import br.meetingplace.services.chat.Chat
 
-class ChatCore private constructor(): BaseChatInterface, ChatFeaturesInterface, Group(), ReadWriteChat, ReadWriteCommunity, IDs, ChatReaderInterface {
+class ChatCore private constructor(): BaseChatInterface, ChatFeaturesInterface, ReadWriteChat, ReadWriteGroup, ReadWriteUser, ReadWriteCommunity, IDs, ChatReaderInterface, Verify{
 
     private val userBaseChat =  ChatUser.getClass()
     private val userChatFeatures=  UserChatFeatures.getClass()
 
     private val groupBaseChat= GroupChat.getClass()
-    private val groupChatFeatures = GroupFeatures.getClass()
+    private val groupChatFeatures = GroupChatFeatures.getClass()
 
     companion object{
         private val Class = ChatCore()
-        fun getCore()= Class
-    }
-
-    private fun verifyType(id: String?, creator: String?): Int{
-        if(!id.isNullOrBlank()){
-            val receiverAsUser = readUser(id)
-            val receiverAsGroup = readGroup(getGroupId(id,if(!creator.isNullOrBlank()) creator else ""))
-
-            return if(receiverAsGroup.getGroupId() == "" && receiverAsUser.getEmail() != "") // is a user
-                0
-            else if(receiverAsGroup.getGroupId() != "" && receiverAsUser.getEmail() == "") // is a group
-                1
-            else // is nothing
-                -1
-        }
-        return -1
+        fun getClass()= Class
     }
 
     override fun sendMessage(data: ChatMessage){
 
         when(verifyType(data.idReceiver,data.creator)){
-            0->{
+            ChatType.USER_CHAT->{
                userBaseChat.sendMessage(data)
             }
-            1->{
+            ChatType.GROUP_CHAT->{
                 if(data.idCommunity.isNullOrBlank())
                     groupBaseChat.sendMessage(data)
                 else{
@@ -66,10 +52,10 @@ class ChatCore private constructor(): BaseChatInterface, ChatFeaturesInterface, 
     }
     override fun favoriteMessage(data: ChatOperations){
         when(verifyType(data.idReceiver,data.creator)){
-            0->{
+            ChatType.USER_CHAT->{
                 userChatFeatures.favoriteMessage(data)
             }
-            1->{
+            ChatType.GROUP_CHAT->{
                 if(data.idCommunity.isNullOrBlank())
                     groupChatFeatures.favoriteMessage(data)
                 else{
@@ -82,10 +68,10 @@ class ChatCore private constructor(): BaseChatInterface, ChatFeaturesInterface, 
     }
     override fun unFavoriteMessage(data: ChatOperations){
         when(verifyType(data.idReceiver,data.creator)){
-            0->{
+            ChatType.USER_CHAT->{
                 userChatFeatures.unFavoriteMessage(data)
             }
-            1->{
+            ChatType.GROUP_CHAT->{
                 if(data.idCommunity.isNullOrBlank())
                     groupChatFeatures.unFavoriteMessage(data)
                 else{
@@ -99,10 +85,10 @@ class ChatCore private constructor(): BaseChatInterface, ChatFeaturesInterface, 
 
     override fun quoteMessage(data: ChatComplexOperations){
         when(verifyType(data.idReceiver,data.creator)){
-            0->{
+            ChatType.USER_CHAT->{
                 userChatFeatures.quoteMessage(data)
             }
-            1->{
+            ChatType.GROUP_CHAT->{
                 if(data.idCommunity.isNullOrBlank())
                     groupChatFeatures.quoteMessage(data)
                 else{
@@ -116,10 +102,10 @@ class ChatCore private constructor(): BaseChatInterface, ChatFeaturesInterface, 
 
     override fun shareMessage(data: ChatComplexOperations){
         when(verifyType(data.idReceiver,data.creator)){
-            0->{
+            ChatType.USER_CHAT->{
                 userChatFeatures.shareMessage(data)
             }
-            1->{
+            ChatType.GROUP_CHAT->{
                 if(data.idCommunity.isNullOrBlank())
                     groupChatFeatures.shareMessage(data)
                 else{
@@ -133,10 +119,10 @@ class ChatCore private constructor(): BaseChatInterface, ChatFeaturesInterface, 
 
     override fun deleteMessage(data: ChatOperations){
         when(verifyType(data.idReceiver,data.creator)){
-            0->{
+            ChatType.USER_CHAT->{
                 userBaseChat.deleteMessage(data)
             }
-            1->{
+            ChatType.GROUP_CHAT->{
                 if(data.idCommunity.isNullOrBlank())
                     groupBaseChat.deleteMessage(data)
                 else{
@@ -154,5 +140,21 @@ class ChatCore private constructor(): BaseChatInterface, ChatFeaturesInterface, 
 
     override fun seeGroupChat(data: Data) {
         TODO("Not yet implemented")
+    }
+
+
+    private fun verifyType(id: String?, creator: String?): ChatType?{
+        if(!id.isNullOrBlank()){
+            val receiverAsUser = readUser(id)
+            val receiverAsGroup = readGroup(getGroupId(id,if(!creator.isNullOrBlank()) creator else ""))
+
+            return if(receiverAsGroup.getGroupId() == "" && receiverAsUser.getEmail() != "") // is a user
+                ChatType.USER_CHAT
+            else if(receiverAsGroup.getGroupId() != "" && receiverAsUser.getEmail() == "") // is a group
+                ChatType.GROUP_CHAT
+            else // is nothing
+                null
+        }
+        return null
     }
 }
