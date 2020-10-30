@@ -2,7 +2,6 @@ package br.meetingplace.management.services.chat.dependencies.user
 
 import br.meetingplace.data.chat.ChatMessage
 import br.meetingplace.data.chat.ChatOperations
-import br.meetingplace.management.dependencies.Generator
 import br.meetingplace.management.dependencies.Verify
 import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteChat
 import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteLoggedUser

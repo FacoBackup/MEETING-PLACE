@@ -51,9 +51,12 @@ class FollowOperator private constructor(): FollowInterface, Verify, ReadWriteUs
                 }
                 1->{ //COMMUNITY
                     val community = readCommunity(getCommunityId(data.ID))
-                    if (verifyLoggedUser(user) && verifyCommunity(community) && community.getId() !in user.getCommunitiesIFollow() && loggedUser !in community.getFollowers() && loggedUser !in community.getModerators()){
+
+                    if (verifyLoggedUser(user) && verifyCommunity(community)  &&loggedUser !in community.getFollowers() && community.getId() !in user.getCommunitiesIFollow() && loggedUser !in community.getModerators()){
+
                         user.updateCommunitiesIFollow(community.getId(), false)
                         community.updateFollower(loggedUser, false)
+
                         writeUser(user, loggedUser)
                         writeCommunity(community, community.getId())
                     }
@@ -72,6 +75,7 @@ class FollowOperator private constructor(): FollowInterface, Verify, ReadWriteUs
                 0->{ //USER
                     val external = readUser(data.ID)
                     if(external.getAge() != -1 && verifyLoggedUser(user) && verifyUser(external) && verifyFollower(external, user)){
+
                         external.updateFollowers(loggedUser,true)
                         user.updateFollowing(data.ID,true)
                         writeUser(user, loggedUser)
@@ -80,9 +84,18 @@ class FollowOperator private constructor(): FollowInterface, Verify, ReadWriteUs
                 }
                 1->{ //COMMUNITY
                     val community = readCommunity(getCommunityId(data.ID))
-                    if (verifyLoggedUser(user) && verifyCommunity(community) && community.getId() in user.getCommunitiesIFollow() && loggedUser in community.getFollowers() && loggedUser !in community.getModerators()){
-                        user.updateCommunitiesIFollow(data.ID, true)
-                        community.updateFollower(loggedUser, true)
+                    if (verifyLoggedUser(user) && verifyCommunity(community)){
+
+                        when(community.getId() in user.getCommunitiesIFollow() && loggedUser in community.getFollowers()){
+                            true->{
+                                user.updateCommunitiesIFollow(data.ID, true)
+                                community.updateFollower(loggedUser, true)
+                            }
+                        }
+                        when(loggedUser in community.getModerators() && community.getId() in user.getModeratorIn()){
+                            true-> community.updateModerator(loggedUser, loggedUser, true)
+                        }
+
                         writeUser(user, loggedUser)
                         writeCommunity(community, community.getId())
                     }

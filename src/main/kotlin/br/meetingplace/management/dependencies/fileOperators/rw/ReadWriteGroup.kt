@@ -1,5 +1,7 @@
 package br.meetingplace.management.dependencies.fileOperators.rw
 
+import br.meetingplace.data.Data
+import br.meetingplace.services.entitie.User
 import br.meetingplace.services.group.Group
 import com.google.gson.GsonBuilder
 import java.io.File

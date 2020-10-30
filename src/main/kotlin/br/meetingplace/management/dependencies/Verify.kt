@@ -1,5 +1,6 @@
 package br.meetingplace.management.dependencies
 
+import br.meetingplace.data.Data
 import br.meetingplace.services.entitie.User
 import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteLoggedUser
 import br.meetingplace.services.chat.Chat

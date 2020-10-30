@@ -2,7 +2,6 @@ package br.meetingplace.management.services.thread.dependencies.subThread
 
 import br.meetingplace.data.threads.ThreadData
 import br.meetingplace.data.threads.ThreadOperationsData
-import br.meetingplace.management.dependencies.Generator
 import br.meetingplace.management.dependencies.Verify
 import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteLoggedUser
 import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteThread

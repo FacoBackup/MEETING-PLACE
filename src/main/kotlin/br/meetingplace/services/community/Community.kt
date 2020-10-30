@@ -35,6 +35,27 @@ class Community private constructor(){
         }
     }
 
+    fun updateModerator(userEmail: String, requester: String, remove: Boolean?){
+        if(requester in moderators){
+            when(remove){
+                true->{ //REMOVE
+                    if(userEmail in moderators)
+                        moderators.remove(userEmail)
+                }
+                false->{ //ADD
+                    if(userEmail !in moderators)
+                        moderators.add(userEmail)
+                }
+                null->{ //STEP-DOWN
+                    if(userEmail in moderators){
+                        moderators.remove(userEmail)
+                        updateFollower(userEmail, false)
+                    }
+                }
+            }
+        }
+    }
+
     fun updateFollower(userEmail: String, remove:Boolean){
         when (remove){
             true->{

@@ -22,21 +22,21 @@ class GroupManagement private constructor(): GroupManagementInterface, ReadWrite
     override fun addMember(data: MemberInput){
         val loggedUser = readLoggedUser().email
         val user = readUser(loggedUser)
-        val external = readUser(data.externalMember)
+        val external = readUser(data.member)
         lateinit var groupId: String
         lateinit var receiver: Group
         lateinit var community: Community
         lateinit var notification: Inbox
 
         if(verifyLoggedUser(user) && verifyUser(external)){
-            val toBeAdded = Member(data.externalMember, 0)
+            val toBeAdded = Member(data.member, 0)
             when(data.idCommunity.isNullOrBlank()){
                 true->{
-                    groupId = getGroupId(data.groupName, data.creator)
+                    groupId = getGroupId(data.ID, data.creator)
                     receiver = readGroup(groupId)
                     notification = Inbox("You're now a member of ${receiver.getNameGroup()}", "Group.")
 
-                    if(verifyUser(external) && verifyGroup(receiver) && receiver.verifyMember(loggedUser) && !receiver.verifyMember(data.externalMember))
+                    if(verifyUser(external) && verifyGroup(receiver) && receiver.verifyMember(loggedUser) && !receiver.verifyMember(data.member))
                         receiver.updateMember(toBeAdded, false)
                     external.updateMemberIn(receiver.getGroupId(), false)
                     external.updateInbox(notification)
@@ -44,7 +44,7 @@ class GroupManagement private constructor(): GroupManagementInterface, ReadWrite
                     writeGroup(receiver, receiver.getGroupId())
                 }
                 false->{
-                    groupId = getCommunityGroupId(data.idCommunity,getGroupId(data.groupName, data.creator))
+                    groupId = getCommunityGroupId(data.idCommunity,getGroupId(data.ID, data.creator))
                     receiver = readGroup(groupId)
                     community = readCommunity(getCommunityId(data.idCommunity))
                     notification = Inbox("You're now a member of ${receiver.getNameGroup()}", "Group.")
@@ -66,26 +66,26 @@ class GroupManagement private constructor(): GroupManagementInterface, ReadWrite
     override fun removeMember(data: MemberInput){
         val loggedUser = readLoggedUser().email
         val user = readUser(loggedUser)
-        val external = readUser(data.externalMember)
+        val external = readUser(data.member)
         lateinit var toBeRemoved: Member
         lateinit var groupId: String
         lateinit var receiver: Group
         lateinit var community: Community
 
         if(verifyLoggedUser(user) && verifyUser(external)){
-            toBeRemoved = Member(data.externalMember, 0)
+            toBeRemoved = Member(data.member, 0)
             when(data.idCommunity.isNullOrBlank()){
                 true->{
-                    groupId = getGroupId(data.groupName, data.creator)
+                    groupId = getGroupId(data.ID, data.creator)
                     receiver = readGroup(groupId)
-                    if(verifyUser(external) && verifyGroup(receiver) && receiver.verifyMember(loggedUser) && !receiver.verifyMember(data.externalMember))
+                    if(verifyUser(external) && verifyGroup(receiver) && receiver.verifyMember(loggedUser) && !receiver.verifyMember(data.member))
                         receiver.updateMember(toBeRemoved, true)
                     external.updateMemberIn(receiver.getGroupId(), true)
                     writeUser(external, external.getEmail())
                     writeGroup(receiver, receiver.getGroupId())
                 }
                 false->{
-                    groupId = getCommunityGroupId(data.idCommunity,getGroupId(data.groupName, data.creator))
+                    groupId = getCommunityGroupId(data.idCommunity,getGroupId(data.ID, data.creator))
                     receiver = readGroup(groupId)
                     community = readCommunity(getCommunityId(data.idCommunity))
                     if(verifyCommunity(community) && (loggedUser == receiver.getCreator() || loggedUser in community.getModerators())){

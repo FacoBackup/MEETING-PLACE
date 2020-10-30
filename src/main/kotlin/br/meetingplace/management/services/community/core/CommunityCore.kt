@@ -44,4 +44,8 @@ class CommunityCore private constructor(): FollowerInterface, CommunityFactoryIn
     override fun approveGroup(data: ApprovalData){
         moderator.approveGroup(data)
     }
+
+    override fun stepDown(data: Data){
+        moderator.stepDown(data)
+    }
 }

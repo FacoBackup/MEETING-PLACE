@@ -1,13 +1,12 @@
 package br.meetingplace.management.services.community.dependencies.followers
 
 import br.meetingplace.data.community.ReportData
-import br.meetingplace.management.dependencies.Generator
 import br.meetingplace.management.dependencies.IDs
 import br.meetingplace.management.dependencies.Verify
 import br.meetingplace.management.dependencies.fileOperators.rw.*
 import br.meetingplace.services.community.data.Report
 
-class Follower private constructor():FollowerInterface, ReadWriteCommunity, ReadWriteUser, ReadWriteLoggedUser, IDs, ReadWriteThread, Verify, Generator, ReadWriteReport{
+class Follower private constructor():FollowerInterface, ReadWriteCommunity, ReadWriteUser, ReadWriteLoggedUser, IDs, ReadWriteThread, Verify, ReadWriteReport{
 
     companion object{
         private val Class = Follower()

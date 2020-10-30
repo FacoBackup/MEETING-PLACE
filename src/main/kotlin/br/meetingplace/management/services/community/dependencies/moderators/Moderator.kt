@@ -1,5 +1,6 @@
 package br.meetingplace.management.services.community.dependencies.moderators
 
+import br.meetingplace.data.Data
 import br.meetingplace.data.community.ApprovalData
 import br.meetingplace.management.dependencies.IDs
 import br.meetingplace.management.dependencies.Verify
@@ -35,6 +36,17 @@ class Moderator private constructor(): ModeratorInterface, ReadWriteUser, ReadWr
             writeCommunity(community, community.getId())
         }
     }
+
+    override fun stepDown(data: Data){
+        val loggedUser = readLoggedUser().email
+        val user = readUser(loggedUser)
+        val community = readCommunity(getCommunityId(data.ID))
+
+        if(verifyLoggedUser(user) && verifyCommunity(community) && user.getEmail() in community.getModerators())
+            community.updateModerator(loggedUser, loggedUser, null)
+    }
+
+
 /*
     fun reportOperation(reportId: String){
         val loggedUser = readLoggedUser().email

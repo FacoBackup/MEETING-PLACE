@@ -4,6 +4,7 @@ import br.meetingplace.services.entitie.User
 import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteGroup
 import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteThread
 import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteUser
+import br.meetingplace.services.community.Community
 import br.meetingplace.services.group.Group
 import br.meetingplace.services.thread.MainThread
 import java.io.File
@@ -37,6 +38,15 @@ class DeleteFile private constructor(): ReadWriteUser, ReadWriteGroup, ReadWrite
     }
     fun deleteUser(data: User){
         val path = File("build.gradle").absolutePath.removeSuffix("build.gradle") + "/src/main/kotlin/br/meetingplace/logs/groups/${data.getEmail()}.json"
+        val file = File(path)
+        try {
+            file.delete()
+        }catch (e: Exception){
+            println("fileNotFound")
+        }
+    }
+    fun deleteCommunity(data: Community){
+        val path = File("build.gradle").absolutePath.removeSuffix("build.gradle") + "/src/main/kotlin/br/meetingplace/logs/communities/${data.getId()}.json"
         val file = File(path)
         try {
             file.delete()
