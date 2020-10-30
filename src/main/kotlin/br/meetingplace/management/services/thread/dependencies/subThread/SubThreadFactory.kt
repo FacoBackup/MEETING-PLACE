@@ -2,6 +2,7 @@ package br.meetingplace.management.services.thread.dependencies.subThread
 
 import br.meetingplace.data.threads.ThreadData
 import br.meetingplace.data.threads.ThreadOperationsData
+import br.meetingplace.management.dependencies.IDs
 import br.meetingplace.management.dependencies.Verify
 import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteLoggedUser
 import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteThread
@@ -10,7 +11,7 @@ import br.meetingplace.management.services.thread.dependencies.ThreadFactoryInte
 import br.meetingplace.services.thread.MainThread
 import br.meetingplace.services.thread.SubThread
 
-class SubThreadFactory private constructor(): ThreadFactoryInterface, Verify, ReadWriteLoggedUser, ReadWriteUser, ReadWriteThread, Generator {
+class SubThreadFactory private constructor(): ThreadFactoryInterface, Verify, ReadWriteLoggedUser, ReadWriteUser, ReadWriteThread, IDs {
 
     companion object{
         private val Class = SubThreadFactory()

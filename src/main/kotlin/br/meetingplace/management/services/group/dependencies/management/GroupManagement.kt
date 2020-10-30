@@ -32,7 +32,7 @@ class GroupManagement private constructor(): GroupManagementInterface, ReadWrite
             val toBeAdded = Member(data.member, 0)
             when(data.idCommunity.isNullOrBlank()){
                 true->{
-                    groupId = getGroupId(data.ID, data.creator)
+                    groupId = simpleToStandardIdGroup(data.ID, user)
                     receiver = readGroup(groupId)
                     notification = Inbox("You're now a member of ${receiver.getNameGroup()}", "Group.")
 
@@ -44,13 +44,12 @@ class GroupManagement private constructor(): GroupManagementInterface, ReadWrite
                     writeGroup(receiver, receiver.getGroupId())
                 }
                 false->{
-                    groupId = getCommunityGroupId(data.idCommunity,getGroupId(data.ID, data.creator))
+                    groupId =simpleToStandardIdGroup(data.ID, user)
                     receiver = readGroup(groupId)
                     community = readCommunity(getCommunityId(data.idCommunity))
                     notification = Inbox("You're now a member of ${receiver.getNameGroup()}", "Group.")
 
                     if(verifyCommunity(community) && (loggedUser == receiver.getCreator() || loggedUser in community.getModerators())){
-
                         receiver.updateMember(toBeAdded, false)
                         external.updateMemberIn(receiver.getGroupId(), false)
                         external.updateInbox(notification)
@@ -76,7 +75,7 @@ class GroupManagement private constructor(): GroupManagementInterface, ReadWrite
             toBeRemoved = Member(data.member, 0)
             when(data.idCommunity.isNullOrBlank()){
                 true->{
-                    groupId = getGroupId(data.ID, data.creator)
+                    groupId =simpleToStandardIdGroup(data.ID, external)
                     receiver = readGroup(groupId)
                     if(verifyUser(external) && verifyGroup(receiver) && receiver.verifyMember(loggedUser) && !receiver.verifyMember(data.member))
                         receiver.updateMember(toBeRemoved, true)
@@ -84,8 +83,8 @@ class GroupManagement private constructor(): GroupManagementInterface, ReadWrite
                     writeUser(external, external.getEmail())
                     writeGroup(receiver, receiver.getGroupId())
                 }
-                false->{
-                    groupId = getCommunityGroupId(data.idCommunity,getGroupId(data.ID, data.creator))
+                false->{ //COMMUNITY
+                    groupId =simpleToStandardIdGroup(data.ID, external)
                     receiver = readGroup(groupId)
                     community = readCommunity(getCommunityId(data.idCommunity))
                     if(verifyCommunity(community) && (loggedUser == receiver.getCreator() || loggedUser in community.getModerators())){

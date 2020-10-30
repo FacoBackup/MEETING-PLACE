@@ -13,7 +13,7 @@ import br.meetingplace.services.chat.Message
 import br.meetingplace.services.group.Member
 import br.meetingplace.services.notification.Inbox
 
-class GroupChat private constructor(): BaseChatInterface, ReadWriteUser, ReadWriteLoggedUser, ReadWriteGroup, Verify, Generator, IDs {
+class GroupChat private constructor(): BaseChatInterface, ReadWriteUser, ReadWriteLoggedUser, ReadWriteGroup, Verify,  IDs {
 
     companion object{
         private val Class = GroupChat()
@@ -23,7 +23,7 @@ class GroupChat private constructor(): BaseChatInterface, ReadWriteUser, ReadWri
     override fun sendMessage(data: ChatMessage) {
         val loggedUser = readLoggedUser().email
         val user = readUser(loggedUser)
-        val group = readGroup(getGroupId(data.idReceiver,if(!data.creator.isNullOrBlank()) data.creator else loggedUser))
+        val group = readGroup(simpleToStandardIdGroup(data.idReceiver, user))
         lateinit var msg: Message
         lateinit var notification: Inbox
         lateinit var  groupMembers:List<Member>
@@ -59,7 +59,7 @@ class GroupChat private constructor(): BaseChatInterface, ReadWriteUser, ReadWri
     override fun deleteMessage(data: ChatOperations) {
         val loggedUser = readLoggedUser().email
         val user = readUser(loggedUser)
-        val group = readGroup(getGroupId(data.idReceiver,if(!data.creator.isNullOrBlank()) data.creator else loggedUser))
+        val group = readGroup(simpleToStandardIdGroup(data.idReceiver, user))
         if(verifyLoggedUser(user) && verifyGroup(group)){
             val chat = group.getChat()
             if(chat.verifyMessage(data.idMessage)){

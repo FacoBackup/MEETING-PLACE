@@ -18,7 +18,7 @@ class CommunityReader: ReadWriteLoggedUser, ReadWriteUser,ReadWriteThread, ReadW
         val community = readCommunity(getCommunityId(data.ID))
 
         if(verifyLoggedUser(user) && verifyCommunity(community) && user.getEmail() in community.getModerators())
-            return community.threads.getReportedThreads()
+            return community.getReportedThreads()
 
         return listOf()
     }
@@ -46,17 +46,17 @@ class CommunityReader: ReadWriteLoggedUser, ReadWriteUser,ReadWriteThread, ReadW
         val loggedUser = readLoggedUser().email
         val user = readUser(loggedUser)
         val community = readCommunity(getCommunityId(data.ID))
-        lateinit var threads: MutableList<String>
+        lateinit var threads: List<String>
 
 
 
         if(verifyLoggedUser(user) && verifyCommunity(community) && user.getEmail() in community.getModerators()){
-            threads = community.threads.getIdThreads()
+            threads = community.getIdThreads()
 
             val communityThreads = mutableListOf<MainThread>()
 
-            for (i in 0 until threads.size){
-                val thread = readThread(threads[i])
+            for (element in threads){
+                val thread = readThread(element)
                 if(verifyThread(thread))
                     communityThreads.add(thread)
             }
@@ -72,7 +72,7 @@ class CommunityReader: ReadWriteLoggedUser, ReadWriteUser,ReadWriteThread, ReadW
         val community = readCommunity(getCommunityId(data.ID))
 
         if(verifyLoggedUser(user) && verifyCommunity(community) && user.getEmail() in community.getModerators())
-            return community.groups.getApprovedGroups()
+            return community.getApprovedGroups()
 
         return listOf()
     }

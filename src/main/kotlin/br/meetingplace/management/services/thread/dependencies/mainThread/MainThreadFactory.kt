@@ -2,6 +2,7 @@ package br.meetingplace.management.services.thread.dependencies.mainThread
 
 import br.meetingplace.data.threads.ThreadData
 import br.meetingplace.data.threads.ThreadOperationsData
+import br.meetingplace.management.dependencies.IDs
 import br.meetingplace.management.dependencies.Verify
 import br.meetingplace.management.dependencies.fileOperators.DeleteFile
 import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteLoggedUser
@@ -10,7 +11,7 @@ import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteUser
 import br.meetingplace.management.services.thread.dependencies.ThreadFactoryInterface
 import br.meetingplace.services.thread.MainThread
 
-class MainThreadFactory private constructor(): ThreadFactoryInterface, Verify, ReadWriteLoggedUser, ReadWriteUser, ReadWriteThread, Generator {
+class MainThreadFactory private constructor(): ThreadFactoryInterface, Verify, ReadWriteLoggedUser, ReadWriteUser, ReadWriteThread, IDs {
 
     companion object{
         private val Class = MainThreadFactory()

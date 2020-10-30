@@ -1,6 +1,7 @@
 package br.meetingplace.management.services.chat.dependencies.factory
 
 import br.meetingplace.data.chat.ChatMessage
+import br.meetingplace.management.dependencies.IDs
 import br.meetingplace.management.dependencies.Verify
 import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteChat
 import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteLoggedUser
@@ -8,7 +9,7 @@ import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteUser
 import br.meetingplace.services.chat.Message
 import br.meetingplace.services.notification.Inbox
 
-class ChatFactory: Verify, ReadWriteUser, ReadWriteChat, ReadWriteLoggedUser, Generator{
+class ChatFactory: Verify, ReadWriteUser, ReadWriteChat, ReadWriteLoggedUser, IDs{
 
     companion object{
         private val Class = ChatFactory()

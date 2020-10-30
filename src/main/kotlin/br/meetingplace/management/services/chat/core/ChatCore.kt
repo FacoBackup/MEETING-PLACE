@@ -49,7 +49,7 @@ class ChatCore private constructor(): BaseChatInterface, ChatFeaturesInterface, 
                         groupBaseChat.sendMessage(data)
                     else {
                         val community = readCommunity(getCommunityId(data.idCommunity))
-                        if (verifyCommunity(community) && community.groups.checkGroupApproval(data.idReceiver))
+                        if (verifyCommunity(community) && community.checkGroupApproval(data.idReceiver))
                             groupBaseChat.sendMessage(data)
                     }
                 }
@@ -70,7 +70,7 @@ class ChatCore private constructor(): BaseChatInterface, ChatFeaturesInterface, 
                         groupChatFeatures.favoriteMessage(data)
                     else {
                         val community = readCommunity(getCommunityId(data.idCommunity))
-                        if (verifyCommunity(community) && community.groups.checkGroupApproval(data.idReceiver))
+                        if (verifyCommunity(community) && community.checkGroupApproval(data.idReceiver))
                             groupChatFeatures.favoriteMessage(data)
                     }
                 }
@@ -90,7 +90,7 @@ class ChatCore private constructor(): BaseChatInterface, ChatFeaturesInterface, 
                         groupChatFeatures.unFavoriteMessage(data)
                     else {
                         val community = readCommunity(getCommunityId(data.idCommunity))
-                        if (verifyCommunity(community) && community.groups.checkGroupApproval(data.idReceiver))
+                        if (verifyCommunity(community) && community.checkGroupApproval(data.idReceiver))
                             groupChatFeatures.unFavoriteMessage(data)
                     }
                 }
@@ -111,7 +111,7 @@ class ChatCore private constructor(): BaseChatInterface, ChatFeaturesInterface, 
                         groupChatFeatures.quoteMessage(data)
                     else {
                         val community = readCommunity(getCommunityId(data.idCommunity))
-                        if (verifyCommunity(community) && community.groups.checkGroupApproval(data.idReceiver))
+                        if (verifyCommunity(community) && community.checkGroupApproval(data.idReceiver))
                             groupChatFeatures.quoteMessage(data)
                     }
                 }
@@ -132,7 +132,7 @@ class ChatCore private constructor(): BaseChatInterface, ChatFeaturesInterface, 
                         groupChatFeatures.shareMessage(data)
                     else {
                         val community = readCommunity(getCommunityId(data.idCommunity))
-                        if (verifyCommunity(community) && community.groups.checkGroupApproval(data.idReceiver))
+                        if (verifyCommunity(community) && community.checkGroupApproval(data.idReceiver))
                             groupChatFeatures.shareMessage(data)
                     }
                 }
@@ -153,7 +153,7 @@ class ChatCore private constructor(): BaseChatInterface, ChatFeaturesInterface, 
                         groupBaseChat.deleteMessage(data)
                     else{
                         val community = readCommunity(getCommunityId(data.idCommunity))
-                        if(verifyCommunity(community) && community.groups.checkGroupApproval(data.idReceiver))
+                        if(verifyCommunity(community) && community.checkGroupApproval(data.idReceiver))
                             groupBaseChat.deleteMessage(data)
                     }
                 }

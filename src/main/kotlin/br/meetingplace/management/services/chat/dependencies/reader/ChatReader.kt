@@ -1,6 +1,7 @@
 package br.meetingplace.management.services.chat.dependencies.reader
 
 import br.meetingplace.data.Data
+import br.meetingplace.management.dependencies.IDs
 import br.meetingplace.management.dependencies.Verify
 import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteChat
 import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteGroup
@@ -11,7 +12,7 @@ import br.meetingplace.services.chat.Chat
 import br.meetingplace.services.entitie.User
 import br.meetingplace.services.group.Group
 
-class ChatReader private constructor(): GroupSearchInterface, ChatReaderInterface, ReadWriteGroup, ReadWriteLoggedUser, ReadWriteUser, ReadWriteChat, Verify{
+class ChatReader private constructor(): GroupSearchInterface, ChatReaderInterface, ReadWriteGroup, ReadWriteLoggedUser, ReadWriteUser, ReadWriteChat, IDs,Verify{
 
     companion object{
         private val Class = ChatReader()
@@ -24,7 +25,7 @@ class ChatReader private constructor(): GroupSearchInterface, ChatReaderInterfac
         lateinit var group: Group
         lateinit var externalUser: User
         if(verifyLoggedUser(user)){
-            group = simpleToStandardIdGroup(data.ID, user)
+            group = readGroup(simpleToStandardIdGroup(data.ID, user))
             return when(verifyGroup(group)){
                 true->{ // is a group
                     group.getChat()

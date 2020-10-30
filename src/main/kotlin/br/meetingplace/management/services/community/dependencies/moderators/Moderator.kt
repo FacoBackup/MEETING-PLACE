@@ -20,7 +20,7 @@ class Moderator private constructor(): ModeratorInterface, ReadWriteUser, ReadWr
         val thread = readThread(data.id)
 
         if(verifyLoggedUser(user) && verifyCommunity(community) && verifyThread(thread) && user.getEmail() in community.getModerators()){
-            community.threads.updateThreadsInValidation(data.id,true)
+            community.updateThreadsInValidation(data.id,true)
             writeCommunity(community, community.getId())
         }
     }
@@ -32,7 +32,7 @@ class Moderator private constructor(): ModeratorInterface, ReadWriteUser, ReadWr
         val group = readGroup(data.id)
 
         if(verifyLoggedUser(user) && verifyCommunity(community) && verifyGroup(group) && user.getEmail() in community.getModerators()){
-            community.groups.updateGroupsInValidation(data.id,true)
+            community.updateGroupsInValidation(data.id,true)
             writeCommunity(community, community.getId())
         }
     }

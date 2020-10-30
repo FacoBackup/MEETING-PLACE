@@ -34,9 +34,10 @@ class CommunityCore private constructor(): FollowerInterface, CommunityFactoryIn
         follower.createReport(data)
     }
 
-    override fun deleteReport(data: ReportData) {
+    override fun deleteReport(data: ApprovalData) {
         follower.deleteReport(data)
     }
+
     override fun approveThread(data: ApprovalData){
         moderator.approveThread(data)
     }

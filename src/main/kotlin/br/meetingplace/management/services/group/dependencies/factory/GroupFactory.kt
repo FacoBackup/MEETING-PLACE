@@ -56,9 +56,9 @@ class GroupFactory private constructor(): GroupFactoryInterface, Verify, ReadWri
                         user.updateMyGroups(newGroup.getGroupId(),false)
 
                         if(loggedUser !in communityMods)
-                            community.groups.updateGroupsInValidation(newGroup.getGroupId(), null)
+                            community.updateGroupsInValidation(newGroup.getGroupId(), null)
                         else
-                            community.groups.updateGroupsInValidation(newGroup.getGroupId(), true)
+                            community.updateGroupsInValidation(newGroup.getGroupId(), true)
 
                         writeGroup(newGroup, newGroup.getGroupId())
                         writeUser(user, loggedUser)
@@ -103,7 +103,7 @@ class GroupFactory private constructor(): GroupFactoryInterface, Verify, ReadWri
                     receiver = readGroup(groupId)
 
                     if (verifyCommunity(community) && (loggedUser == receiver.getCreator() || loggedUser in community.getModerators())) {
-                        when (community.groups.checkGroupApproval(receiver.getGroupId())) {
+                        when (community.checkGroupApproval(receiver.getGroupId())) {
                             true -> {
                                 members = receiver.getMembers()
                                 for (element in members) {
@@ -114,7 +114,7 @@ class GroupFactory private constructor(): GroupFactoryInterface, Verify, ReadWri
                                     }
                                 }
 
-                                community.groups.removeApprovedGroup(receiver.getGroupId())
+                                community.removeApprovedGroup(receiver.getGroupId())
                                 user.updateMyGroups(receiver.getGroupId(), true)
                                 DeleteFile.getDeleteFileOperator().deleteGroup(receiver)
                                 writeUser(user, loggedUser)
@@ -131,7 +131,7 @@ class GroupFactory private constructor(): GroupFactoryInterface, Verify, ReadWri
                                     }
                                 }
 
-                                community.groups.updateGroupsInValidation(receiver.getGroupId(), false)
+                                community.updateGroupsInValidation(receiver.getGroupId(), false)
                                 user.updateMyGroups(receiver.getGroupId(), true)
                                 DeleteFile.getDeleteFileOperator().deleteGroup(receiver)
                                 writeUser(user, loggedUser)

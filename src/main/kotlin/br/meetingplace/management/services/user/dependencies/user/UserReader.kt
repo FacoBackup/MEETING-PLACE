@@ -75,12 +75,12 @@ abstract class UserReader:  Verify, ReadWriteLoggedUser, ReadWriteUser, ReadWrit
         if(verifyLoggedUser(user)){
             val followingIds = user.getFollowing()
 
-            for (element in followingIds){
-                val following = readUser(element)
+            for (a in followingIds){
+                val following = readUser(a)
                 if( verifyUser(following)){
                     val followingThreads = following.getMyThreads()
-                    for (element in followingThreads){
-                        val thread = readThread(element)
+                    for (b in followingThreads){
+                        val thread = readThread(b)
                         if (verifyThread(thread))
                             myTimeline.add(thread)
                     }
@@ -91,8 +91,8 @@ abstract class UserReader:  Verify, ReadWriteLoggedUser, ReadWriteUser, ReadWrit
             for(i in communities.indices){
                 val community = readCommunity(communities[i])
                 if(verifyCommunity(community)){
-                    val threads = community.threads.getIdThreads()
-                    for(j in 0 until threads.size){
+                    val threads = community.getIdThreads()
+                    for(j in threads.indices){
                         val thread = readThread(threads[i])
                         if(verifyThread(thread))
                             myTimeline.add(thread)

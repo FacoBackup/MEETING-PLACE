@@ -39,9 +39,9 @@ class ThreadCore private constructor():LikeInterface,Verify, ReadWriteUser, Read
                             val idThread = main.create(data)
                             //the verification for data.idCommunity != null already occurred, so don't mind the !!
                             if(loggedUser !in community.getModerators())
-                                community.threads.updateThreadsInValidation(idThread!!, null)
+                                community.updateThreadsInValidation(idThread!!, null)
                             else
-                                community.threads.updateThreadsInValidation(idThread!!, true)
+                                community.updateThreadsInValidation(idThread!!, true)
                             writeCommunity(community, community.getId())
                         }
                     }
@@ -52,7 +52,7 @@ class ThreadCore private constructor():LikeInterface,Verify, ReadWriteUser, Read
                         sub.create(data)
                     else{
                         community = readCommunity(data.idCommunity)
-                        if(verifyCommunity(community) && community.threads.checkThreadApproval(data.idCommunity))
+                        if(verifyCommunity(community) && community.checkThreadApproval(data.idCommunity))
                             sub.create(data)
                     }
                 }
@@ -69,13 +69,13 @@ class ThreadCore private constructor():LikeInterface,Verify, ReadWriteUser, Read
                     main.delete(data)
                 else{
                     community = readCommunity(data.idCommunity)
-                    if(verifyCommunity(community) && community.threads.checkThreadApproval(data.idCommunity)){
-                        community.threads.removeApprovedThread(data.idThread)
+                    if(verifyCommunity(community) && community.checkThreadApproval(data.idCommunity)){
+                        community.removeApprovedThread(data.idThread)
                         main.delete(data)
                         writeCommunity(community, community.getId())
                     }
-                    else if(verifyCommunity(community) && !community.threads.checkThreadApproval(data.idCommunity)){
-                        community.threads.updateThreadsInValidation(data.idThread, false)
+                    else if(verifyCommunity(community) && !community.checkThreadApproval(data.idCommunity)){
+                        community.updateThreadsInValidation(data.idThread, false)
                         main.delete(data)
                         writeCommunity(community, community.getId())
                     }
@@ -86,7 +86,7 @@ class ThreadCore private constructor():LikeInterface,Verify, ReadWriteUser, Read
                     sub.delete(data)
                 else{
                     community = readCommunity(data.idCommunity)
-                    if(verifyCommunity(community) && community.threads.checkThreadApproval(data.idCommunity))
+                    if(verifyCommunity(community) && community.checkThreadApproval(data.idCommunity))
                         sub.delete(data)
                     writeCommunity(community, community.getId())
                 }
@@ -103,7 +103,7 @@ class ThreadCore private constructor():LikeInterface,Verify, ReadWriteUser, Read
                     LikeMainThread.getLikeOperator().like(data)
                 else{
                     community = readCommunity(data.idCommunity)
-                    if(verifyCommunity(community) && community.threads.checkThreadApproval(data.idCommunity))
+                    if(verifyCommunity(community) && community.checkThreadApproval(data.idCommunity))
                         LikeMainThread.getLikeOperator().like(data)
                 }
             }
@@ -112,7 +112,7 @@ class ThreadCore private constructor():LikeInterface,Verify, ReadWriteUser, Read
                     LikeSubThread.getLikeOperator().like(data)
                 else{
                     community = readCommunity(data.idCommunity)
-                    if(verifyCommunity(community) && community.threads.checkThreadApproval(data.idCommunity))
+                    if(verifyCommunity(community) && community.checkThreadApproval(data.idCommunity))
                         LikeSubThread.getLikeOperator().like(data)
                 }
             }
@@ -128,7 +128,7 @@ class ThreadCore private constructor():LikeInterface,Verify, ReadWriteUser, Read
                     LikeMainThread.getLikeOperator().dislike(data)
                 else{
                     community = readCommunity(data.idCommunity)
-                    if(verifyCommunity(community) && community.threads.checkThreadApproval(data.idCommunity))
+                    if(verifyCommunity(community) && community.checkThreadApproval(data.idCommunity))
                         LikeMainThread.getLikeOperator().dislike(data)
                 }
             }
@@ -137,7 +137,7 @@ class ThreadCore private constructor():LikeInterface,Verify, ReadWriteUser, Read
                     LikeSubThread.getLikeOperator().dislike(data)
                 else{
                     community = readCommunity(data.idCommunity)
-                    if(verifyCommunity(community) && community.threads.checkThreadApproval(data.idCommunity))
+                    if(verifyCommunity(community) && community.checkThreadApproval(data.idCommunity))
                         LikeSubThread.getLikeOperator().dislike(data)
                 }
             }

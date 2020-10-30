@@ -3,6 +3,7 @@ package br.meetingplace.management.services.chat.dependencies.user
 import br.meetingplace.data.chat.ChatComplexOperations
 import br.meetingplace.data.chat.ChatMessage
 import br.meetingplace.data.chat.ChatOperations
+import br.meetingplace.management.dependencies.IDs
 import br.meetingplace.management.dependencies.Verify
 import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteChat
 import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteLoggedUser
@@ -11,7 +12,7 @@ import br.meetingplace.management.services.chat.core.ChatCore
 import br.meetingplace.management.services.chat.dependencies.ChatFeaturesInterface
 import br.meetingplace.services.notification.Inbox
 
-class UserChatFeatures private constructor(): ChatFeaturesInterface, ReadWriteUser, ReadWriteLoggedUser, ReadWriteChat, Verify, Generator{
+class UserChatFeatures private constructor(): ChatFeaturesInterface, ReadWriteUser, ReadWriteLoggedUser, ReadWriteChat, Verify, IDs{
 
     companion object{
         private val Class = UserChatFeatures()
@@ -72,7 +73,7 @@ class UserChatFeatures private constructor(): ChatFeaturesInterface, ReadWriteUs
         if(verifyChat(chat) && verifyLoggedUser(user) && verifyUser(receiver)){
             data.message = chat.shareMessage(data)
             if(data.message != ""){
-                sharedMessage = ChatMessage("|Shared| ${data.message}", data.idReceiver,true, data.creator,data.idCommunity)
+                sharedMessage = ChatMessage("|Shared| ${data.message}", data.idReceiver,true,data.idCommunity)
                 ChatCore.getClass().sendMessage(sharedMessage)
             }
         }

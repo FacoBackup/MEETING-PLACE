@@ -1,30 +1,26 @@
 package br.meetingplace.services.community
 
-import br.meetingplace.services.community.communityServices.CommunityGroups
-import br.meetingplace.services.community.communityServices.CommunityThreads
-import br.meetingplace.services.thread.MainThread
+import br.meetingplace.services.community.services.CommunityServices
 
-class Community private constructor(){
+class Community private constructor(): CommunityServices(){
 
     companion object{
         private val op = Community()
         fun getCommunity ()= op
     }
+
     private var name= "" // THE NAME IS THE IDENTIFIER
     private var id = ""
     private var about= ""
     private val followers = mutableListOf<String>()
     private val moderators = mutableListOf<String>()
-    val threads = CommunityThreads.getThreads()
-    val groups = CommunityGroups.getGroups()
 
-    //GETTERS
     fun getFollowers () = followers
     fun getName() = name
     fun getId() = id
     fun getAbout() = about
     fun getModerators() = moderators
-    //GETTERS
+
 
     fun startCommunity(name: String, id: String, about: String, creator: String){
         if(this.name == "" && moderators.isEmpty()){
