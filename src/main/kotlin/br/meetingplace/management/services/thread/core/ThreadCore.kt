@@ -38,11 +38,12 @@ class ThreadCore private constructor():LikeInterface,Verify, ReadWriteUser, Read
                         if(verifyCommunity(community) ){
                             val idThread = main.create(data)
                             //the verification for data.idCommunity != null already occurred, so don't mind the !!
+                            //the verify community method already insures that the id and name are different of null so don't mind the !!
                             if(loggedUser !in community.getModerators())
                                 community.updateThreadsInValidation(idThread!!, null)
                             else
                                 community.updateThreadsInValidation(idThread!!, true)
-                            writeCommunity(community, community.getId())
+                            writeCommunity(community, community.getId()!!)
                         }
                     }
                 }
@@ -72,12 +73,14 @@ class ThreadCore private constructor():LikeInterface,Verify, ReadWriteUser, Read
                     if(verifyCommunity(community) && community.checkThreadApproval(data.idCommunity)){
                         community.removeApprovedThread(data.idThread)
                         main.delete(data)
-                        writeCommunity(community, community.getId())
+                        //the verify community method already insures that the id and name are different of null so don't mind the !!
+                        writeCommunity(community, community.getId()!!)
                     }
                     else if(verifyCommunity(community) && !community.checkThreadApproval(data.idCommunity)){
                         community.updateThreadsInValidation(data.idThread, false)
                         main.delete(data)
-                        writeCommunity(community, community.getId())
+                        //the verify community method already insures that the id and name are different of null so don't mind the !!
+                        writeCommunity(community, community.getId()!!)
                     }
                 }
             }
@@ -88,7 +91,6 @@ class ThreadCore private constructor():LikeInterface,Verify, ReadWriteUser, Read
                     community = readCommunity(data.idCommunity)
                     if(verifyCommunity(community) && community.checkThreadApproval(data.idCommunity))
                         sub.delete(data)
-                    writeCommunity(community, community.getId())
                 }
             }
         }

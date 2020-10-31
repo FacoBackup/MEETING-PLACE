@@ -7,6 +7,7 @@ import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteCommuni
 import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteThread
 import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteUser
 import br.meetingplace.services.entitie.User
+import br.meetingplace.services.entitie.profiles.followdata.FollowData
 import br.meetingplace.services.notification.Inbox
 
 class Follow private constructor(): FollowInterface, Verify, ReadWriteUser, ReadWriteThread, ReadWriteCommunity, IDs {
@@ -16,34 +17,29 @@ class Follow private constructor(): FollowInterface, Verify, ReadWriteUser, Read
         fun getClass() = Class
     }
 
-    private fun verifyType(data: Data): Int{
-        val isCommunity = readCommunity(data.ID)
-        val isUser = readUser(data.ID)
-
-        return if(isCommunity.getId() == "" && isUser.getEmail() != "") //IS A USER
-            0
-        else if(isCommunity.getId() != "" && isUser.getEmail() == "")// IS A COMMUNITY
-            1
-        else // IS NONE OF THE ABOVE
-            -1
-    }
-
     override fun follow(data: Data){
         val loggedUser = readLoggedUser().email
         val user = readUser(loggedUser)
         lateinit var notification: Inbox
         lateinit var external: User
+        lateinit var followingData: FollowData
+        lateinit var followerData: FollowData
 
         if(verifyLoggedUser(user)){
             when(verifyType(data)){
                 0->{ //USER
                     external = readUser(data.ID)
                     notification = Inbox("${user.getUserName()} is now following you.", "New follower.")
-
                     if(verifyLoggedUser(user) && verifyUser(external) && !verifyFollower(external, user)){
+
+                        //the verify user method already insures that the user name and id are different of null, so don't mind the !!
+                        followerData = FollowData( user.getUserName()!!,user.getEmail())
+                        followingData = FollowData( external.getUserName()!!,external.getEmail())
+
+
                         external.updateInbox(notification)
-                        external.updateFollowers(loggedUser,false)
-                        user.updateFollowing(data.ID,false)
+                        external.updateFollowers(followerData,false)
+                        user.updateFollowing(followingData,false)
 
                         writeUser(user, loggedUser)
                         writeUser(external ,data.ID)
@@ -52,13 +48,13 @@ class Follow private constructor(): FollowInterface, Verify, ReadWriteUser, Read
                 1->{ //COMMUNITY
                     val community = readCommunity(getCommunityId(data.ID))
 
-                    if (verifyLoggedUser(user) && verifyCommunity(community)  &&loggedUser !in community.getFollowers() && community.getId() !in user.getCommunitiesIFollow() && loggedUser !in community.getModerators()){
-
-                        user.updateCommunitiesIFollow(community.getId(), false)
+                    if (verifyLoggedUser(user) && verifyCommunity(community)  && loggedUser !in community.getFollowers() && loggedUser !in community.getModerators() && community.getId() !in user.getCommunitiesIFollow() && community.getId() !in user.getModeratorIn()){
+                        //the verify community method already insures that the id and name are different of null so don't mind the !!
+                        user.updateCommunitiesIFollow(community.getId()!!, false)
                         community.updateFollower(loggedUser, false)
 
                         writeUser(user, loggedUser)
-                        writeCommunity(community, community.getId())
+                        writeCommunity(community, community.getId()!!)
                     }
                 }
             }
@@ -69,15 +65,21 @@ class Follow private constructor(): FollowInterface, Verify, ReadWriteUser, Read
     override fun unfollow(data: Data){
         val loggedUser = readLoggedUser().email
         val user = readUser(loggedUser)
-
+        lateinit var followingData: FollowData
+        lateinit var followerData: FollowData
+        lateinit var external: User
         if(verifyLoggedUser(user)){
             when(verifyType(data)){
                 0->{ //USER
-                    val external = readUser(data.ID)
+                    external = readUser(data.ID)
                     if(external.getAge() != -1 && verifyLoggedUser(user) && verifyUser(external) && verifyFollower(external, user)){
 
-                        external.updateFollowers(loggedUser,true)
-                        user.updateFollowing(data.ID,true)
+                        //the verify user method already insures that the user name and id are different of null, so don't mind the !!
+                        followerData = FollowData( user.getUserName()!!,user.getEmail())
+                        followingData = FollowData( external.getUserName()!!,external.getEmail())
+
+                        external.updateFollowers(followerData,true)
+                        user.updateFollowing(followingData,true)
                         writeUser(user, loggedUser)
                         writeUser(external ,data.ID)
                     }
@@ -92,15 +94,25 @@ class Follow private constructor(): FollowInterface, Verify, ReadWriteUser, Read
                                 community.updateFollower(loggedUser, true)
                             }
                         }
-                        when(loggedUser in community.getModerators() && community.getId() in user.getModeratorIn()){
-                            true-> community.updateModerator(loggedUser, loggedUser, true)
-                        }
-
+                        //the verify community method already insures that the id and name are different of null so don't mind the !!
                         writeUser(user, loggedUser)
-                        writeCommunity(community, community.getId())
+                        writeCommunity(community, community.getId()!!)
                     }
                 }
             }
         }
     } //UPDATE
+
+
+    private fun verifyType(data: Data): Int{
+        val isCommunity = readCommunity(data.ID)
+        val isUser = readUser(data.ID)
+
+        return if(!verifyCommunity(isCommunity) && verifyUser(isUser)) //IS A USER
+            0
+        else if(verifyCommunity(isCommunity) && !verifyUser(isUser))// IS A COMMUNITY
+            1
+        else // IS NONE OF THE ABOVE
+            -1
+    }
 }

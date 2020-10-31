@@ -9,9 +9,9 @@ class Community private constructor(): CommunityServices(){
         fun getCommunity ()= op
     }
 
-    private var name= "" // THE NAME IS THE IDENTIFIER
-    private var id = ""
-    private var about= ""
+    private var name: String?= null
+    private var id: String?= null
+    private var about: String?= null
     private val followers = mutableListOf<String>()
     private val moderators = mutableListOf<String>()
 
@@ -23,7 +23,7 @@ class Community private constructor(): CommunityServices(){
 
 
     fun startCommunity(name: String, id: String, about: String, creator: String){
-        if(this.name == "" && moderators.isEmpty()){
+        if(this.name.isNullOrBlank() && moderators.isEmpty()){
             this.name = name
             this.about = about
             this.id = id

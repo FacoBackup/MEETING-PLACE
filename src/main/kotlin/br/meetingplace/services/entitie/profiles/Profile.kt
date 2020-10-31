@@ -1,5 +1,6 @@
 package br.meetingplace.services.entitie.profiles
 
+import br.meetingplace.services.entitie.profiles.followdata.FollowData
 import br.meetingplace.services.entitie.profiles.professional.ProfessionalProfile
 import br.meetingplace.services.entitie.profiles.social.SocialProfile
 import br.meetingplace.services.entitie.profiles.social.interfaces.*
@@ -38,11 +39,11 @@ abstract class Profile: SocialChats, SocialCommunities, SocialFollowers, SocialG
         return social.getCommunitiesIFollow()
     }
 
-    override fun getFollowers(): List<String> {
+    override fun getFollowers(): List<FollowData> {
         return social.getFollowers()
     }
 
-    override fun getFollowing(): List<String> {
+    override fun getFollowing(): List<FollowData> {
         return social.getFollowing()
     }
 
@@ -70,12 +71,12 @@ abstract class Profile: SocialChats, SocialCommunities, SocialFollowers, SocialG
         social.updateCommunitiesIFollow(id,unfollow)
     }
 
-    override fun updateFollowers(userEmail: String, remove: Boolean) {
-        social.updateFollowers(userEmail,remove)
+    override fun updateFollowers(data: FollowData, remove: Boolean) {
+        social.updateFollowers(data,remove)
     }
 
-    override fun updateFollowing(userEmail: String, remove: Boolean) {
-        social.updateFollowing(userEmail,remove)
+    override fun updateFollowing(data: FollowData, remove: Boolean) {
+        social.updateFollowing(data,remove)
     }
 
     override fun updateMemberIn(idGroup: String, leave: Boolean) {

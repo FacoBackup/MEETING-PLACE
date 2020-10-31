@@ -21,9 +21,10 @@ class Follower private constructor():FollowerInterface, ReadWriteCommunity, Read
         val thread = readThread(data.idService)
 
         if (verifyLoggedUser(user) && verifyCommunity(community) && verifyThread(thread)){
-            val newReport = Report(generateId(), loggedUser, data.idService, data.reason, false, community.getId(), null)
+            //the verify community method already insures that the id and name are different of null so don't mind the !!
+            val newReport = Report(generateId(), loggedUser, data.idService, data.reason, false, community.getId()!!, null)
             community.updateReport(newReport, false)
-            writeCommunity(community, community.getId())
+            writeCommunity(community, community.getId()!!)
             writeReport(newReport, newReport.reportId)
         }
     }
@@ -35,9 +36,9 @@ class Follower private constructor():FollowerInterface, ReadWriteCommunity, Read
         val report = readReport(data.id)
 
         if (verifyLoggedUser(user) && verifyCommunity(community) && verifyReport(report) && (loggedUser in community.getModerators() || loggedUser == report.creator)){
-
             community.updateReport(report,true)
-            writeCommunity(community, community.getId())
+            //the verify community method already insures that the id and name are different of null so don't mind the !!
+            writeCommunity(community, community.getId()!!)
             DeleteFile.getDeleteFileOperator().deleteReport(report)
         }
     }

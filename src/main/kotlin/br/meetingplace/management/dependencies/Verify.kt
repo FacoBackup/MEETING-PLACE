@@ -6,13 +6,14 @@ import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteLoggedU
 import br.meetingplace.services.chat.Chat
 import br.meetingplace.services.community.Community
 import br.meetingplace.services.community.data.Report
+import br.meetingplace.services.entitie.profiles.followdata.FollowData
 import br.meetingplace.services.group.Group
 import br.meetingplace.services.thread.MainThread
 
 interface Verify: ReadWriteLoggedUser {
 
     fun verifyUser(user: User): Boolean {
-        return !user.getUserName().isNullOrBlank() && user.getPassword().isNotBlank() && user.getEmail().isNotBlank() && user.getAge() >= 16
+        return !user.getUserName().isNullOrBlank() && user.getPassword().isNotBlank() && user.getEmail().isNotBlank() && user.getAge() >= 16 && !user.getUserName().isNullOrBlank()
     }
 
     fun verifyLoggedUser(user: User): Boolean {
@@ -35,10 +36,8 @@ interface Verify: ReadWriteLoggedUser {
     }
 
     fun verifyFollower(external: User, user: User): Boolean {
-        val logged = readLoggedUser().email
-
-        if(user.getAge() != -1 && external.getAge() != -1 && logged.isNotBlank()){
-            if(logged in external.getFollowers())
+        if(verifyLoggedUser(user)){
+            if(FollowData(user.getUserName()!!, user.getEmail()) in external.getFollowers())
                 return true
         }
         return false
@@ -49,6 +48,6 @@ interface Verify: ReadWriteLoggedUser {
     }
 
     fun verifyCommunity(community: Community): Boolean{
-        return community.getId().isNotBlank() && community.getName().isNotBlank()
+        return !community.getId().isNullOrBlank()  && !community.getName().isNullOrBlank()
     }
 }

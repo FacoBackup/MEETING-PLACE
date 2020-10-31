@@ -1,5 +1,6 @@
 package br.meetingplace.services.entitie.profiles.social
 
+import br.meetingplace.services.entitie.profiles.followdata.FollowData
 import br.meetingplace.services.entitie.profiles.social.interfaces.*
 import br.meetingplace.services.notification.Inbox
 
@@ -21,8 +22,8 @@ class SocialProfile private constructor(): SocialChats, SocialCommunities, Socia
     private var myChats = mutableListOf<String>()
     private var myGroups = mutableListOf<String>()
     private var memberIn = mutableListOf<String>()
-    private var followers = mutableListOf<String>()
-    private var following = mutableListOf<String>()
+    private var followers = mutableListOf<FollowData>()
+    private var following = mutableListOf<FollowData>()
     private var inbox = mutableListOf<Inbox>()
 
     override fun createSocialProfile(userName: String, about: String, nationality: String, gender: String){
@@ -63,28 +64,27 @@ class SocialProfile private constructor(): SocialChats, SocialCommunities, Socia
             }
         }
     }
-    override fun updateFollowers(userEmail: String, remove: Boolean){
+    override fun updateFollowers(data: FollowData, remove: Boolean){
         when (remove){
             true ->{
-                if (userEmail in followers)
-                    followers.remove(userEmail)
+                if (data in followers)
+                    followers.remove(data)
             }
             false->{
-                if (userEmail !in followers)
-                    followers.add(userEmail)
+                if (data !in followers)
+                    followers.add(data)
             }
         }
-
     }
-    override fun updateFollowing(userEmail: String, remove: Boolean){
+    override fun updateFollowing(data: FollowData, remove: Boolean){
         when (remove){
             true ->{
-                if (userEmail in following)
-                    following.remove(userEmail)
+                if (data in following)
+                    following.remove(data)
             }
             false->{
-                if (userEmail !in following)
-                    following.add(userEmail)
+                if (data !in following)
+                    following.add(data)
             }
         }
     }

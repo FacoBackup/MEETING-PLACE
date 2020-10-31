@@ -18,6 +18,7 @@ import br.meetingplace.management.services.Login
 import br.meetingplace.management.services.chat.core.ChatCore
 import br.meetingplace.management.services.community.core.CommunityCore
 import br.meetingplace.management.services.group.core.GroupCore
+import br.meetingplace.management.services.search.core.SearchCore
 import br.meetingplace.management.services.thread.core.ThreadCore
 import br.meetingplace.management.services.user.core.UserCore
 import io.ktor.application.*
@@ -31,13 +32,15 @@ import io.ktor.server.netty.*
 
 val userSystem= UserCore.getClass()
 val threadSystem=  ThreadCore.getClass()
-val chatSystem = ChatCore.getClass() // controls chat and groups
+val chatSystem = ChatCore.getClass()
 val groupSystem = GroupCore.getClass()
 val login = Login.getLoginSystem()
 val communitySystem = CommunityCore.getClass()
+val searchSystem = SearchCore.getClass()
 
 fun main (){
     val port = System.getenv("PORT")?.toInt() ?: 3000
+
     embeddedServer(Netty, port) {
         routing {
             install(ContentNegotiation) {
@@ -45,6 +48,22 @@ fun main (){
                     setPrettyPrinting()
                 }
             }
+
+            get("/search/user"){
+                val data = call.receive<Data>()
+                val search = searchSystem.searchUser(data)
+                if(search != null)
+                    call.respond(search)
+                else call.respond("nulo")
+            }
+            get("/search/community"){
+                val data = call.receive<Data>()
+                val search = searchSystem.searchCommunity(data)
+                if(search != null)
+                    call.respond(search)
+                else call.respond("nulo")
+            }
+
             post("/community/create"){
                 val data = call.receive<CommunityData>()
                 call.respond(communitySystem.create(data))
@@ -103,11 +122,6 @@ fun main (){
                 val unfollow = call.receive<Data>()
                 call.respond(userSystem.unfollow(unfollow))
             }
-
-//            //MESSAGES USERS
-//            get("/my/messages") {
-//                call.respond(chatSystem.getMyChats())
-//            }
             post("/message/send"){
                 val chat = call.receive<ChatMessage>()
                 call.respond(chatSystem.sendMessage(chat))
@@ -134,7 +148,7 @@ fun main (){
             }
             //MESSAGES USERS
 
-//            THREADS
+            //THREADS
             get("/user/see/threads"){
                 call.respond(userSystem.getMyThreads())
             }

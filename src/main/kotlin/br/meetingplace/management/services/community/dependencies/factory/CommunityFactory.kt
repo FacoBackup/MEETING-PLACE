@@ -1,6 +1,7 @@
 package br.meetingplace.management.services.community.dependencies.factory
 
 import br.meetingplace.data.community.CommunityData
+import br.meetingplace.management.dependencies.IDs
 import br.meetingplace.management.dependencies.Verify
 import br.meetingplace.management.dependencies.fileOperators.DeleteFile
 import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteCommunity
@@ -9,7 +10,7 @@ import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteUser
 import br.meetingplace.services.community.Community
 import br.meetingplace.services.notification.Inbox
 
-class CommunityFactory private constructor(): ReadWriteUser, ReadWriteLoggedUser, ReadWriteCommunity, Verify{
+class CommunityFactory private constructor(): ReadWriteUser, ReadWriteLoggedUser, ReadWriteCommunity, Verify, IDs{
 
     companion object{
         private val Class = CommunityFactory()
@@ -19,14 +20,17 @@ class CommunityFactory private constructor(): ReadWriteUser, ReadWriteLoggedUser
     fun create(data: CommunityData){
         val loggedUser = readLoggedUser().email
         val user = readUser(loggedUser)
+        val community = readCommunity(getCommunityId(data.name))
+
         lateinit var newCommunity: Community
         lateinit var id: String
 
-        if (verifyLoggedUser(user)){
+        if (verifyLoggedUser(user) && !verifyCommunity(community)){
             newCommunity = Community.getCommunity()
-            id = data.name.replace("\\s".toRegex(),"").toLowerCase()
+            id = getCommunityId(data.name)
             newCommunity.startCommunity(data.name, id, data.about, loggedUser)
             user.updateModeratorIn(id,false)
+
             writeCommunity(newCommunity, id)
             writeUser(user, user.getEmail())
         }

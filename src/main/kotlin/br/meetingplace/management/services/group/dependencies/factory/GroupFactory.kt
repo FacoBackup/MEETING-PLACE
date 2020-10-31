@@ -49,8 +49,8 @@ class GroupFactory private constructor(): GroupFactoryInterface, Verify, ReadWri
                             if (verifyUser(mod) && mod != user)
                                 mod.updateInbox(notification)
                         }
-
-                        id = getCommunityGroupId(community.getId(), data.groupName)
+                        //the verify community method already insures that the id and name are different of null so don't mind the !!
+                        id = getCommunityGroupId(community.getId()!!, data.groupName)
 
                         newGroup.startGroup(data.groupName, id,data.about, loggedUser)
                         user.updateMyGroups(newGroup.getGroupId(),false)
@@ -62,7 +62,7 @@ class GroupFactory private constructor(): GroupFactoryInterface, Verify, ReadWri
 
                         writeGroup(newGroup, newGroup.getGroupId())
                         writeUser(user, loggedUser)
-                        writeCommunity(community, community.getId())
+                        writeCommunity(community, community.getId()!!)
                     }
                 }
             }
@@ -118,7 +118,8 @@ class GroupFactory private constructor(): GroupFactoryInterface, Verify, ReadWri
                                 user.updateMyGroups(receiver.getGroupId(), true)
                                 DeleteFile.getDeleteFileOperator().deleteGroup(receiver)
                                 writeUser(user, loggedUser)
-                                writeCommunity(community, community.getId())
+                                //the verify community method already insures that the id and name are different of null so don't mind the !!
+                                writeCommunity(community, community.getId()!!)
                             }
                             false -> {
 
@@ -135,7 +136,8 @@ class GroupFactory private constructor(): GroupFactoryInterface, Verify, ReadWri
                                 user.updateMyGroups(receiver.getGroupId(), true)
                                 DeleteFile.getDeleteFileOperator().deleteGroup(receiver)
                                 writeUser(user, loggedUser)
-                                writeCommunity(community, community.getId())
+                                //the verify community method already insures that the id and name are different of null so don't mind the !!
+                                writeCommunity(community, community.getId()!!)
                             }//false
                         }//when
                     }//if

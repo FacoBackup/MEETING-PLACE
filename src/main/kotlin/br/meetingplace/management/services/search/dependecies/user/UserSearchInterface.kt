@@ -4,5 +4,5 @@ import br.meetingplace.data.Data
 import br.meetingplace.services.entitie.User
 
 interface UserSearchInterface {
-    fun searchUser(data: Data): List<User>
+    fun searchUser(data: Data): User?
 }

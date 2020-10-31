@@ -9,6 +9,7 @@ import br.meetingplace.management.services.Login
 import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteLoggedUser
 import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteThread
 import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteUser
+import br.meetingplace.services.entitie.profiles.followdata.FollowData
 
 
 class UserFactory private constructor(): UserInterface, ReadWriteLoggedUser, ReadWriteUser, Verify, ReadWriteThread{
@@ -30,27 +31,28 @@ class UserFactory private constructor(): UserInterface, ReadWriteLoggedUser, Rea
     override fun delete(){
         val logged = readLoggedUser().email
         val user = readUser(logged)
-        lateinit var followers: List<String>
-        lateinit var following: List<String>
+        lateinit var followers: List<FollowData>
+        lateinit var following: List<FollowData>
         lateinit var userExternal: User
+        lateinit var followerData: FollowData
 
         if(verifyUser(user)){
 
             followers = user.getFollowers()
             following = user.getFollowing()
 
-            for(element in followers){
-                userExternal = readUser(element)
+            for(index in followers.indices){
+                userExternal = readUser(followers[index].email)
                 if(userExternal.getAge() != -1) {
-                    userExternal.updateFollowing(logged, true)
+                    userExternal.updateFollowing(FollowData(user.getUserName()!!,logged), true)
                     writeUser(userExternal, userExternal.getEmail())
                 }
             }
 
-            for(element in following){
-                userExternal = readUser(element)
+            for(index in following.indices){
+                userExternal = readUser(following[index].email)
                 if(userExternal.getAge() != -1){
-                    userExternal.updateFollowers(logged,true)
+                    userExternal.updateFollowers(FollowData(user.getUserName()!!,logged),true)
                     writeUser(userExternal,userExternal.getEmail())
                 }
             }
@@ -71,8 +73,8 @@ class UserFactory private constructor(): UserInterface, ReadWriteLoggedUser, Rea
 
         if(verifyLoggedUser(user)){
             val myThreads = user.getMyThreads()
-            for(i in 0 until myThreads.size){
-                val thread = readThread(myThreads[i])
+            for(index in myThreads){
+                val thread = readThread(index)
                 if(verifyThread(thread))
                     DeleteFile.getDeleteFileOperator().deleteThread(thread)
             }

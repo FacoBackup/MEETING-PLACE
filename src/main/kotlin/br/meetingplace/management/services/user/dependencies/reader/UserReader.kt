@@ -48,8 +48,8 @@ class UserReader private constructor():  Verify, ReadWriteLoggedUser, ReadWriteU
         if(verifyLoggedUser(user)){
             val followingIds = user.getFollowing()
 
-            for (a in followingIds){
-                val following = readUser(a)
+            for (a in followingIds.indices){
+                val following = readUser(followingIds[a].email)
                 if( verifyUser(following)){
                     val followingThreads = following.getMyThreads()
                     for (b in followingThreads){

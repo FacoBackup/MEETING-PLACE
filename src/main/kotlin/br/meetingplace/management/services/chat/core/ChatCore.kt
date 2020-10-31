@@ -170,9 +170,9 @@ class ChatCore private constructor(): BaseChatInterface, ChatFeaturesInterface, 
             val receiverAsUser = readUser(id)
             val receiverAsGroup = readGroup(simpleToStandardIdGroup(id, loggedUser))
 
-            return if(receiverAsGroup.getGroupId().isBlank() && receiverAsUser.getEmail().isNotBlank())
+            return if(!verifyGroup(receiverAsGroup) && verifyUser(receiverAsUser))
                 ChatType.USER_CHAT
-            else if(receiverAsGroup.getGroupId().isNotBlank() && receiverAsUser.getEmail().isBlank())
+            else if(verifyGroup(receiverAsGroup) && !verifyUser(receiverAsUser))
                 ChatType.GROUP_CHAT
             else
                 null

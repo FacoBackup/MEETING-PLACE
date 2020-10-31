@@ -20,8 +20,9 @@ class Moderator private constructor(): ModeratorInterface, ReadWriteUser, ReadWr
         val thread = readThread(data.id)
 
         if(verifyLoggedUser(user) && verifyCommunity(community) && verifyThread(thread) && user.getEmail() in community.getModerators()){
+            //the verify community method already insures that the id and name are different of null so don't mind the !!
             community.updateThreadsInValidation(data.id,true)
-            writeCommunity(community, community.getId())
+            writeCommunity(community, community.getId()!!)
         }
     }
 
@@ -33,7 +34,8 @@ class Moderator private constructor(): ModeratorInterface, ReadWriteUser, ReadWr
 
         if(verifyLoggedUser(user) && verifyCommunity(community) && verifyGroup(group) && user.getEmail() in community.getModerators()){
             community.updateGroupsInValidation(data.id,true)
-            writeCommunity(community, community.getId())
+            //the verify community method already insures that the id and name are different of null so don't mind the !!
+            writeCommunity(community, community.getId()!!)
         }
     }
 
@@ -42,7 +44,7 @@ class Moderator private constructor(): ModeratorInterface, ReadWriteUser, ReadWr
         val user = readUser(loggedUser)
         val community = readCommunity(getCommunityId(data.ID))
 
-        if(verifyLoggedUser(user) && verifyCommunity(community) && user.getEmail() in community.getModerators())
+        if(verifyLoggedUser(user) && verifyCommunity(community) && user.getEmail() in community.getModerators() && community.getId() in user.getModeratorIn())
             community.updateModerator(loggedUser, loggedUser, null)
     }
 
