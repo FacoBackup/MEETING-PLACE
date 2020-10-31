@@ -2,16 +2,16 @@ package br.meetingplace.management.services.thread.dependencies.mainThread
 
 import br.meetingplace.data.threads.ThreadData
 import br.meetingplace.data.threads.ThreadOperationsData
-import br.meetingplace.management.dependencies.IDs
-import br.meetingplace.management.dependencies.Verify
-import br.meetingplace.management.dependencies.fileOperators.DeleteFile
-import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteLoggedUser
-import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteThread
-import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteUser
+import br.meetingplace.management.dependencies.idmanager.controller.IDsController
+import br.meetingplace.management.dependencies.verify.dependencies.Verify
+import br.meetingplace.management.dependencies.ReadWriteController
+import br.meetingplace.management.dependencies.readwrite.dependencies.user.ReadWriteLoggedUser
+import br.meetingplace.management.dependencies.readwrite.dependencies.thread.ReadWriteThread
+import br.meetingplace.management.dependencies.readwrite.dependencies.user.ReadWriteUser
 import br.meetingplace.management.services.thread.dependencies.ThreadFactoryInterface
 import br.meetingplace.services.thread.MainThread
 
-class MainThreadFactory private constructor(): ThreadFactoryInterface, Verify, ReadWriteLoggedUser, ReadWriteUser, ReadWriteThread, IDs {
+class MainThreadFactory private constructor(): ThreadFactoryInterface, Verify, ReadWriteLoggedUser, ReadWriteUser, ReadWriteThread, IDsController {
 
     companion object{
         private val Class = MainThreadFactory()
@@ -49,7 +49,7 @@ class MainThreadFactory private constructor(): ThreadFactoryInterface, Verify, R
 
         if(verifyThread(thread) && verifyLoggedUser(user) && data.idSubThread == null ) {
 
-            DeleteFile.getDeleteFileOperator().deleteThread(thread)
+            ReadWriteController.getDeleteFileOperator().deleteThread(thread)
             user.updateMyThreads(data.idThread,false) //FALSE IS TO REMOVE THREAD
             writeUser(user, user.getEmail())
         }

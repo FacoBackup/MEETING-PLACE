@@ -11,16 +11,12 @@ abstract class Profile: SocialChats, SocialCommunities, SocialFollowers, SocialG
     private val social = SocialProfile.getClass()
     private val professional = ProfessionalProfile.getClass()
 
-    override fun createSocialProfile(userName: String, about: String, nationality: String, gender: String){
-        social.createSocialProfile(userName, about, nationality, gender)
+    override fun updateSocialProfile(about: String, nationality: String, gender: String){
+        social.updateSocialProfile(about, nationality, gender)
     }
 
     override fun updateMyChats(id: String) {
         social.updateMyChats(id)
-    }
-
-    override fun getUserName(): String? {
-        return social.getUserName()
     }
 
     override fun updateAbout(newAbout: String) {

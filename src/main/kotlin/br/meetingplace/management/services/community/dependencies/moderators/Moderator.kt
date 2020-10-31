@@ -2,12 +2,17 @@ package br.meetingplace.management.services.community.dependencies.moderators
 
 import br.meetingplace.data.Data
 import br.meetingplace.data.community.ApprovalData
-import br.meetingplace.management.dependencies.IDs
-import br.meetingplace.management.dependencies.Verify
-import br.meetingplace.management.dependencies.fileOperators.rw.*
+import br.meetingplace.management.dependencies.idmanager.controller.IDsController
+import br.meetingplace.management.dependencies.verify.dependencies.Verify
+import br.meetingplace.management.dependencies.readwrite.dependencies.community.ReadWriteCommunity
+import br.meetingplace.management.dependencies.readwrite.dependencies.community.ReadWriteReport
+import br.meetingplace.management.dependencies.readwrite.dependencies.group.ReadWriteGroup
+import br.meetingplace.management.dependencies.readwrite.dependencies.thread.ReadWriteThread
+import br.meetingplace.management.dependencies.readwrite.dependencies.user.ReadWriteLoggedUser
+import br.meetingplace.management.dependencies.readwrite.dependencies.user.ReadWriteUser
 
-class Moderator private constructor(): ModeratorInterface, ReadWriteUser, ReadWriteLoggedUser, ReadWriteThread, ReadWriteGroup, ReadWriteCommunity, Verify, IDs, ReadWriteReport{
-
+class Moderator private constructor(): ModeratorInterface, ReadWriteUser, ReadWriteLoggedUser, ReadWriteThread, ReadWriteGroup, ReadWriteCommunity, Verify, ReadWriteReport {
+    private val iDs = IDsController.getClass()
     companion object{
         private val Class = Moderator()
         fun getClass() = Class
@@ -16,7 +21,7 @@ class Moderator private constructor(): ModeratorInterface, ReadWriteUser, ReadWr
     override fun approveThread(data: ApprovalData){
         val loggedUser = readLoggedUser().email
         val user = readUser(loggedUser)
-        val community = readCommunity(getCommunityId(data.community))
+        val community = readCommunity(iDs.getCommunityId(data.community))
         val thread = readThread(data.id)
 
         if(verifyLoggedUser(user) && verifyCommunity(community) && verifyThread(thread) && user.getEmail() in community.getModerators()){
@@ -29,7 +34,7 @@ class Moderator private constructor(): ModeratorInterface, ReadWriteUser, ReadWr
     override fun approveGroup(data: ApprovalData){
         val loggedUser = readLoggedUser().email
         val user = readUser(loggedUser)
-        val community = readCommunity(getCommunityId(data.community))
+        val community = readCommunity(iDs.getCommunityId(data.community))
         val group = readGroup(data.id)
 
         if(verifyLoggedUser(user) && verifyCommunity(community) && verifyGroup(group) && user.getEmail() in community.getModerators()){
@@ -42,7 +47,7 @@ class Moderator private constructor(): ModeratorInterface, ReadWriteUser, ReadWr
     override fun stepDown(data: Data){
         val loggedUser = readLoggedUser().email
         val user = readUser(loggedUser)
-        val community = readCommunity(getCommunityId(data.ID))
+        val community = readCommunity(iDs.getCommunityId(data.ID))
 
         if(verifyLoggedUser(user) && verifyCommunity(community) && user.getEmail() in community.getModerators() && community.getId() in user.getModeratorIn())
             community.updateModerator(loggedUser, loggedUser, null)

@@ -3,16 +3,16 @@ package br.meetingplace.management.services.chat.dependencies.user
 import br.meetingplace.data.chat.ChatComplexOperations
 import br.meetingplace.data.chat.ChatMessage
 import br.meetingplace.data.chat.ChatOperations
-import br.meetingplace.management.dependencies.IDs
-import br.meetingplace.management.dependencies.Verify
-import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteChat
-import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteLoggedUser
-import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteUser
-import br.meetingplace.management.services.chat.core.ChatCore
+import br.meetingplace.management.dependencies.idmanager.controller.IDsController
+import br.meetingplace.management.dependencies.verify.dependencies.Verify
+import br.meetingplace.management.dependencies.readwrite.dependencies.chat.ReadWriteChat
+import br.meetingplace.management.dependencies.readwrite.dependencies.user.ReadWriteLoggedUser
+import br.meetingplace.management.dependencies.readwrite.dependencies.user.ReadWriteUser
+import br.meetingplace.management.services.chat.controller.ChatController
 import br.meetingplace.management.services.chat.dependencies.ChatFeaturesInterface
 import br.meetingplace.services.notification.Inbox
 
-class UserChatFeatures private constructor(): ChatFeaturesInterface, ReadWriteUser, ReadWriteLoggedUser, ReadWriteChat, Verify, IDs{
+class UserChatFeatures private constructor(): ChatFeaturesInterface, ReadWriteUser, ReadWriteLoggedUser, ReadWriteChat, Verify, IDsController {
 
     companion object{
         private val Class = UserChatFeatures()
@@ -74,7 +74,7 @@ class UserChatFeatures private constructor(): ChatFeaturesInterface, ReadWriteUs
             data.message = chat.shareMessage(data)
             if(data.message != ""){
                 sharedMessage = ChatMessage("|Shared| ${data.message}", data.idReceiver,true,data.idCommunity)
-                ChatCore.getClass().sendMessage(sharedMessage)
+                ChatController.getClass().sendMessage(sharedMessage)
             }
         }
     } //UPDATE->CREATE

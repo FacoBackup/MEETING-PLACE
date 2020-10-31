@@ -15,12 +15,12 @@ import br.meetingplace.data.user.LoginByEmail
 import br.meetingplace.data.user.SocialProfileData
 import br.meetingplace.data.user.UserData
 import br.meetingplace.management.services.Login
-import br.meetingplace.management.services.chat.core.ChatCore
-import br.meetingplace.management.services.community.core.CommunityCore
-import br.meetingplace.management.services.group.core.GroupCore
-import br.meetingplace.management.services.search.core.SearchCore
-import br.meetingplace.management.services.thread.core.ThreadCore
-import br.meetingplace.management.services.user.core.UserCore
+import br.meetingplace.management.services.chat.controller.ChatController
+import br.meetingplace.management.services.community.controller.CommunityController
+import br.meetingplace.management.services.group.controller.GroupController
+import br.meetingplace.management.services.search.controller.SearchController
+import br.meetingplace.management.services.thread.controller.ThreadController
+import br.meetingplace.management.services.user.controller.UserController
 import io.ktor.application.*
 import io.ktor.features.*
 import io.ktor.gson.*
@@ -30,13 +30,13 @@ import io.ktor.routing.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 
-val userSystem= UserCore.getClass()
-val threadSystem=  ThreadCore.getClass()
-val chatSystem = ChatCore.getClass()
-val groupSystem = GroupCore.getClass()
+val userSystem= UserController.getClass()
+val threadSystem=  ThreadController.getClass()
+val chatSystem = ChatController.getClass()
+val groupSystem = GroupController.getClass()
 val login = Login.getLoginSystem()
-val communitySystem = CommunityCore.getClass()
-val searchSystem = SearchCore.getClass()
+val communitySystem = CommunityController.getClass()
+val searchSystem = SearchController.getClass()
 
 fun main (){
     val port = System.getenv("PORT")?.toInt() ?: 3000
@@ -108,7 +108,7 @@ fun main (){
 
             post("/create/social"){
                 val user = call.receive<SocialProfileData>()
-                call.respond(userSystem.createProfile(user))
+                call.respond(userSystem.updateProfile(user))
             }
 //            post("/user/create/professional"){
 //                val user = call.receive<ProfessionalProfile>()

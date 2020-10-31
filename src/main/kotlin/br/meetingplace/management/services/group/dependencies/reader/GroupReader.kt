@@ -1,9 +1,9 @@
 package br.meetingplace.management.services.group.dependencies.reader
 
-import br.meetingplace.management.dependencies.Verify
-import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteGroup
-import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteLoggedUser
-import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteUser
+import br.meetingplace.management.dependencies.verify.dependencies.Verify
+import br.meetingplace.management.dependencies.readwrite.dependencies.group.ReadWriteGroup
+import br.meetingplace.management.dependencies.readwrite.dependencies.user.ReadWriteLoggedUser
+import br.meetingplace.management.dependencies.readwrite.dependencies.user.ReadWriteUser
 import br.meetingplace.services.group.Group
 
 class GroupReader private constructor(): GroupReaderInterface, ReadWriteGroup, ReadWriteUser, ReadWriteLoggedUser, Verify {

@@ -1,17 +1,17 @@
 package br.meetingplace.management.services.community.dependencies.factory
 
 import br.meetingplace.data.community.CommunityData
-import br.meetingplace.management.dependencies.IDs
-import br.meetingplace.management.dependencies.Verify
-import br.meetingplace.management.dependencies.fileOperators.DeleteFile
-import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteCommunity
-import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteLoggedUser
-import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteUser
+import br.meetingplace.management.dependencies.idmanager.controller.IDsController
+import br.meetingplace.management.dependencies.verify.dependencies.Verify
+import br.meetingplace.management.dependencies.ReadWriteController
+import br.meetingplace.management.dependencies.readwrite.dependencies.community.ReadWriteCommunity
+import br.meetingplace.management.dependencies.readwrite.dependencies.user.ReadWriteLoggedUser
+import br.meetingplace.management.dependencies.readwrite.dependencies.user.ReadWriteUser
 import br.meetingplace.services.community.Community
 import br.meetingplace.services.notification.Inbox
 
-class CommunityFactory private constructor(): ReadWriteUser, ReadWriteLoggedUser, ReadWriteCommunity, Verify, IDs{
-
+class CommunityFactory private constructor(): ReadWriteUser, ReadWriteLoggedUser, ReadWriteCommunity, Verify {
+    private val iDs = IDsController.getClass()
     companion object{
         private val Class = CommunityFactory()
         fun getClass () = Class
@@ -20,19 +20,19 @@ class CommunityFactory private constructor(): ReadWriteUser, ReadWriteLoggedUser
     fun create(data: CommunityData){
         val loggedUser = readLoggedUser().email
         val user = readUser(loggedUser)
-        val community = readCommunity(getCommunityId(data.name))
+        val community = readCommunity(iDs.getCommunityId(data.name))
 
         lateinit var newCommunity: Community
         lateinit var id: String
 
         if (verifyLoggedUser(user) && !verifyCommunity(community)){
             newCommunity = Community.getCommunity()
-            id = getCommunityId(data.name)
+            id = iDs.getCommunityId(data.name)
             newCommunity.startCommunity(data.name, id, data.about, loggedUser)
             user.updateModeratorIn(id,false)
 
             writeCommunity(newCommunity, id)
-            writeUser(user, user.getEmail())
+            writeUserToFile(user,iDs.attachNameToEmail(user.getUserName(),user.getEmail()))
         }
     }
 
@@ -47,7 +47,7 @@ class CommunityFactory private constructor(): ReadWriteUser, ReadWriteLoggedUser
             community = readCommunity(data.ID)
             if(verifyCommunity(community)){
                 when(community.getModerators().isEmpty()){
-                    true-> DeleteFile.getDeleteFileOperator().deleteCommunity(community)
+                    true-> ReadWriteController.getDeleteFileOperator().deleteCommunity(community)
                     false->{
                         notification = Inbox("${user.getUserName()} requested for a community deletion, if you approve the deletion you have to step-down from moderator.", "Community")
                         mods = community.getModerators()

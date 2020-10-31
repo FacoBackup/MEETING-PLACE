@@ -1,17 +1,17 @@
 package br.meetingplace.management.services.user.dependencies.follow
 
 import br.meetingplace.data.Data
-import br.meetingplace.management.dependencies.IDs
-import br.meetingplace.management.dependencies.Verify
-import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteCommunity
-import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteThread
-import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteUser
+import br.meetingplace.management.dependencies.idmanager.controller.IDsController
+import br.meetingplace.management.dependencies.verify.dependencies.Verify
+import br.meetingplace.management.dependencies.readwrite.dependencies.community.ReadWriteCommunity
+import br.meetingplace.management.dependencies.readwrite.dependencies.thread.ReadWriteThread
+import br.meetingplace.management.dependencies.readwrite.dependencies.user.ReadWriteUser
 import br.meetingplace.services.entitie.User
 import br.meetingplace.services.entitie.profiles.followdata.FollowData
 import br.meetingplace.services.notification.Inbox
 
-class Follow private constructor(): FollowInterface, Verify, ReadWriteUser, ReadWriteThread, ReadWriteCommunity, IDs {
-
+class Follow private constructor(): FollowInterface, Verify, ReadWriteUser, ReadWriteThread, ReadWriteCommunity {
+    private val iDs = IDsController.getClass()
     companion object{
         private val Class = Follow()
         fun getClass() = Class
@@ -41,19 +41,19 @@ class Follow private constructor(): FollowInterface, Verify, ReadWriteUser, Read
                         external.updateFollowers(followerData,false)
                         user.updateFollowing(followingData,false)
 
-                        writeUser(user, loggedUser)
-                        writeUser(external ,data.ID)
+                        writeUserToFile(user,iDs.attachNameToEmail(user.getUserName(),user.getEmail()))
+                        writeUserToFile(external,iDs.attachNameToEmail(external.getUserName(),external.getEmail()))
                     }
                 }
                 1->{ //COMMUNITY
-                    val community = readCommunity(getCommunityId(data.ID))
+                    val community = readCommunity(iDs.getCommunityId(data.ID))
 
                     if (verifyLoggedUser(user) && verifyCommunity(community)  && loggedUser !in community.getFollowers() && loggedUser !in community.getModerators() && community.getId() !in user.getCommunitiesIFollow() && community.getId() !in user.getModeratorIn()){
                         //the verify community method already insures that the id and name are different of null so don't mind the !!
                         user.updateCommunitiesIFollow(community.getId()!!, false)
                         community.updateFollower(loggedUser, false)
 
-                        writeUser(user, loggedUser)
+                        writeUserToFile(user,iDs.attachNameToEmail(user.getUserName(),user.getEmail()))
                         writeCommunity(community, community.getId()!!)
                     }
                 }
@@ -75,17 +75,17 @@ class Follow private constructor(): FollowInterface, Verify, ReadWriteUser, Read
                     if(external.getAge() != -1 && verifyLoggedUser(user) && verifyUser(external) && verifyFollower(external, user)){
 
                         //the verify user method already insures that the user name and id are different of null, so don't mind the !!
-                        followerData = FollowData( user.getUserName()!!,user.getEmail())
-                        followingData = FollowData( external.getUserName()!!,external.getEmail())
+                        followerData = FollowData( user.getUserName(),user.getEmail())
+                        followingData = FollowData( external.getUserName(),external.getEmail())
 
                         external.updateFollowers(followerData,true)
                         user.updateFollowing(followingData,true)
-                        writeUser(user, loggedUser)
-                        writeUser(external ,data.ID)
+                        writeUserToFile(user,iDs.attachNameToEmail(user.getUserName(),user.getEmail()))
+                        writeUserToFile(external,iDs.attachNameToEmail(external.getUserName(),external.getEmail()))
                     }
                 }
                 1->{ //COMMUNITY
-                    val community = readCommunity(getCommunityId(data.ID))
+                    val community = readCommunity(iDs.getCommunityId(data.ID))
                     if (verifyLoggedUser(user) && verifyCommunity(community)){
 
                         when(community.getId() in user.getCommunitiesIFollow() && loggedUser in community.getFollowers()){
@@ -95,7 +95,7 @@ class Follow private constructor(): FollowInterface, Verify, ReadWriteUser, Read
                             }
                         }
                         //the verify community method already insures that the id and name are different of null so don't mind the !!
-                        writeUser(user, loggedUser)
+                        writeUserToFile(user,iDs.attachNameToEmail(user.getUserName(),user.getEmail()))
                         writeCommunity(community, community.getId()!!)
                     }
                 }

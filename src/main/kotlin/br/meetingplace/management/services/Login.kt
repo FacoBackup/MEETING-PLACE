@@ -1,9 +1,9 @@
 package br.meetingplace.management.services
 
 import br.meetingplace.data.user.LoginByEmail
-import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteLoggedUser
-import br.meetingplace.management.dependencies.Verify
-import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteUser
+import br.meetingplace.management.dependencies.readwrite.dependencies.user.ReadWriteLoggedUser
+import br.meetingplace.management.dependencies.verify.dependencies.Verify
+import br.meetingplace.management.dependencies.readwrite.dependencies.user.ReadWriteUser
 
 class Login private constructor(): ReadWriteLoggedUser, ReadWriteUser, Verify {
 

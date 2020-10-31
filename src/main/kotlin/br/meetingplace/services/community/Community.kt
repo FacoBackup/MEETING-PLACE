@@ -1,6 +1,7 @@
 package br.meetingplace.services.community
 
 import br.meetingplace.services.community.services.CommunityServices
+import br.meetingplace.services.entitie.profiles.followdata.FollowData
 
 class Community private constructor(): CommunityServices(){
 
@@ -12,8 +13,8 @@ class Community private constructor(): CommunityServices(){
     private var name: String?= null
     private var id: String?= null
     private var about: String?= null
-    private val followers = mutableListOf<String>()
-    private val moderators = mutableListOf<String>()
+    private val followers = mutableListOf<FollowData>()
+    private val moderators = mutableListOf<FollowData>()
 
     fun getFollowers () = followers
     fun getName() = name
@@ -22,7 +23,7 @@ class Community private constructor(): CommunityServices(){
     fun getModerators() = moderators
 
 
-    fun startCommunity(name: String, id: String, about: String, creator: String){
+    fun startCommunity(name: String, id: String, about: String, creator: FollowData){
         if(this.name.isNullOrBlank() && moderators.isEmpty()){
             this.name = name
             this.about = about
@@ -31,37 +32,37 @@ class Community private constructor(): CommunityServices(){
         }
     }
 
-    fun updateModerator(userEmail: String, requester: String, remove: Boolean?){
+    fun updateModerator(data: FollowData, requester: FollowData, remove: Boolean?){
         if(requester in moderators){
             when(remove){
                 true->{ //REMOVE
-                    if(userEmail in moderators)
-                        moderators.remove(userEmail)
+                    if(data in moderators)
+                        moderators.remove(data)
                 }
                 false->{ //ADD
-                    if(userEmail !in moderators)
-                        moderators.add(userEmail)
+                    if(data !in moderators)
+                        moderators.add(data)
                 }
                 null->{ //STEP-DOWN
-                    if(userEmail in moderators){
-                        moderators.remove(userEmail)
-                        updateFollower(userEmail, false)
+                    if(data in moderators){
+                        moderators.remove(data)
+                        updateFollower(data, false)
                     }
                 }
             }
         }
     }
 
-    fun updateFollower(userEmail: String, remove:Boolean){
+    fun updateFollower(data: FollowData, remove:Boolean){
         when (remove){
             true->{
-                if(userEmail in followers){
-                    followers.remove(userEmail)
+                if(data in followers){
+                    followers.remove(data)
                 }
             }
             false->{
-                if(userEmail !in followers){
-                    followers.add(userEmail)
+                if(data !in followers){
+                    followers.add(data)
                 }
             }
         }

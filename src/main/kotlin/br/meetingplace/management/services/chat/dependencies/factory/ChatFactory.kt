@@ -1,16 +1,16 @@
 package br.meetingplace.management.services.chat.dependencies.factory
 
 import br.meetingplace.data.chat.ChatMessage
-import br.meetingplace.management.dependencies.IDs
-import br.meetingplace.management.dependencies.Verify
-import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteChat
-import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteLoggedUser
-import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteUser
+import br.meetingplace.management.dependencies.idmanager.controller.IDsController
+import br.meetingplace.management.dependencies.verify.dependencies.Verify
+import br.meetingplace.management.dependencies.readwrite.dependencies.chat.ReadWriteChat
+import br.meetingplace.management.dependencies.readwrite.dependencies.user.ReadWriteLoggedUser
+import br.meetingplace.management.dependencies.readwrite.dependencies.user.ReadWriteUser
 import br.meetingplace.services.chat.Message
 import br.meetingplace.services.notification.Inbox
 
-class ChatFactory: Verify, ReadWriteUser, ReadWriteChat, ReadWriteLoggedUser, IDs{
-
+class ChatFactory: Verify, ReadWriteUser, ReadWriteChat, ReadWriteLoggedUser {
+    private val iDs = IDsController.getClass()
     companion object{
         private val Class = ChatFactory()
         fun getClass()= Class
@@ -20,7 +20,7 @@ class ChatFactory: Verify, ReadWriteUser, ReadWriteChat, ReadWriteLoggedUser, ID
         val loggedUser = readLoggedUser().email
         val user = readUser(loggedUser)
         val receiver = readUser(data.idReceiver)
-        val idChat = getChatId(loggedUser, receiver.getEmail())
+        val idChat = iDs.getChatId(loggedUser, receiver.getEmail())
         val chat = readChat(idChat)
         lateinit var msg: Message
         lateinit var notification: Inbox
@@ -28,7 +28,7 @@ class ChatFactory: Verify, ReadWriteUser, ReadWriteChat, ReadWriteLoggedUser, ID
         if(verifyChat(chat))
         notification = Inbox("${user.getUserName()} started a conversation with you.", "Message.")
         chat.startChat(listOf(loggedUser, receiver.getEmail()), idChat)
-        msg = Message(data.message, generateId(), loggedUser, true)
+        msg = Message(data.message, iDs.generateId(), loggedUser, true)
         chat.addMessage(msg)
 
         user.updateMyChats(idChat)
@@ -36,8 +36,8 @@ class ChatFactory: Verify, ReadWriteUser, ReadWriteChat, ReadWriteLoggedUser, ID
         receiver.updateInbox(notification)
 
         writeChat(chat, idChat)
-        writeUser(user, user.getEmail())
-        writeUser(receiver, receiver.getEmail())
+        writeUserToFile(user,iDs.attachNameToEmail(user.getUserName(),user.getEmail()))
+        writeUserToFile(receiver,iDs.attachNameToEmail(receiver.getUserName(),receiver.getEmail()))
     }
 
 }

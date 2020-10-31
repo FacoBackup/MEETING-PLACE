@@ -1,11 +1,10 @@
 package br.meetingplace.management.services.user.dependencies.reader
 
-import br.meetingplace.management.dependencies.Verify
-import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteCommunity
-import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteLoggedUser
-import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteThread
-import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteUser
-import br.meetingplace.services.community.Community
+import br.meetingplace.management.dependencies.verify.dependencies.Verify
+import br.meetingplace.management.dependencies.readwrite.dependencies.community.ReadWriteCommunity
+import br.meetingplace.management.dependencies.readwrite.dependencies.user.ReadWriteLoggedUser
+import br.meetingplace.management.dependencies.readwrite.dependencies.thread.ReadWriteThread
+import br.meetingplace.management.dependencies.readwrite.dependencies.user.ReadWriteUser
 import br.meetingplace.services.entitie.User
 import br.meetingplace.services.thread.MainThread
 

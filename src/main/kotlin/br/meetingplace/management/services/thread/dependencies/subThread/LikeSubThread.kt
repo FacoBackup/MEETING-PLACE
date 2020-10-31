@@ -1,17 +1,17 @@
 package br.meetingplace.management.services.thread.dependencies.subThread
 
 import br.meetingplace.data.threads.ThreadOperationsData
-import br.meetingplace.management.dependencies.Verify
-import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteCommunity
-import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteLoggedUser
-import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteThread
-import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteUser
+import br.meetingplace.management.dependencies.verify.dependencies.Verify
+import br.meetingplace.management.dependencies.readwrite.dependencies.community.ReadWriteCommunity
+import br.meetingplace.management.dependencies.readwrite.dependencies.user.ReadWriteLoggedUser
+import br.meetingplace.management.dependencies.readwrite.dependencies.thread.ReadWriteThread
+import br.meetingplace.management.dependencies.readwrite.dependencies.user.ReadWriteUser
 import br.meetingplace.management.services.thread.dependencies.LikeInterface
 import br.meetingplace.services.entitie.User
 import br.meetingplace.services.notification.Inbox
 import br.meetingplace.services.thread.SubThread
 
-class LikeSubThread private constructor(): LikeInterface, ReadWriteCommunity, ReadWriteUser, ReadWriteLoggedUser, ReadWriteThread, Verify{
+class LikeSubThread private constructor(): LikeInterface, ReadWriteCommunity, ReadWriteUser, ReadWriteLoggedUser, ReadWriteThread, Verify {
 
     companion object{
         private val Class = LikeSubThread()
@@ -41,7 +41,7 @@ class LikeSubThread private constructor(): LikeInterface, ReadWriteCommunity, Re
                     1 -> {
                         if(user.getEmail() != creator.getEmail()){
                             creator.updateInbox(notification)
-                            writeUser(creator, creator.getEmail())
+                            writeUserToFile(creator,attachNameToEmail(creator.getUserName(),creator.getEmail()))
                         }
                         thread.dislikeToLikeSubThread(loggedUser,data.idSubThread)
                         writeThread(thread,thread.getId())
@@ -49,7 +49,7 @@ class LikeSubThread private constructor(): LikeInterface, ReadWriteCommunity, Re
                     2 -> {
                         if(user.getEmail() != creator.getEmail()){
                             creator.updateInbox(notification)
-                            writeUser(creator, creator.getEmail())
+                            writeUserToFile(creator,attachNameToEmail(creator.getUserName(),creator.getEmail()))
                         }
                         thread.likeSubThread(loggedUser,data.idSubThread)
                         writeThread(thread,thread.getId())

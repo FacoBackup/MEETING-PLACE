@@ -11,11 +11,9 @@ class SocialProfile private constructor(): SocialChats, SocialCommunities, Socia
         fun getClass () = Class
     }
 
-    private var userName: String? = null
     private var gender: String? = null
     private var nationality: String? = null
     private var about: String? = null
-
     private var moderatorIn = mutableListOf<String>()
     private var communitiesIFollow = mutableListOf<String>()
     private var myThreads = mutableListOf<String>()
@@ -26,14 +24,10 @@ class SocialProfile private constructor(): SocialChats, SocialCommunities, Socia
     private var following = mutableListOf<FollowData>()
     private var inbox = mutableListOf<Inbox>()
 
-    override fun createSocialProfile(userName: String, about: String, nationality: String, gender: String){
-        if (this.userName.isNullOrBlank()){
-
-            this.userName = userName
+    override fun updateSocialProfile(about: String, nationality: String, gender: String){
             this.about = about
             this.nationality = nationality
             this.gender = gender
-        }
     }
 
     override fun clearNotifications(){
@@ -147,6 +141,4 @@ class SocialProfile private constructor(): SocialChats, SocialCommunities, Socia
     override fun getFollowers() = followers
     override fun getMyChats () = myChats
     override fun getMyThreads () = myThreads
-    override fun getUserName() = userName
-    //GETTERS
 }

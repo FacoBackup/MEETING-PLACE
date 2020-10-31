@@ -2,18 +2,19 @@ package br.meetingplace.management.services.group.dependencies.factory
 
 import br.meetingplace.data.group.GroupData
 import br.meetingplace.data.group.GroupOperationsData
-import br.meetingplace.management.dependencies.IDs
-import br.meetingplace.management.dependencies.Verify
-import br.meetingplace.management.dependencies.fileOperators.DeleteFile
-import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteCommunity
-import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteGroup
-import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteUser
+import br.meetingplace.management.dependencies.idmanager.controller.IDsController
+import br.meetingplace.management.dependencies.verify.dependencies.Verify
+import br.meetingplace.management.dependencies.ReadWriteController
+import br.meetingplace.management.dependencies.readwrite.dependencies.community.ReadWriteCommunity
+import br.meetingplace.management.dependencies.readwrite.dependencies.group.ReadWriteGroup
+import br.meetingplace.management.dependencies.readwrite.dependencies.user.ReadWriteUser
 import br.meetingplace.services.community.Community
 import br.meetingplace.services.group.Group
 import br.meetingplace.services.group.Member
 import br.meetingplace.services.notification.Inbox
 
-class GroupFactory private constructor(): GroupFactoryInterface, Verify, ReadWriteUser, IDs, ReadWriteGroup, ReadWriteCommunity{
+class GroupFactory private constructor(): GroupFactoryInterface, Verify, ReadWriteUser, ReadWriteGroup, ReadWriteCommunity {
+    private val iDs = IDsController.getClass()
     companion object{
         private val Class = GroupFactory()
         fun getClass () = Class
@@ -30,16 +31,16 @@ class GroupFactory private constructor(): GroupFactoryInterface, Verify, ReadWri
         if(verifyLoggedUser(user) && data.groupName.isNotEmpty()){
 
             newGroup = Group()
-            id = getGroupId(data.groupName, loggedUser)
+            id = iDs.getGroupId(data.groupName, loggedUser)
             when(data.idCommunity.isNullOrBlank()){
                 true->{
                     newGroup.startGroup(data.groupName, id,data.about, loggedUser)
                     user.updateMyGroups(newGroup.getGroupId(),false)
                     writeGroup(newGroup, newGroup.getGroupId())
-                    writeUser(user, loggedUser)
+                    writeUserToFile(user,iDs.attachNameToEmail(user.getUserName(),user.getEmail()))
                 }
                 false->{
-                    val community = readCommunity(getCommunityId(data.idCommunity))
+                    val community = readCommunity(iDs.getCommunityId(data.idCommunity))
                     if(verifyCommunity(community)){
                         communityMods = community.getModerators()
                         notification = Inbox("$loggedUser wants to create a new group in ${community.getName()}.", "Community Group")
@@ -50,7 +51,7 @@ class GroupFactory private constructor(): GroupFactoryInterface, Verify, ReadWri
                                 mod.updateInbox(notification)
                         }
                         //the verify community method already insures that the id and name are different of null so don't mind the !!
-                        id = getCommunityGroupId(community.getId()!!, data.groupName)
+                        id = iDs.getCommunityGroupId(community.getId()!!, data.groupName)
 
                         newGroup.startGroup(data.groupName, id,data.about, loggedUser)
                         user.updateMyGroups(newGroup.getGroupId(),false)
@@ -61,7 +62,7 @@ class GroupFactory private constructor(): GroupFactoryInterface, Verify, ReadWri
                             community.updateGroupsInValidation(newGroup.getGroupId(), true)
 
                         writeGroup(newGroup, newGroup.getGroupId())
-                        writeUser(user, loggedUser)
+                        writeUserToFile(user,iDs.attachNameToEmail(user.getUserName(),user.getEmail()))
                         writeCommunity(community, community.getId()!!)
                     }
                 }
@@ -79,7 +80,7 @@ class GroupFactory private constructor(): GroupFactoryInterface, Verify, ReadWri
         if(verifyLoggedUser(user)) {
             when (data.idCommunity.isNullOrBlank()) {
                 true -> {
-                    groupId = getGroupId(data.groupName, loggedUser)
+                    groupId = iDs.getGroupId(data.groupName, loggedUser)
                     receiver = readGroup(groupId)
 
                     if (verifyGroup(receiver) && receiver.getCreator() == loggedUser) {
@@ -88,18 +89,18 @@ class GroupFactory private constructor(): GroupFactoryInterface, Verify, ReadWri
                             val member = readUser(element.userEmail)
                             if (verifyUser(member)) {
                                 member.updateMemberIn(receiver.getGroupId(), true)
-                                writeUser(member, member.getEmail())
+                                writeUserToFile(member,iDs.attachNameToEmail(member.getUserName(),member.getEmail()))
                             }
                         }
 
                         user.updateMyGroups(groupId, true)
-                        DeleteFile.getDeleteFileOperator().deleteGroup(receiver)
-                        writeUser(user, loggedUser)
+                        ReadWriteController.getDeleteFileOperator().deleteGroup(receiver)
+                        writeUserToFile(user,iDs.attachNameToEmail(user.getUserName(),user.getEmail()))
                     }
                 }
                 false -> {
-                    community = readCommunity(getCommunityId(data.idCommunity))
-                    groupId = getCommunityGroupId(data.idCommunity, data.groupName)
+                    community = readCommunity(iDs.getCommunityId(data.idCommunity))
+                    groupId = iDs.getCommunityGroupId(data.idCommunity, data.groupName)
                     receiver = readGroup(groupId)
 
                     if (verifyCommunity(community) && (loggedUser == receiver.getCreator() || loggedUser in community.getModerators())) {
@@ -110,14 +111,14 @@ class GroupFactory private constructor(): GroupFactoryInterface, Verify, ReadWri
                                     val member = readUser(element.userEmail)
                                     if (verifyUser(member)) {
                                         member.updateMemberIn(receiver.getGroupId(), true)
-                                        writeUser(member, member.getEmail())
+                                        writeUserToFile(member,iDs.attachNameToEmail(member.getUserName(),member.getEmail()))
                                     }
                                 }
 
                                 community.removeApprovedGroup(receiver.getGroupId())
                                 user.updateMyGroups(receiver.getGroupId(), true)
-                                DeleteFile.getDeleteFileOperator().deleteGroup(receiver)
-                                writeUser(user, loggedUser)
+                                ReadWriteController.getDeleteFileOperator().deleteGroup(receiver)
+                                writeUserToFile(user,iDs.attachNameToEmail(user.getUserName(),user.getEmail()))
                                 //the verify community method already insures that the id and name are different of null so don't mind the !!
                                 writeCommunity(community, community.getId()!!)
                             }
@@ -128,14 +129,14 @@ class GroupFactory private constructor(): GroupFactoryInterface, Verify, ReadWri
                                     val member = readUser(element.userEmail)
                                     if (verifyUser(member)) {
                                         member.updateMemberIn(receiver.getGroupId(), true)
-                                        writeUser(member, member.getEmail())
+                                        writeUserToFile(member,iDs.attachNameToEmail(member.getUserName(),member.getEmail()))
                                     }
                                 }
 
                                 community.updateGroupsInValidation(receiver.getGroupId(), false)
                                 user.updateMyGroups(receiver.getGroupId(), true)
-                                DeleteFile.getDeleteFileOperator().deleteGroup(receiver)
-                                writeUser(user, loggedUser)
+                                ReadWriteController.getDeleteFileOperator().deleteGroup(receiver)
+                                writeUserToFile(user,iDs.attachNameToEmail(user.getUserName(),user.getEmail()))
                                 //the verify community method already insures that the id and name are different of null so don't mind the !!
                                 writeCommunity(community, community.getId()!!)
                             }//false

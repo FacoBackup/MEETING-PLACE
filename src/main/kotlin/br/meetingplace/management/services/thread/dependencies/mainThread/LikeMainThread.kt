@@ -1,11 +1,11 @@
 package br.meetingplace.management.services.thread.dependencies.mainThread
 
 import br.meetingplace.data.threads.ThreadOperationsData
-import br.meetingplace.management.dependencies.Verify
-import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteCommunity
-import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteLoggedUser
-import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteThread
-import br.meetingplace.management.dependencies.fileOperators.rw.ReadWriteUser
+import br.meetingplace.management.dependencies.verify.dependencies.Verify
+import br.meetingplace.management.dependencies.readwrite.dependencies.community.ReadWriteCommunity
+import br.meetingplace.management.dependencies.readwrite.dependencies.user.ReadWriteLoggedUser
+import br.meetingplace.management.dependencies.readwrite.dependencies.thread.ReadWriteThread
+import br.meetingplace.management.dependencies.readwrite.dependencies.user.ReadWriteUser
 import br.meetingplace.management.services.thread.dependencies.LikeInterface
 import br.meetingplace.services.entitie.User
 import br.meetingplace.services.notification.Inbox
@@ -38,7 +38,7 @@ class LikeMainThread private constructor(): LikeInterface, ReadWriteCommunity, R
                 1-> {// DISLIKED to LIKED
                     if(thread.getCreator() != loggedUser){
                         creator.updateInbox(notification)
-                        writeUser(creator, creator.getEmail())
+                        writeUserToFile(creator,attachNameToEmail(creator.getUserName(),creator.getEmail()))
                     }
                     creator.updateInbox(notification)
                     thread.dislikeToLike(loggedUser)
@@ -47,7 +47,7 @@ class LikeMainThread private constructor(): LikeInterface, ReadWriteCommunity, R
                 2 -> {// 2 hasn't liked yet
                     if(thread.getCreator() != loggedUser){
                         creator.updateInbox(notification)
-                        writeUser(creator, creator.getEmail())
+                        writeUserToFile(creator,attachNameToEmail(creator.getUserName(),creator.getEmail()))
                     }
                     thread.like(loggedUser)
                     writeThread(thread,thread.getId())
