@@ -4,7 +4,6 @@ import br.meetingplace.data.user.LoginByEmail
 import br.meetingplace.services.entitie.User
 import com.google.gson.GsonBuilder
 import java.io.File
-import java.lang.Exception
 
 class UserRW private constructor(): ReadWriteLoggedUser, ReadWriteUser{
     companion object{
@@ -16,7 +15,7 @@ class UserRW private constructor(): ReadWriteLoggedUser, ReadWriteUser{
         val pathToFile = File("build.gradle").absolutePath.removeSuffix("build.gradle") + "/src/main/kotlin/br/meetingplace/logs/logged.json"
         val gson = GsonBuilder().setPrettyPrinting().create()
         val file = File(pathToFile)
-        var data = LoginByEmail("", "", "", null)
+        var data = LoginByEmail("", "", "")
         try {
             val bufferedReader = file.bufferedReader()
             val inputString = bufferedReader.use{ it.readText()}
@@ -33,7 +32,7 @@ class UserRW private constructor(): ReadWriteLoggedUser, ReadWriteUser{
         val json = gson.toJson(data)
         file.writeText(json)
     }
-    override fun readUser(fileName: String): User {
+    override fun readUserFromFile(fileName: String): User {
         val pathToFile = File("build.gradle").absolutePath.removeSuffix("build.gradle") + "/src/main/kotlin/br/meetingplace/logs/users/$fileName"
         val gson = GsonBuilder().setPrettyPrinting().create()
         val file = File(pathToFile)
@@ -46,7 +45,7 @@ class UserRW private constructor(): ReadWriteLoggedUser, ReadWriteUser{
             return user
         }
     }
-    override fun writeUserToFile(data: User, fileName: String){
+    override fun writeUser(data: User, fileName: String){
         val pathToFile = File("build.gradle").absolutePath.removeSuffix("build.gradle") + "/src/main/kotlin/br/meetingplace/logs/users/$fileName.json"
         val gson = GsonBuilder().setPrettyPrinting().create()
         val file= File(pathToFile)

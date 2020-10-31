@@ -1,14 +1,15 @@
 package br.meetingplace.management.services.user.dependencies.reader
 
-import br.meetingplace.management.dependencies.verify.dependencies.Verify
-import br.meetingplace.management.dependencies.readwrite.dependencies.community.ReadWriteCommunity
-import br.meetingplace.management.dependencies.readwrite.dependencies.user.ReadWriteLoggedUser
-import br.meetingplace.management.dependencies.readwrite.dependencies.thread.ReadWriteThread
-import br.meetingplace.management.dependencies.readwrite.dependencies.user.ReadWriteUser
+import br.meetingplace.management.dependencies.idmanager.controller.IDsController
+import br.meetingplace.management.dependencies.readwrite.controller.ReadWriteController
+import br.meetingplace.management.dependencies.verify.controller.VerifyController
 import br.meetingplace.services.entitie.User
 import br.meetingplace.services.thread.MainThread
 
-class UserReader private constructor():  Verify, ReadWriteLoggedUser, ReadWriteUser, ReadWriteThread, ReadWriteCommunity, UserReaderInterface {
+class UserReader private constructor():UserReaderInterface {
+    private val rw = ReadWriteController.getClass()
+    private val verify = VerifyController.getClass()
+    private val iDs = IDsController.getClass()
 
     companion object{
         private val Class = UserReader()
@@ -16,22 +17,22 @@ class UserReader private constructor():  Verify, ReadWriteLoggedUser, ReadWriteU
     }
 
     override fun getMyUser(): User {
-        val logged = readLoggedUser().email
-        return readUser(logged)
+        val logged = rw.readLoggedUser().email
+        return  rw.readUser(logged)
     }//READ
 
     override fun getMyThreads(): MutableList<MainThread> {
-        val loggedUser = readLoggedUser().email
-        val user = readUser(loggedUser)
+        val loggedUser =  rw.readLoggedUser().email
+        val user =  rw.readUser(loggedUser)
         val myThreads = mutableListOf<MainThread>()
         lateinit var myThreadIds: List<String>
 
-        if(verifyLoggedUser(user)){
+        if(verify.verifyUser(user)){
             myThreadIds = user.getMyThreads()
 
             for (element in myThreadIds){
-                val thread = readThread(element)
-                if (verifyThread(thread))
+                val thread =  rw.readThread(element)
+                if (verify.verifyThread(thread))
                     myThreads.add(thread)
             }
             return myThreads
@@ -40,20 +41,20 @@ class UserReader private constructor():  Verify, ReadWriteLoggedUser, ReadWriteU
     }//READ
 
     override fun getMyTimeline(): MutableList<MainThread> { //NEEDS WORK HERE
-        val loggedUser = readLoggedUser().email
-        val user = readUser(loggedUser)
+        val loggedUser =  rw.readLoggedUser().email
+        val user =  rw.readUser(loggedUser)
         val myTimeline = mutableListOf<MainThread>()
 
-        if(verifyLoggedUser(user)){
+        if(verify.verifyUser(user)){
             val followingIds = user.getFollowing()
 
             for (a in followingIds.indices){
-                val following = readUser(followingIds[a].email)
-                if( verifyUser(following)){
+                val following =  rw.readUser(followingIds[a].email)
+                if(verify.verifyUser(following)){
                     val followingThreads = following.getMyThreads()
                     for (b in followingThreads){
-                        val thread = readThread(b)
-                        if (verifyThread(thread))
+                        val thread =  rw.readThread(b)
+                        if (verify.verifyThread(thread))
                             myTimeline.add(thread)
                     }
                 }
@@ -61,12 +62,12 @@ class UserReader private constructor():  Verify, ReadWriteLoggedUser, ReadWriteU
 
             val communities = user.getCommunitiesIFollow()
             for(i in communities.indices){
-                val community = readCommunity(communities[i])
-                if(verifyCommunity(community)){
+                val community =  rw.readCommunity(communities[i])
+                if(verify.verifyCommunity(community)){
                     val threads = community.getIdThreads()
                     for(j in threads.indices){
-                        val thread = readThread(threads[i])
-                        if(verifyThread(thread))
+                        val thread =  rw.readThread(threads[i])
+                        if(verify.verifyThread(thread))
                             myTimeline.add(thread)
                     }
                 }

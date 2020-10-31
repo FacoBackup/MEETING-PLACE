@@ -2,59 +2,60 @@ package br.meetingplace.management.services.user.dependencies.factory
 
 import br.meetingplace.data.user.LoginByEmail
 import br.meetingplace.data.user.UserData
-import br.meetingplace.management.dependencies.verify.dependencies.Verify
-import br.meetingplace.management.dependencies.ReadWriteController
 import br.meetingplace.management.dependencies.idmanager.controller.IDsController
+import br.meetingplace.management.dependencies.readwrite.controller.ReadWriteController
+import br.meetingplace.management.dependencies.verify.controller.VerifyController
 import br.meetingplace.services.entitie.User
 import br.meetingplace.management.services.Login
-import br.meetingplace.management.dependencies.readwrite.dependencies.user.ReadWriteLoggedUser
-import br.meetingplace.management.dependencies.readwrite.dependencies.thread.ReadWriteThread
-import br.meetingplace.management.dependencies.readwrite.dependencies.user.ReadWriteUser
 import br.meetingplace.services.entitie.profiles.followdata.FollowData
 
 
-class UserFactory private constructor(): UserInterface, ReadWriteLoggedUser, ReadWriteUser, Verify, ReadWriteThread {
+class UserFactory private constructor(): UserInterface{
     private val iDs = IDsController.getClass()
+    private val rw = ReadWriteController.getClass()
+    private val verify = VerifyController.getClass()
+
     companion object{
         private val Class = UserFactory()
         fun getClass()= Class
     }
 
     override fun create(newUser: UserData){
-        val logged = readLoggedUser().email
+        val logged = rw.readLoggedUser().email
         val user = User(newUser.userName, newUser.age, newUser.email.toLowerCase(), newUser.password)
 
         if(logged == "" && user.getAge() > 0){
-            writeUserToFile(user,iDs.attachNameToEmail(user.getUserName(),user.getEmail()))
-            Login.getLoginSystem().login(LoginByEmail(user.getEmail(), user.getPassword()))
+            rw.writeUser(user,user.getEmail())
+            Login.getLoginSystem().login(LoginByEmail(user.getUserName(), user.getEmail(), user.getPassword()))
         }
     }//CREATE
     
     override fun delete(){
-        val logged = readLoggedUser().email
-        val user = readUser(logged)
+        val logged = rw.readLoggedUser().email
+        val user = rw.readUserFromFile(logged)
+
         lateinit var followers: List<FollowData>
         lateinit var following: List<FollowData>
         lateinit var userExternal: User
 
-        if(verifyUser(user)){
+        if(verify.verifyUser(user)){
 
             followers = user.getFollowers()
             following = user.getFollowing()
 
             for(index in followers.indices){
-                userExternal = readUser(followers[index].email)
+                userExternal = rw.readUserFromFile(followers[index].email)
                 if(userExternal.getAge() != -1) {
                     userExternal.updateFollowing(FollowData(user.getUserName(),logged), true)
-                    writeUserToFile(userExternal,iDs.attachNameToEmail(userExternal.getUserName(),userExternal.getEmail()))
+                    rw.writeUser(userExternal,userExternal.getEmail())
                 }
             }
 
             for(index in following.indices){
-                userExternal = readUser(following[index].email)
+                userExternal = rw.readUserFromFile(following[index].email)
                 if(userExternal.getAge() != -1){
                     userExternal.updateFollowers(FollowData(user.getUserName(),logged),true)
-                    writeUserToFile(userExternal,iDs.attachNameToEmail(userExternal.getUserName(),userExternal.getEmail()))
+                    rw.writeUser(userExternal,userExternal.getEmail())
                 }
             }
             /*
@@ -69,15 +70,15 @@ class UserFactory private constructor(): UserInterface, ReadWriteLoggedUser, Rea
     }//DELETE
 
     private fun deleteAllThreadsFromUserId(){
-        val loggedUser = readLoggedUser().email
-        val user = readUser(loggedUser)
+        val loggedUser = rw.readLoggedUser().email
+        val user =rw.readUserFromFile(loggedUser)
 
-        if(verifyLoggedUser(user)){
+        if(verify.verifyUser(user)){
             val myThreads = user.getMyThreads()
             for(index in myThreads){
-                val thread = readThread(index)
-                if(verifyThread(thread))
-                    ReadWriteController.getDeleteFileOperator().deleteThread(thread)
+                val thread = rw.readThread(index)
+                if(verify.verifyThread(thread))
+                   rw.deleteThread(thread)
             }
         }
     } //DELETE

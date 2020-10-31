@@ -40,14 +40,14 @@ class ReadWriteController private constructor(): ReadWriteGroup, ReadWriteCommun
     override fun readLoggedUser(): LoginByEmail {
         return user.readLoggedUser()
     }
-    override fun readUser(fileName: String): User {
-        return user.readUser(fileName)
+    override fun readUserFromFile(fileName: String): User {
+        return user.readUserFromFile(fileName)
     }
     override fun writeLoggedUser(data: LoginByEmail) {
         user.writeLoggedUser(data)
     }
-    override fun writeUserToFile(data: User, fileName: String) {
-        user.writeUserToFile(data, fileName)
+    override fun writeUser(data: User, fileName: String) {
+        user.writeUser(data, fileName)
     }
 
     //CHAT

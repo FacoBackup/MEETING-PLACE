@@ -31,7 +31,7 @@ class ChatReader private constructor(): ChatReaderInterface{
                     group.getChat()
                 }
                 false->{ //maybe a user
-                    externalUser = rw.readUser() //fix here
+                    externalUser = rw.readUser(iDs.attachNameToEmail(if(!data.name.isNullOrBlank()) data.name else "", data.ID))
                     if(verify.verifyUser(externalUser)) {
                         rw.readChat(iDs.getChatId(logged!!, externalUser.getEmail()))
                     } else null

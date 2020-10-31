@@ -12,7 +12,7 @@ import br.meetingplace.management.dependencies.readwrite.dependencies.user.ReadW
 import br.meetingplace.services.entitie.User
 import java.util.*
 
-class IDsController private constructor(): ReadWriteLoggedUser, ChatIdsInterface, GroupIdsInterface, UserIdsInterface, CommunityIdsInterface{
+class IDsController private constructor(): ChatIdsInterface, GroupIdsInterface, UserIdsInterface, CommunityIdsInterface{
 
     private val community = CommunityIds.getClass()
     private val user = UserIds.getClass()
@@ -57,16 +57,16 @@ class IDsController private constructor(): ReadWriteLoggedUser, ChatIdsInterface
     }
 
     //USER
-    override fun fixUserName(name: String): String{
-        return user.fixUserName(name)
+    override fun fixEmail(email: String): String{
+        return user.fixEmail(email)
     }
-    override fun attachNameToEmail(name: String, email: String): String{
-        return user.attachNameToEmail(name, email)
-    }
-    override fun getEmailByAttachedNameToEmail(attached: String): String{
-        return user.getEmailByAttachedNameToEmail(attached)
-    }
-    override fun getNameByAttachedNameToEmail(attached: String): String{
-        return user.getNameByAttachedNameToEmail(attached)
-    }
+//    override fun attachNameToEmail(name: String, email: String): String{
+//        return user.attachNameToEmail(name, email)
+//    }
+//    override fun getEmailByAttachedNameToEmail(attached: String): String{
+//        return user.getEmailByAttachedNameToEmail(attached)
+//    }
+//    override fun getNameByAttachedNameToEmail(attached: String): String{
+//        return user.getNameByAttachedNameToEmail(attached)
+//    }
 }

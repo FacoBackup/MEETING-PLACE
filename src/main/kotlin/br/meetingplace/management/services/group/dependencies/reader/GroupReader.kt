@@ -1,28 +1,31 @@
 package br.meetingplace.management.services.group.dependencies.reader
 
-import br.meetingplace.management.dependencies.verify.dependencies.Verify
-import br.meetingplace.management.dependencies.readwrite.dependencies.group.ReadWriteGroup
-import br.meetingplace.management.dependencies.readwrite.dependencies.user.ReadWriteLoggedUser
-import br.meetingplace.management.dependencies.readwrite.dependencies.user.ReadWriteUser
+import br.meetingplace.management.dependencies.idmanager.controller.IDsController
+import br.meetingplace.management.dependencies.readwrite.controller.ReadWriteController
+import br.meetingplace.management.dependencies.verify.controller.VerifyController
 import br.meetingplace.services.group.Group
 
-class GroupReader private constructor(): GroupReaderInterface, ReadWriteGroup, ReadWriteUser, ReadWriteLoggedUser, Verify {
+class GroupReader private constructor(): GroupReaderInterface{
+    private val iDs = IDsController.getClass()
+    private val rw = ReadWriteController.getClass()
+    private val verify = VerifyController.getClass()
+
     companion object{
         private val Class = GroupReader()
         fun getClass () =Class
     }
 
     override fun readMyGroups(): MutableList<Group> {
-        val loggedUser = readLoggedUser().email
-        val user = readUser(loggedUser)
+        val loggedUser = rw.readLoggedUser().email
+        val user = rw.readUser(loggedUser)
 
         val myGroups = mutableListOf<Group>()
-        if(verifyLoggedUser(user)){
+        if(verify.verifyUser(user)){
             val myGroupsIds = user.getMyGroups()
             for (i in myGroupsIds.indices){
-                val group = readGroup(myGroupsIds[i])
-                if(verifyGroup(group))
-                    myGroups.add(readGroup(myGroupsIds[i]))
+                val group = rw.readGroup(myGroupsIds[i])
+                if(verify.verifyGroup(group))
+                    myGroups.add(rw.readGroup(myGroupsIds[i]))
             }
             return myGroups
         }
@@ -30,16 +33,16 @@ class GroupReader private constructor(): GroupReaderInterface, ReadWriteGroup, R
     } // READ
 
     override fun readMemberIn(): MutableList<Group> {
-        val loggedUser = readLoggedUser().email
-        val user = readUser(loggedUser)
+        val loggedUser =rw.readLoggedUser().email
+        val user = rw.readUser(loggedUser)
 
         val memberIn = mutableListOf<Group>()
-        if(verifyLoggedUser(user)){
+        if(verify.verifyUser(user)){
             val groupsIds = user.getMemberIn()
             for (i in groupsIds.indices){
-                val group = readGroup(groupsIds[i])
-                if(verifyGroup(group))
-                    memberIn.add(readGroup(groupsIds[i]))
+                val group = rw.readGroup(groupsIds[i])
+                if(verify.verifyGroup(group))
+                    memberIn.add(rw.readGroup(groupsIds[i]))
             }
             return memberIn
         }
