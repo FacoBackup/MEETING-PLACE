@@ -1,28 +1,30 @@
 package br.meetingplace.management.services.search.dependecies.user
 
 import br.meetingplace.data.Data
-import br.meetingplace.management.dependencies.verify.dependencies.Verify
-import br.meetingplace.management.dependencies.readwrite.dependencies.user.ReadWriteLoggedUser
-import br.meetingplace.management.dependencies.readwrite.dependencies.user.ReadWriteUser
+import br.meetingplace.management.dependencies.idmanager.controller.IDsController
+import br.meetingplace.management.dependencies.readwrite.controller.ReadWriteController
+import br.meetingplace.management.dependencies.verify.controller.VerifyController
+import br.meetingplace.management.services.search.dependecies.data.SimplifiedUser
 import br.meetingplace.management.services.search.dependecies.type.SearchType
-import br.meetingplace.services.entitie.User
-
-class UserSearch private constructor(): UserSearchInterface, ReadWriteUser, ReadWriteLoggedUser, Verify {
-
+class UserSearch private constructor(): UserSearchInterface{
+    private val iDs = IDsController.getClass()
+    private val rw = ReadWriteController.getClass()
+    private val verify = VerifyController.getClass()
     companion object{
         private val Class = UserSearch()
         fun getClass() = Class
     }
 
-    override fun searchUser(data: Data): List<User>{
+    override fun searchUser(data: Data): List<SimplifiedUser>{
         when(verifyType(data)){
             SearchType.BY_NAME->{
 
             }
             SearchType.BY_EMAIL->{
-                val user = readUser(data.ID)
-                return if(verifyUser(user))
-                    listOf(user)
+                val user = rw.readUser(data.ID)
+                return if(verify.verifyUser(user)){
+                    listOf(SimplifiedUser(user.getUserName(), user.getEmail(), iDs.attachNameToEmail(user.getUserName(), user.getEmail())))
+                }
                 else listOf()
             }
         }

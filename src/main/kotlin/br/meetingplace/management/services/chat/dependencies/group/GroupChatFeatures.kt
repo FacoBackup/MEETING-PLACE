@@ -4,15 +4,15 @@ import br.meetingplace.data.chat.ChatComplexOperations
 import br.meetingplace.data.chat.ChatMessage
 import br.meetingplace.data.chat.ChatOperations
 import br.meetingplace.management.dependencies.idmanager.controller.IDsController
-import br.meetingplace.management.dependencies.verify.dependencies.Verify
-import br.meetingplace.management.dependencies.readwrite.dependencies.group.ReadWriteGroup
-import br.meetingplace.management.dependencies.readwrite.dependencies.user.ReadWriteLoggedUser
-import br.meetingplace.management.dependencies.readwrite.dependencies.user.ReadWriteUser
+import br.meetingplace.management.dependencies.readwrite.controller.ReadWriteController
+import br.meetingplace.management.dependencies.verify.controller.VerifyController
 import br.meetingplace.management.services.chat.controller.ChatController
 import br.meetingplace.management.services.chat.dependencies.ChatFeaturesInterface
 
-class GroupChatFeatures private constructor(): ChatFeaturesInterface, ReadWriteLoggedUser, ReadWriteUser, ReadWriteGroup, Verify {
+class GroupChatFeatures private constructor(): ChatFeaturesInterface{
     private val iDs = IDsController.getClass()
+    private val rw = ReadWriteController.getClass()
+    private val verify = VerifyController.getClass()
 
     companion object{
         private val Class = GroupChatFeatures()
@@ -20,52 +20,56 @@ class GroupChatFeatures private constructor(): ChatFeaturesInterface, ReadWriteL
     }
 
     override fun favoriteMessage(data: ChatOperations){
-        val loggedUser = readLoggedUser().email
-        val user = readUser(loggedUser)
-        val group = readGroup(iDs.simpleToStandardIdGroup(data.idReceiver, user))
+        val logged = rw.readLoggedUser().fileName
+        val user = rw.readUser(if(!logged.isNullOrBlank()) logged else "")
 
-        if(verifyLoggedUser(user) && verifyGroup(group)){
+        val group = rw.readGroup(iDs.simpleToStandardIdGroup(data.idReceiver, user))
+
+        if(verify.verifyUser(user) && verify.verifyGroup(group)){
             val chat = group.getChat()
             chat.favoriteMessage(data)
             group.updateChat(chat)
-            writeGroup(group, group.getGroupId())
+            rw.writeGroup(group, group.getGroupId())
         }
     }//UPDATE
 
     override fun unFavoriteMessage(data: ChatOperations){
-        val loggedUser = readLoggedUser().email
-        val user = readUser(loggedUser)
-        val group = readGroup(iDs.simpleToStandardIdGroup(data.idReceiver, user))
+        val logged = rw.readLoggedUser().fileName
+        val user = rw.readUser(if(!logged.isNullOrBlank()) logged else "")
 
-        if(verifyLoggedUser(user) && verifyGroup(group)){
+        val group = rw.readGroup(iDs.simpleToStandardIdGroup(data.idReceiver, user))
+
+        if(verify.verifyUser(user) && verify.verifyGroup(group)){
             val chat = group.getChat()
             chat.unFavoriteMessage(data)
             group.updateChat(chat)
-            writeGroup(group, group.getGroupId())
+            rw.writeGroup(group, group.getGroupId())
         }
     }//UPDATE
 
     override fun quoteMessage(data: ChatComplexOperations){ // NEEDS WORK HERE
-        val loggedUser = readLoggedUser().email
-        val user = readUser(loggedUser)
-        val group = readGroup(iDs.simpleToStandardIdGroup(data.idReceiver, user))
+        val logged = rw.readLoggedUser().fileName
+        val user = rw.readUser(if(!logged.isNullOrBlank()) logged else "")
 
-        if(verifyLoggedUser(user) && verifyGroup(group)){
+        val group = rw.readGroup(iDs.simpleToStandardIdGroup(data.idReceiver, user))
+
+        if(verify.verifyUser(user) && verify.verifyGroup(group)){
             val chat = group.getChat()
             if(chat.verifyMessage(data.idMessage)){
                 chat.quoteMessage(data, iDs.generateId())
                 group.updateChat(chat)
-                writeGroup(group,group.getGroupId())
+                rw.writeGroup(group,group.getGroupId())
             }
         }
     }//UPDATE
 
     override fun shareMessage(data: ChatComplexOperations) {
-        val loggedUser = readLoggedUser().email
-        val user = readUser(loggedUser)
-        val group = readGroup(iDs.simpleToStandardIdGroup(data.idReceiver, user))
+        val logged = rw.readLoggedUser().fileName
+        val user = rw.readUser(if(!logged.isNullOrBlank()) logged else "")
 
-        if(verifyLoggedUser(user) && verifyGroup(group)){
+        val group = rw.readGroup(iDs.simpleToStandardIdGroup(data.idReceiver, user))
+
+        if(verify.verifyUser(user) && verify.verifyGroup(group)){
             val chat = group.getChat()
             val messageContent = chat.shareMessage(data)
             if(messageContent != ""){

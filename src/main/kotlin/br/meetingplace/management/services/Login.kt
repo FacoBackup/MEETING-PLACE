@@ -1,11 +1,15 @@
 package br.meetingplace.management.services
 
 import br.meetingplace.data.user.LoginByEmail
-import br.meetingplace.management.dependencies.readwrite.dependencies.user.ReadWriteLoggedUser
-import br.meetingplace.management.dependencies.verify.dependencies.Verify
-import br.meetingplace.management.dependencies.readwrite.dependencies.user.ReadWriteUser
+import br.meetingplace.management.dependencies.idmanager.controller.IDsController
+import br.meetingplace.management.dependencies.readwrite.controller.ReadWriteController
+import br.meetingplace.management.dependencies.verify.controller.VerifyController
+import br.meetingplace.services.entitie.User
 
-class Login private constructor(): ReadWriteLoggedUser, ReadWriteUser, Verify {
+class Login private constructor(){
+    private val rw = ReadWriteController.getClass()
+    private val verify = VerifyController.getClass()
+    private val iDs = IDsController.getClass()
 
     companion object{
         private val login = Login()
@@ -13,22 +17,29 @@ class Login private constructor(): ReadWriteLoggedUser, ReadWriteUser, Verify {
     }
 
     fun login(newUser: LoginByEmail){ //CASE SENSITIVE
-        val logged = readLoggedUser()
+        val logged = rw.readLoggedUser()
+        lateinit var user: User
         newUser.email = newUser.email.toLowerCase()
-        val user = readUser(newUser.email)
+        newUser.fileName = iDs.attachNameToEmail(newUser.userName,newUser.email)
 
-
-        if(user.getAge() >= 16 && logged.email == "" && newUser.password == user.getPassword() && newUser.email == user.getEmail()){
-            logged.email = user.getEmail()
-            logged.password = user.getPassword()
-            writeLoggedUser(logged)
+        if(newUser.fileName.isNullOrBlank() && logged.email.isNotBlank() && newUser.userName.isNotBlank()){
+            user = rw.readUser(newUser.fileName!!)
+            when(verify.verifyUser(rw.readUser(newUser.fileName!!)) && user.getAge() >= 16 && newUser.password == user.getPassword()){
+                true->{
+                    logged.email = user.getEmail()
+                    logged.password = user.getPassword()
+                    rw.writeLoggedUser(logged)
+                }
+            }
         }
     }
 
     fun logout(){
-        val logged = readLoggedUser()
+        val logged = rw.readLoggedUser()
         logged.email = ""
         logged.password = ""
-        writeLoggedUser(logged)
+        logged.fileName = null
+        logged.userName = ""
+        rw.writeLoggedUser(logged)
     }
 }

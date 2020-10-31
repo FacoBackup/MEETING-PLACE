@@ -16,7 +16,7 @@ class UserRW private constructor(): ReadWriteLoggedUser, ReadWriteUser{
         val pathToFile = File("build.gradle").absolutePath.removeSuffix("build.gradle") + "/src/main/kotlin/br/meetingplace/logs/logged.json"
         val gson = GsonBuilder().setPrettyPrinting().create()
         val file = File(pathToFile)
-        var data = LoginByEmail("", "")
+        var data = LoginByEmail("", "", "", null)
         try {
             val bufferedReader = file.bufferedReader()
             val inputString = bufferedReader.use{ it.readText()}
@@ -34,7 +34,7 @@ class UserRW private constructor(): ReadWriteLoggedUser, ReadWriteUser{
         file.writeText(json)
     }
     override fun readUser(fileName: String): User {
-        val pathToFile = File("build.gradle").absolutePath.removeSuffix("build.gradle") + "/src/main/kotlin/br/meetingplace/logs/users/$fileName.json"
+        val pathToFile = File("build.gradle").absolutePath.removeSuffix("build.gradle") + "/src/main/kotlin/br/meetingplace/logs/users/$fileName"
         val gson = GsonBuilder().setPrettyPrinting().create()
         val file = File(pathToFile)
         var user = User("", -1, "", "")

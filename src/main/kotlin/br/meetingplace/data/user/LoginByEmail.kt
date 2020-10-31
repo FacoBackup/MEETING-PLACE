@@ -1,3 +1,3 @@
 package br.meetingplace.data.user
 
-data class LoginByEmail(var email: String, var password: String) {}
+data class LoginByEmail(var userName: String, var email: String, var password: String, var fileName: String?) {}
