@@ -1,0 +1,3 @@
+package br.meetingplace.server.controllers.subjects.services.notificationTODO.community
+
+interface ModeratorNotificationInterface

@@ -1,0 +1,3 @@
+package br.meetingplace.server.controllers.subjects.services.notificationTODO.group.member
+
+interface MemberNotificationInterface
