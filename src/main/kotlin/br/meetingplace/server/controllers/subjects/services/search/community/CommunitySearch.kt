@@ -1,18 +1,16 @@
 package br.meetingplace.server.controllers.subjects.services.search.community
 
-import br.meetingplace.server.controllers.dependencies.rw.controller.RWController
+import br.meetingplace.server.controllers.dependencies.readwrite.community.CommunityRWInterface
 import br.meetingplace.server.dto.SimpleOperator
 import br.meetingplace.server.subjects.services.community.Community
 
-class CommunitySearch private constructor() : CommunitySearchInterface {
+class CommunitySearch private constructor()  {
     companion object {
         private val Class = CommunitySearch()
         fun getClass() = Class
     }
 
-    private val rw = RWController.getClass()
-
-    override fun searchCommunity(data: SimpleOperator): Community? {
-        return data.identifier.owner?.let { rw.readCommunity(it) }
+    fun searchCommunity(data: SimpleOperator, rwCommunity: CommunityRWInterface): Community? {
+        return rwCommunity.read(data.identifier.ID)
     }
 }

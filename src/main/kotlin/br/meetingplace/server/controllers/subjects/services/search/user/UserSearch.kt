@@ -1,25 +1,19 @@
 package br.meetingplace.server.controllers.subjects.services.search.user
 
-import br.meetingplace.server.controllers.dependencies.id.controller.IDController
-import br.meetingplace.server.controllers.dependencies.rw.controller.RWController
-import br.meetingplace.server.controllers.dependencies.verify.controller.VerifyController
+import br.meetingplace.server.controllers.dependencies.readwrite.user.UserRWInterface
 import br.meetingplace.server.dto.SimpleOperator
 import br.meetingplace.server.subjects.entities.SimplifiedUser
 
 
-class UserSearch private constructor() : UserSearchInterface {
-    private val iDs = IDController.getClass()
-    private val rw = RWController.getClass()
-    private val verify = VerifyController.getClass()
-
+class UserSearch private constructor() {
     companion object {
         private val Class = UserSearch()
         fun getClass() = Class
     }
 
-    override fun searchUser(data: SimpleOperator): List<SimplifiedUser> {
-        val user = rw.readUser(data.identifier.ID)
-        return if (verify.verifyUser(user)) {
+    fun searchUser(data: SimpleOperator, rwUser: UserRWInterface): List<SimplifiedUser> {
+        val user = rwUser.read(data.identifier.ID)
+        return if (user != null) {
             listOf(SimplifiedUser(user.getUserName(), user.getEmail()))
         } else listOf()
     }

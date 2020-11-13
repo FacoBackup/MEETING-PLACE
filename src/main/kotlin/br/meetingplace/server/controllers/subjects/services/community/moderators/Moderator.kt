@@ -1,55 +1,52 @@
 package br.meetingplace.server.controllers.subjects.services.community.moderators
 
-import br.meetingplace.server.controllers.dependencies.rw.controller.RWController
-import br.meetingplace.server.controllers.dependencies.verify.controller.VerifyController
+import br.meetingplace.server.controllers.dependencies.readwrite.community.CommunityRWInterface
+import br.meetingplace.server.controllers.dependencies.readwrite.group.GroupRWInterface
+import br.meetingplace.server.controllers.dependencies.readwrite.topic.main.TopicRWInterface
+import br.meetingplace.server.controllers.dependencies.readwrite.user.UserRWInterface
 import br.meetingplace.server.dto.MemberOperator
 import br.meetingplace.server.dto.community.ApprovalData
 import br.meetingplace.server.subjects.services.members.data.MemberType
 import br.meetingplace.server.subjects.services.topic.SimplifiedTopic
 
-class Moderator private constructor() : ModeratorInterface {
-    private val rw = RWController.getClass()
-    private val verify = VerifyController.getClass()
+class Moderator private constructor() {
 
     companion object {
         private val Class = Moderator()
         fun getClass() = Class
     }
 
-    override fun approveTopic(data: ApprovalData) {
-        val user = rw.readUser(data.login.email)
-        val community = data.identifier.owner?.let { rw.readCommunity(it) }
+    fun approveTopic(data: ApprovalData, rwCommunity: CommunityRWInterface, rwUser: UserRWInterface, rwTopic: TopicRWInterface) {
+        val user = rwUser.read(data.login.email)
+        val community = data.identifier.owner?.let { rwCommunity.read(it) }
 
-        if (verify.verifyUser(user) && community != null && verify.verifyCommunity(community) && data.login.email in community.getModerators() && !data.identifier.owner.isNullOrBlank()) {
-            val topic = rw.readTopic(data.identifier.ID, data.identifier.owner, null, true)
-            if (verify.verifyTopic(topic)) {
+        if (user != null && community != null && data.login.email in community.getModerators() && !data.identifier.owner.isNullOrBlank()) {
+            val topic = rwTopic.read(data.identifier.ID)
+            if (topic != null) {
                 community.updateTopicInValidation(SimplifiedTopic(data.identifier.ID, topic.getOwner()), true)
-                rw.writeCommunity(community, community.getID())
+                rwCommunity.write(community)
             }
         }
     }
 
-    override fun approveGroup(data: ApprovalData) {
-        val user = rw.readUser(data.login.email)
-        val community = data.identifier.owner?.let { rw.readCommunity(it) }
+    fun approveGroup(data: ApprovalData, rwCommunity: CommunityRWInterface, rwUser: UserRWInterface, rwGroup: GroupRWInterface) {
+        val user = rwUser.read(data.login.email)
+        val community = data.identifier.owner?.let { rwCommunity.read(it) }
 
-        if (verify.verifyUser(user) && community != null && verify.verifyCommunity(community) && (community.getMemberRole(
-                        data.login.email
-                ) == MemberType.MODERATOR || community.getMemberRole(data.login.email) == MemberType.CREATOR)
-        ) {
-            val group = rw.readGroup(data.identifier.ID, data.identifier.owner, true)
-            if (verify.verifyGroup(group)) {
+        if (user != null && community != null && (community.getMemberRole(data.login.email) == MemberType.MODERATOR || community.getMemberRole(data.login.email) == MemberType.CREATOR)) {
+            val group = rwGroup.read(data.identifier.ID)
+            if (group != null) {
                 community.updateGroupsInValidation(data.identifier.ID, true)
-                rw.writeCommunity(community, community.getID())
+                rwCommunity.write(community)
             }
         }
     }
 
-    override fun stepDown(data: MemberOperator) {
-        val user = rw.readUser(data.login.email)
-        val community = data.identifier.owner?.let { rw.readCommunity(it) }
+    fun stepDown(data: MemberOperator, rwCommunity: CommunityRWInterface, rwUser: UserRWInterface) {
+        val user = rwUser.read(data.login.email)
+        val community = data.identifier.owner?.let { rwCommunity.read(it) }
 
-        if (verify.verifyUser(user) && community != null && verify.verifyCommunity(community) && community.verifyMember(data.login.email))
+        if (user != null && community != null && community.verifyMember(data.login.email))
             community.updateModerator(data.login.email, data.login.email, null)
     }
 }

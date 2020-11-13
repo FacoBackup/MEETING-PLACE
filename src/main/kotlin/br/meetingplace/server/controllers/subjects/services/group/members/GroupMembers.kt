@@ -1,77 +1,69 @@
 package br.meetingplace.server.controllers.subjects.services.group.members
 
-import br.meetingplace.server.controllers.dependencies.id.controller.IDController
-import br.meetingplace.server.controllers.dependencies.rw.controller.RWController
-import br.meetingplace.server.controllers.dependencies.verify.controller.VerifyController
+import br.meetingplace.server.controllers.dependencies.readwrite.community.CommunityRWInterface
+import br.meetingplace.server.controllers.dependencies.readwrite.group.GroupRWInterface
+import br.meetingplace.server.controllers.dependencies.readwrite.user.UserRWInterface
 import br.meetingplace.server.dto.MemberOperator
-import br.meetingplace.server.subjects.services.community.Community
-import br.meetingplace.server.subjects.services.groups.Group
 import br.meetingplace.server.subjects.services.members.data.MemberData
 import br.meetingplace.server.subjects.services.members.data.MemberType
 import br.meetingplace.server.subjects.services.notification.NotificationData
 
-class GroupMembers private constructor() : GroupMembersInterface {
-    private val iDs = IDController.getClass()
-    private val rw = RWController.getClass()
-    private val verify = VerifyController.getClass()
-
+class GroupMembers private constructor() {
     companion object {
         private val Class = GroupMembers()
         fun getClass() = Class
     }
 
-    override fun addMember(data: MemberOperator) {
-        val user = rw.readUser(data.login.email)
-        val newMember = rw.readUser(data.memberEmail)
+    fun addMember(data: MemberOperator, rwCommunity: CommunityRWInterface,rwGroup: GroupRWInterface, rwUser: UserRWInterface) {
+        val user = rwUser.read(data.login.email)
+        val newMember = rwUser.read(data.memberEmail)
 
-        lateinit var community: Community
         lateinit var notification: NotificationData
         lateinit var toBeAdded: MemberData
 
-        if (verify.verifyUser(user) && verify.verifyUser(newMember) && !data.identifier.owner.isNullOrBlank()) {
+        if (user != null && newMember != null && !data.identifier.owner.isNullOrBlank()) {
             toBeAdded = MemberData(newMember.getEmail(), MemberType.NORMAL)
             when (data.identifier.community) {
                 false -> {
-                    val group = rw.readGroup(data.identifier.ID, data.identifier.owner, false)
-                    if (verify.verifyGroup(group) && verify.verifyUser(newMember) && group.verifyMember(data.login.email) && !group.verifyMember(
-                                    data.memberEmail
-                            )
-                    ) {
+                    val group = rwGroup.read(data.identifier.ID)
+                    if (group != null && group.verifyMember(data.login.email)
+                            && !group.verifyMember(data.memberEmail)) {
+
                         notification = NotificationData("You're now a member of ${group.getNameGroup()}", "Group.")
 
                         group.updateMember(toBeAdded, false)
                         newMember.updateMemberIn(group.getGroupID(), false)
                         newMember.updateInbox(notification)
-                        rw.writeUser(newMember, newMember.getEmail())
-                        rw.writeGroup(group)
+                        rwUser.write(newMember)
+                        rwGroup.write(group)
                     }
                 }
                 true -> {
-                    val group = rw.readGroup(data.identifier.ID, data.identifier.owner, true)
-                    community = rw.readCommunity(iDs.getCommunityId(data.identifier.owner))
-                    if (verify.verifyGroup(group) && verify.verifyCommunity(community) && (data.login.email == group.getCreator() || data.login.email in community.getModerators())) {
+                    val group = rwGroup.read(data.identifier.ID)
+                    val community = rwCommunity.read(data.identifier.owner)
+                    if (group != null && community != null && (data.login.email == group.getCreator() || data.login.email in community.getModerators())) {
                         notification = NotificationData("You're now a member of ${group.getNameGroup()}", "Group.")
                         group.updateMember(toBeAdded, false)
                         newMember.updateMemberIn(group.getGroupID(), false)
                         newMember.updateInbox(notification)
-                        rw.writeUser(newMember, newMember.getEmail())
-                        rw.writeGroup(group)
+                        rwUser.write(newMember)
+                        rwGroup.write(group)
                     }
                 }
             }
         }
     }
 
-    override fun changeMemberRole(data: MemberOperator) {
-        val user = rw.readUser(data.login.email)
-        val member = rw.readUser(data.memberEmail)
+    fun changeMemberRole(data: MemberOperator,rwGroup: GroupRWInterface, rwUser: UserRWInterface) {
+        val user = rwUser.read(data.login.email)
+        val member = rwUser.read(data.memberEmail)
 
         val group = when (data.identifier.community) {
-            false -> data.identifier.owner?.let { rw.readGroup(data.identifier.ID, it, false) }
-            true -> data.identifier.owner?.let { rw.readGroup(data.identifier.ID, it, true) }
+            false -> data.identifier.owner?.let { rwGroup.read(data.identifier.ID) }
+            true -> data.identifier.owner?.let { rwGroup.read(data.identifier.ID) }
         }
 
-        if (verify.verifyUser(user) && group != null && verify.verifyGroup(group) && verify.verifyUser(member) &&
+        if (user != null && group != null && member != null &&
                 (group.getMemberRole(user.getEmail()) == MemberType.MODERATOR || group.getMemberRole(user.getEmail()) == MemberType.CREATOR) &&
                 group.getMemberRole(member.getEmail()) != null
         ) {
@@ -89,41 +81,42 @@ class GroupMembers private constructor() : GroupMembersInterface {
         }
     }
 
-    override fun removeMember(data: MemberOperator) {
+    fun removeMember(data: MemberOperator, rwGroup: GroupRWInterface, rwUser: UserRWInterface, rwCommunity: CommunityRWInterface) {
 
-        val user = rw.readUser(data.login.email)
-        val member = rw.readUser(data.memberEmail)
+        val user = rwUser.read(data.login.email)
+        val member = rwUser.read(data.memberEmail)
 
         lateinit var toBeRemoved: MemberData
-        lateinit var community: Community
-        lateinit var group: Group
 
-        if (verify.verifyUser(user) && verify.verifyUser(member) && !data.identifier.owner.isNullOrBlank()) {
+        if (user != null && member != null && !data.identifier.owner.isNullOrBlank()) {
             when (data.identifier.community) {
                 false -> {
+                    val group = rwGroup.read(data.identifier.ID)
 
-                    group = rw.readGroup(data.identifier.ID, data.identifier.owner, false)
-                    val memberRole = group.getMemberRole(member.getEmail())
 
-                    if (verify.verifyGroup(group) && group.verifyMember(data.login.email) && memberRole != null && (data.login.email in group.getModerators() || data.login.email in group.getCreator())) {
-                        toBeRemoved = MemberData(member.getEmail(), memberRole)
-                        group.updateMember(toBeRemoved, true)
-                        member.updateMemberIn(group.getGroupID(), true)
+                    if (group != null && group.verifyMember(data.login.email) && (data.login.email in group.getModerators() || data.login.email in group.getCreator())) {
+                        val memberRole = group.getMemberRole(member.getEmail())
+                        if(memberRole != null){
+                            toBeRemoved = MemberData(member.getEmail(), memberRole)
+                            group.updateMember(toBeRemoved, true)
+                            member.updateMemberIn(group.getGroupID(), true)
 
-                        rw.writeUser(member, member.getEmail())
-                        rw.writeGroup(group)
+                            rwUser.write(member)
+                            rwGroup.write(group)
+                        }
+
                     }
 
                 }
                 true -> { //COMMUNITY
-                    group = rw.readGroup(data.identifier.ID, data.identifier.owner, true)
-                    community = rw.readCommunity(iDs.getCommunityId(data.identifier.owner))
-                    if (verify.verifyGroup(group) && verify.verifyCommunity(community) && (data.login.email == group.getCreator() || data.login.email in community.getModerators())) {
+                    val group = rwGroup.read(data.identifier.ID)
+                    val community = rwCommunity.read(data.identifier.owner)
+                    if (group != null && community != null && (data.login.email == group.getCreator() || data.login.email in community.getModerators())) {
 
                         group.updateMember(toBeRemoved, true)
                         member.updateMemberIn(group.getGroupID(), true)
-                        rw.writeUser(member, member.getEmail())
-                        rw.writeGroup(group)
+                        rwUser.write(member)
+                        rwGroup.write(group)
                     }
                 }
             }

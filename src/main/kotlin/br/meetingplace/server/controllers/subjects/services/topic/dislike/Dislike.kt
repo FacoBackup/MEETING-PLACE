@@ -1,134 +1,134 @@
 package br.meetingplace.server.controllers.subjects.services.topic.dislike
 
-import br.meetingplace.server.controllers.dependencies.rw.controller.RWController
-import br.meetingplace.server.controllers.dependencies.verify.controller.VerifyController
+import br.meetingplace.server.controllers.dependencies.readwrite.community.CommunityRWInterface
+import br.meetingplace.server.controllers.dependencies.readwrite.topic.main.TopicRWInterface
+import br.meetingplace.server.controllers.dependencies.readwrite.topic.sub.SubTopicRWInterface
+import br.meetingplace.server.controllers.dependencies.readwrite.user.UserRWInterface
 import br.meetingplace.server.dto.topics.TopicOperationsData
 import br.meetingplace.server.subjects.services.topic.Topic
 
-class Dislike private constructor() : DislikeInterface {
-    private val rw = RWController.getClass()
-    private val verify = VerifyController.getClass()
-
+class Dislike private constructor() {
     companion object {
         private val Class = Dislike()
         fun getClass() = Class
     }
 
-    override fun dislike(data: TopicOperationsData) {
-        val user = rw.readUser(data.login.email)
+    fun dislike(data: TopicOperationsData, rwUser: UserRWInterface, rwTopic: TopicRWInterface, rwSubTopic: SubTopicRWInterface, rwCommunity: CommunityRWInterface) {
+        val user = rwUser.read(data.login.email)
 
-        if (verify.verifyUser(user)) {
+        if (user != null) {
             when (data.communityID.isNullOrBlank()) {
                 true -> { //USER
                     when (data.identifier.subTopicID.isNullOrBlank()) {
                         true -> { //MAIN
-                            dislikeUserMainTopic(data)
+                            dislikeUserMainTopic(data, rwTopic)
                         }
                         false -> { //SUB
-                            dislikeUserSubTopic(data)
+                            dislikeUserSubTopic(data, rwTopic, rwSubTopic)
                         }
                     }
                 }
                 false -> { //COMMUNITY
                     when (data.identifier.subTopicID.isNullOrBlank()) {
                         true -> { //MAIN
-                            dislikeCommunityMainTopic(data)
+                            dislikeCommunityMainTopic(data, rwTopic, rwCommunity)
                         }
                         false -> { //SUB
-                            dislikeCommunitySubtopic(data)
+                            dislikeCommunitySubtopic(data, rwTopic, rwCommunity, rwSubTopic)
                         }
                     }
                 }
-            }//WHEN
-        }//IF VERIFY USER
+            }
+        }
     }
 
 
-    private fun dislikeUserMainTopic(data: TopicOperationsData) {
-        val topic = rw.readTopic(data.identifier.mainTopicID, data.identifier.mainTopicOwner, null, false)
+    private fun dislikeUserMainTopic(data: TopicOperationsData, rwTopic: TopicRWInterface) {
+        val topic = rwTopic.read(data.identifier.mainTopicID)
 
-        if (verify.verifyTopic(topic)) {
+        if (topic != null) {
             when (checkLikeDislike(topic, data.login.email)) {
                 0 -> {
                     println("1")
                     topic.likeToDislike(data.login.email)
-                    rw.writeTopic(topic)
+                    rwTopic.write(topic)
                 } // like to dislike
                 1 -> {
                     println("2")
                     topic.removeDislike(data.login.email)
-                    rw.writeTopic(topic)
+                    rwTopic.write(topic)
                 }
                 2 -> {
                     println("3")
                     topic.dislike(data.login.email)
-                    rw.writeTopic(topic)
+                    rwTopic.write(topic)
                 }
             }
         }
     }
 
-    private fun dislikeUserSubTopic(data: TopicOperationsData) {
-        val topic = data.identifier.subTopicID?.let { rw.readTopic(it, data.identifier.mainTopicOwner, data.identifier.mainTopicID, false) }
+    private fun dislikeUserSubTopic(data: TopicOperationsData, rwTopic: TopicRWInterface, rwSubTopic: SubTopicRWInterface) {
+        val subTopic = data.identifier.subTopicID?.let { rwSubTopic.read(it, data.identifier.mainTopicID) }
+        val mainTopic = rwTopic.read(data.identifier.mainTopicID)
 
-        if (topic != null && verify.verifyTopic(topic)) {
-            when (checkLikeDislike(topic, data.login.email)) {
+        if (subTopic != null && mainTopic != null) {
+            when (checkLikeDislike(subTopic, data.login.email)) {
                 0 -> {
-                    topic.likeToDislike(data.login.email)
-                    rw.writeTopic(topic)
+                    subTopic.likeToDislike(data.login.email)
+                    rwSubTopic.write(subTopic)
                 } // like to dislike
                 1 -> {
-                    topic.removeDislike(data.login.email)
-                    rw.writeTopic(topic)
+                    subTopic.removeDislike(data.login.email)
+                    rwSubTopic.write(subTopic)
                 }
                 2 -> {
-                    topic.dislike(data.login.email)
-                    rw.writeTopic(topic)
+                    subTopic.dislike(data.login.email)
+                    rwSubTopic.write(subTopic)
                 }
             }
         }
     }
 
-    private fun dislikeCommunityMainTopic(data: TopicOperationsData) {
-        val topic = rw.readTopic(data.identifier.mainTopicID, data.communityID!!, null, true)
-        val community = rw.readCommunity(data.communityID)
-        if (verify.verifyTopic(topic)
-                && verify.verifyCommunity(community) && community.checkTopicApproval(topic.getID())) {
+    private fun dislikeCommunityMainTopic(data: TopicOperationsData, rwTopic: TopicRWInterface, rwCommunity: CommunityRWInterface) {
+        val topic = rwTopic.read(data.identifier.mainTopicID)
+        val community = data.communityID?.let { rwCommunity.read(it) }
+        if (topic != null && community != null && community.checkTopicApproval(topic.getID())) {
             when (checkLikeDislike(topic, data.login.email)) {
                 0 -> {
                     topic.likeToDislike(data.login.email)
-                    rw.writeTopic(topic)
+                    rwTopic.write(topic)
                 } // like to dislike
                 1 -> {
                     topic.removeDislike(data.login.email)
-                    rw.writeTopic(topic)
+                    rwTopic.write(topic)
                 }
                 2 -> {
                     topic.dislike(data.login.email)
-                    rw.writeTopic(topic)
+                    rwTopic.write(topic)
                 }
             }
         }
     }
 
-    private fun dislikeCommunitySubtopic(data: TopicOperationsData) {
-        val topic = data.identifier.subTopicID?.let { rw.readTopic(it, data.communityID!!, data.identifier.mainTopicID, true) }
-        val community = rw.readCommunity(data.communityID!!)
+    private fun dislikeCommunitySubtopic(data: TopicOperationsData, rwTopic: TopicRWInterface, rwCommunity: CommunityRWInterface, rwSubTopic: SubTopicRWInterface) {
+        val subTopic = data.identifier.subTopicID?.let { rwSubTopic.read(it, data.identifier.mainTopicID) }
+        val mainTopic = rwTopic.read(data.identifier.mainTopicID)
 
-        if (topic != null && verify.verifyTopic(topic)
-                && verify.verifyCommunity(community) && community.checkTopicApproval(topic.getID())) {
-            when (checkLikeDislike(topic, data.login.email)) {
+        val community = data.communityID?.let { rwCommunity.read(it) }
+
+        if (subTopic != null && mainTopic != null && community != null && community.checkTopicApproval(mainTopic.getID())) {
+            when (checkLikeDislike(subTopic, data.login.email)) {
                 0 -> {
-                    topic.likeToDislike(data.login.email)
-                    rw.writeTopic(topic)
+                    subTopic.likeToDislike(data.login.email)
+                    rwSubTopic.write(subTopic)
                 } // like to dislike
                 1 -> {
-                    topic.removeDislike(data.login.email)
-                    rw.writeTopic(topic)
+                    subTopic.removeDislike(data.login.email)
+                    rwSubTopic.write(subTopic)
                 }
                 2 -> {
-                    topic.dislike(data.login.email)
-                    rw.writeTopic(topic)
+                    subTopic.dislike(data.login.email)
+                    rwSubTopic.write(subTopic)
                 }
             }
         }

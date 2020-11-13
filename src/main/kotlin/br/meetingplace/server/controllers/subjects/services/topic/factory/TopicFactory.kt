@@ -1,47 +1,45 @@
 package br.meetingplace.server.controllers.subjects.services.topic.factory
 
-import br.meetingplace.server.controllers.dependencies.id.controller.IDController
-import br.meetingplace.server.controllers.dependencies.rw.controller.RWController
-import br.meetingplace.server.controllers.dependencies.verify.controller.VerifyController
+import br.meetingplace.server.controllers.dependencies.readwrite.community.CommunityRWInterface
+import br.meetingplace.server.controllers.dependencies.readwrite.topic.main.TopicRWInterface
+import br.meetingplace.server.controllers.dependencies.readwrite.topic.sub.SubTopicRWInterface
+import br.meetingplace.server.controllers.dependencies.readwrite.user.UserRWInterface
 import br.meetingplace.server.dto.topics.TopicData
 import br.meetingplace.server.subjects.services.members.data.MemberType
 import br.meetingplace.server.subjects.services.owner.OwnerType
 import br.meetingplace.server.subjects.services.owner.topic.TopicOwnerData
 import br.meetingplace.server.subjects.services.topic.SimplifiedTopic
 import br.meetingplace.server.subjects.services.topic.Topic
+import java.util.*
 
-class TopicFactory private constructor() : TopicFactoryInterface {
-    private val iDs = IDController.getClass()
-    private val rw = RWController.getClass()
-    private val verify = VerifyController.getClass()
-
+class TopicFactory private constructor() {
     companion object {
         private val Class = TopicFactory()
         fun getClass() = Class
     }
 
-    override fun create(data: TopicData) {
-        val user = rw.readUser(data.login.email)
+    fun create(data: TopicData, rwTopic: TopicRWInterface, rwUser: UserRWInterface, rwSubTopic: SubTopicRWInterface, rwCommunity: CommunityRWInterface) {
+        val user = rwUser.read(data.login.email)
 
-        if (verify.verifyUser(user)) {
+        if (user != null) {
             when (data.communityID.isNullOrBlank()) {
                 true -> { //USER
                     when (data.identifier == null) {
                         true -> { //MAIN
-                            createUserMainTopic(data)
+                            createUserMainTopic(data, rwUser, rwTopic)
                         }
                         false -> { //SUB
-                            createUserSubTopic(data)
+                            createUserSubTopic(data, rwUser, rwTopic, rwSubTopic)
                         }
                     }
                 }
                 false -> { //COMMUNITY
                     when (data.identifier == null) {
                         true -> { //MAIN
-                            createCommunityMainTopic(data)
+                            createCommunityMainTopic(data, rwUser, rwCommunity, rwTopic)
                         }
                         false -> { //SUB
-                            createCommunitySubTopic(data)
+                            createCommunitySubTopic(data, rwUser, rwCommunity, rwTopic, rwSubTopic)
                         }
                     }
                 }
@@ -49,12 +47,12 @@ class TopicFactory private constructor() : TopicFactoryInterface {
         }//IF VERIFY USER
     }
 
-    private fun createCommunityMainTopic(data: TopicData) {
-        val user = rw.readUser(data.login.email)
-        val community = rw.readCommunity(data.communityID!!)
+    private fun createCommunityMainTopic(data: TopicData, rwUser: UserRWInterface, rwCommunity: CommunityRWInterface, rwTopic: TopicRWInterface) {
+        val user = rwUser.read(data.login.email)
+        val community = data.communityID?.let { rwCommunity.read(it) }
 
-        if (data.identifier != null && verify.verifyCommunity(community)) {
-            val topic = Topic(TopicOwnerData(community.getID(), data.login.email, OwnerType.COMMUNITY), user.getEmail(), iDs.generateId(), null)
+        if (data.identifier != null && community != null && user != null) {
+            val topic = Topic(TopicOwnerData(community.getID(), data.login.email, OwnerType.COMMUNITY), user.getEmail(), UUID.randomUUID().toString(), null)
 
             when (community.getMemberRole(data.login.email)) {
                 MemberType.CREATOR -> {
@@ -67,53 +65,54 @@ class TopicFactory private constructor() : TopicFactoryInterface {
                     community.updateTopicInValidation(SimplifiedTopic(topic.getID(), topic.getOwner()), null)
                 }
             }
-            rw.writeTopic(topic)
-            rw.writeUser(user, user.getEmail())
-            rw.writeCommunity(community, community.getID())
+            rwTopic.write(topic)
+            rwUser.write(user)
+            rwCommunity.write(community)
         }
     }
 
-    private fun createCommunitySubTopic(data: TopicData) {
-        val user = rw.readUser(data.login.email)
-        val community = rw.readCommunity(data.communityID!!)
+    private fun createCommunitySubTopic(data: TopicData, rwUser: UserRWInterface, rwCommunity: CommunityRWInterface, rwTopic: TopicRWInterface, rwSubTopic: SubTopicRWInterface) {
+        val user = rwUser.read(data.login.email)
+        val community = data.communityID?.let { rwCommunity.read(it) }
 
-        if (data.identifier != null && verify.verifyCommunity(community)) {
-            val mainTopic = rw.readTopic(data.identifier.mainTopicID, data.communityID, null, true)
-            if (verify.verifyTopic(mainTopic) && community.checkTopicApproval(mainTopic.getID())) {
-                val subtopic = Topic(mainTopic.getOwner(), user.getEmail(), iDs.generateId(), data.identifier.mainTopicID)
+        if (data.identifier != null && community != null && user != null) {
+            val mainTopic = rwTopic.read(data.identifier.mainTopicID)
+            if (mainTopic != null && community.checkTopicApproval(mainTopic.getID())) {
+                val subtopic = Topic(mainTopic.getOwner(), user.getEmail(), UUID.randomUUID().toString(), data.identifier.mainTopicID)
                 mainTopic.addSubTopic(subtopic.getID())
                 subtopic.addContent(data.header, data.body, user.getUserName())
-                rw.writeTopic(mainTopic)
-                rw.writeTopic(subtopic)
-                rw.writeUser(user, user.getEmail())
+                rwTopic.write(mainTopic)
+                rwSubTopic.write(subtopic)
+                rwUser.write(user)
             }
         }
     }
 
-    private fun createUserMainTopic(data: TopicData) {
-        val user = rw.readUser(data.login.email)
-        val topic = Topic(TopicOwnerData(user.getEmail(), user.getEmail(), OwnerType.USER), user.getEmail(), iDs.generateId(), null)
-        val simplifiedTopic = SimplifiedTopic(topic.getID(), topic.getOwner())
+    private fun createUserMainTopic(data: TopicData, rwUser: UserRWInterface, rwTopic: TopicRWInterface) {
+        val user = rwUser.read(data.login.email)
 
-        topic.addContent(data.header, data.body, user.getUserName())
-        rw.writeTopic(topic)
-        user.updateMyTopics(simplifiedTopic, true)
-        rw.writeUser(user, user.getEmail())
+        if(user != null){
+            val topic = Topic(TopicOwnerData(user.getEmail(), user.getEmail(), OwnerType.USER), user.getEmail(), UUID.randomUUID().toString(), null)
 
+            topic.addContent(data.header, data.body, user.getUserName())
+            rwTopic.write(topic)
+            user.updateMyTopics(topic.getID(), true)
+            rwUser.write(user)
+        }
     }
 
-    private fun createUserSubTopic(data: TopicData) {
-        val user = rw.readUser(data.login.email)
+    private fun createUserSubTopic(data: TopicData, rwUser: UserRWInterface, rwTopic: TopicRWInterface, rwSubTopic: SubTopicRWInterface) {
+        val user = rwUser.read(data.login.email)
 
-        if (data.identifier != null) {
-            val mainTopic = rw.readTopic(data.identifier.mainTopicID, data.identifier.mainTopicOwner, null, false)
-            if (verify.verifyTopic(mainTopic)) {
-                val subtopic = Topic(mainTopic.getOwner(), user.getEmail(), iDs.generateId(), data.identifier.mainTopicID)
+        if (data.identifier != null && user != null) {
+            val mainTopic = rwTopic.read(data.identifier.mainTopicID)
+            if (mainTopic != null) {
+                val subtopic = Topic(mainTopic.getOwner(), user.getEmail(), UUID.randomUUID().toString(), data.identifier.mainTopicID)
                 mainTopic.addSubTopic(subtopic.getID())
                 subtopic.addContent(data.header, data.body, user.getUserName())
-                rw.writeTopic(mainTopic)
-                rw.writeTopic(subtopic)
-                rw.writeUser(user, user.getEmail())
+                rwTopic.write(mainTopic)
+                rwSubTopic.write(subtopic)
+                rwUser.write(user)
             }
         }
     }

@@ -56,16 +56,16 @@ class CommunityTopics private constructor() : CommunityTopicsInterface {
     override fun updateReport(data: Report, delete: Boolean) {
         when (delete) {
             true -> {
-                if (data.reportId in reportIDs) {
+                if (data.reportID in reportIDs) {
                     reportedTopics.remove(data)
-                    reportIDs.remove(data.reportId)
+                    reportIDs.remove(data.reportID)
                 }
             }
             false -> {
-                if (data.reportId !in reportIDs && checkTopicApproval(data.serviceID)
+                if (data.reportID !in reportIDs && checkTopicApproval(data.serviceID)
                 ) {
                     reportedTopics.add(data)
-                    reportIDs.add(data.reportId)
+                    reportIDs.add(data.reportID)
                 }
             }
         }

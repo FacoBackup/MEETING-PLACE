@@ -1,33 +1,30 @@
 package br.meetingplace.server.controllers.subjects.services.community.reports
 
-import br.meetingplace.server.controllers.dependencies.id.controller.IDController
-import br.meetingplace.server.controllers.dependencies.rw.controller.RWController
-import br.meetingplace.server.controllers.dependencies.verify.controller.VerifyController
+import br.meetingplace.server.controllers.dependencies.readwrite.community.CommunityRWInterface
+import br.meetingplace.server.controllers.dependencies.readwrite.report.ReportRWInterface
+import br.meetingplace.server.controllers.dependencies.readwrite.topic.main.TopicRWInterface
+import br.meetingplace.server.controllers.dependencies.readwrite.user.UserRWInterface
 import br.meetingplace.server.dto.community.ApprovalData
 import br.meetingplace.server.dto.community.ReportData
 import br.meetingplace.server.subjects.services.community.dependencies.data.Report
+import java.util.*
 
-class CommunityReports private constructor() : CommunityReportsInterface {
-
-    private val iDs = IDController.getClass()
-    private val rw = RWController.getClass()
-    private val verify = VerifyController.getClass()
-
+class CommunityReports private constructor() {
     companion object {
         private val Class = CommunityReports()
         fun getClass() = Class
     }
 
-    override fun createReport(data: ReportData) {
-        val user = rw.readUser(data.login.email)
-        val community = data.identifier.owner?.let { rw.readCommunity(it) }
+    fun createReport(data: ReportData, rwUser: UserRWInterface, rwCommunity: CommunityRWInterface, rwTopic: TopicRWInterface, rwReport: ReportRWInterface) {
+        val user = rwUser.read(data.login.email)
+        val community = data.identifier.owner?.let { rwCommunity.read(it) }
 
 
-        if (verify.verifyUser(user) && community != null && verify.verifyCommunity(community) && community.checkTopicApproval(data.identifier.ID)) {
-            val topic = rw.readTopic(data.identifier.ID, user.getEmail(), null, true)
-            if (verify.verifyTopic(topic)) {
+        if (user != null && community != null && community.checkTopicApproval(data.identifier.ID)) {
+            val topic = rwTopic.read(data.identifier.ID)
+            if (topic != null) {
                 val newReport = Report(
-                        iDs.generateId(),
+                        UUID.randomUUID().toString(),
                         data.login.email,
                         data.identifier.ID,
                         data.reason,
@@ -36,21 +33,21 @@ class CommunityReports private constructor() : CommunityReportsInterface {
                         null
                 )
                 community.updateReport(newReport, false)
-                rw.writeCommunity(community, community.getID())
-                rw.writeReport(newReport)
+                rwCommunity.write(community)
+                rwReport.write(newReport)
             }
         }
     }
 
-    override fun deleteReport(data: ApprovalData) {
-        val user = rw.readUser(data.login.email)
-        val community = data.identifier.owner?.let { rw.readCommunity(it) }
-        val report = rw.readReport(data.identifier.ID)
+    fun deleteReport(data: ApprovalData, rwUser: UserRWInterface, rwCommunity: CommunityRWInterface, rwReport: ReportRWInterface) {
+        val user = rwUser.read(data.login.email)
+        val community = data.identifier.owner?.let { rwCommunity.read(it) }
+        val report = rwReport.read(data.identifier.ID)
 
-        if (verify.verifyUser(user) && community != null && verify.verifyCommunity(community) && verify.verifyReport(report) && (data.login.email in community.getModerators() || data.login.email == report.creator)) {
+        if (user != null && community != null && report != null && (data.login.email in community.getModerators() || data.login.email == report.creator)) {
             community.updateReport(report, true)
-            rw.writeCommunity(community, community.getID())
-            rw.deleteReport(report)
+            rwCommunity.write(community)
+            rwReport.delete(report)
         }
     }
 }

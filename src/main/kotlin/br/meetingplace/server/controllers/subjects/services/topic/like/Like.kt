@@ -1,42 +1,41 @@
 package br.meetingplace.server.controllers.subjects.services.topic.like
 
-import br.meetingplace.server.controllers.dependencies.rw.controller.RWController
-import br.meetingplace.server.controllers.dependencies.verify.controller.VerifyController
+import br.meetingplace.server.controllers.dependencies.readwrite.community.CommunityRWInterface
+import br.meetingplace.server.controllers.dependencies.readwrite.topic.main.TopicRWInterface
+import br.meetingplace.server.controllers.dependencies.readwrite.topic.sub.SubTopicRWInterface
+import br.meetingplace.server.controllers.dependencies.readwrite.user.UserRWInterface
 import br.meetingplace.server.dto.topics.TopicOperationsData
 import br.meetingplace.server.subjects.services.notification.NotificationData
 import br.meetingplace.server.subjects.services.topic.Topic
 
-class Like private constructor() : LikeInterface {
-    private val rw = RWController.getClass()
-    private val verify = VerifyController.getClass()
-
+class Like private constructor() {
     companion object {
         private val Class = Like()
         fun getClass() = Class
     }
 
-    override fun like(data: TopicOperationsData) {
-        val user = rw.readUser(data.login.email)
+    fun like(data: TopicOperationsData, rwUser: UserRWInterface, rwSubTopic: SubTopicRWInterface, rwTopic: TopicRWInterface, rwCommunity: CommunityRWInterface) {
+        val user = rwUser.read(data.login.email)
 
-        if (verify.verifyUser(user)) {
+        if (user != null) {
             when (data.communityID.isNullOrBlank()) {
                 true -> { //USER
                     when (data.identifier.subTopicID.isNullOrBlank()) {
                         true -> { //MAIN
-                            likeUserMainTopic(data)
+                            likeUserMainTopic(data, rwUser, rwTopic)
                         }
                         false -> { //SUB
-                            likeUserSubTopic(data)
+                            likeUserSubTopic(data, rwSubTopic, rwUser)
                         }
                     }
                 }
                 false -> { //COMMUNITY
                     when (data.identifier.subTopicID.isNullOrBlank()) {
                         true -> { //MAIN
-                            likeCommunityMainTopic(data)
+                            likeCommunityMainTopic(data, rwTopic, rwUser, rwCommunity)
                         }
                         false -> { //SUB
-                            likeCommunitySubtopic(data)
+                            likeCommunitySubtopic(data, rwSubTopic, rwUser, rwCommunity)
                         }
                     }
                 }
@@ -44,135 +43,135 @@ class Like private constructor() : LikeInterface {
         }//IF VERIFY USER
     }
 
-    private fun likeUserMainTopic(data: TopicOperationsData) {
-        val user = rw.readUser(data.login.email)
-        val topic = rw.readTopic(data.identifier.mainTopicID, data.identifier.mainTopicOwner, null, false)
-        val creator = rw.readUser(data.identifier.mainTopicOwner)
+    private fun likeUserMainTopic(data: TopicOperationsData, rwUser: UserRWInterface, rwTopic: TopicRWInterface) {
+        val user = rwUser.read(data.login.email)
+        val topic = rwTopic.read(data.identifier.mainTopicID)
+        val creator = rwUser.read(data.identifier.mainTopicOwner)
         lateinit var notification: NotificationData
 
-        if (verify.verifyTopic(topic) && verify.verifyUser(creator)) {
+        if (user != null && topic != null && creator != null) {
             notification = NotificationData("${user.getUserName()} liked your reply.", "Thread.")
             when (checkLikeDislike(topic, data.login.email)) {
                 0 -> {
                     topic.removeLike(data.login.email)
-                    rw.writeTopic(topic)
+                    rwTopic.write(topic)
                 }
                 1 -> {
                     if (user.getEmail() != creator.getEmail()) {
                         creator.updateInbox(notification)
-                        rw.writeUser(creator, creator.getEmail())
+                        rwUser.write(creator)
                     }
                     topic.dislikeToLike(data.login.email)
-                    rw.writeTopic(topic)
+                    rwTopic.write(topic)
                 } // like to dislike
                 2 -> {
                     if (user.getEmail() != creator.getEmail()) {
                         creator.updateInbox(notification)
-                        rw.writeUser(creator, creator.getEmail())
+                        rwUser.write(creator)
                     }
                     topic.like(data.login.email)
-                    rw.writeTopic(topic)
+                    rwTopic.write(topic)
                 } // hasn't DISLIKED yet
             }
         }
     }
 
-    private fun likeUserSubTopic(data: TopicOperationsData) {
-        val user = rw.readUser(data.login.email)
-        val topic = data.identifier.subTopicID?.let { rw.readTopic(it, data.identifier.mainTopicOwner, data.identifier.mainTopicID, false) }
-        val creator = rw.readUser(data.identifier.mainTopicOwner)
+    private fun likeUserSubTopic(data: TopicOperationsData, rwSubTopic: SubTopicRWInterface, rwUser: UserRWInterface) {
+        val user = rwUser.read(data.login.email)
+        val subTopic = data.identifier.subTopicID?.let { rwSubTopic.read(it, data.identifier.mainTopicID) }
+        val creator = rwUser.read(data.identifier.mainTopicOwner)
         lateinit var notification: NotificationData
 
-        if (topic != null && verify.verifyTopic(topic) && verify.verifyUser(creator)) {
+        if (subTopic != null && user != null && creator != null) {
             notification = NotificationData("${user.getUserName()} liked your reply.", "Thread.")
-            when (checkLikeDislike(topic, data.login.email)) {
+            when (checkLikeDislike(subTopic, data.login.email)) {
                 0 -> {
-                    topic.removeLike(data.login.email)
-                    rw.writeTopic(topic)
+                    subTopic.removeLike(data.login.email)
+                    rwSubTopic.write(subTopic)
                 }
                 1 -> {
                     if (user.getEmail() != creator.getEmail()) {
                         creator.updateInbox(notification)
-                        rw.writeUser(creator, creator.getEmail())
+                        rwUser.write(creator)
                     }
-                    topic.dislikeToLike(data.login.email)
-                    rw.writeTopic(topic)
+                    subTopic.dislikeToLike(data.login.email)
+                    rwSubTopic.write(subTopic)
                 } // like to dislike
                 2 -> {
                     if (user.getEmail() != creator.getEmail()) {
                         creator.updateInbox(notification)
-                        rw.writeUser(creator, creator.getEmail())
+                        rwUser.write(creator)
                     }
-                    topic.like(data.login.email)
-                    rw.writeTopic(topic)
+                    subTopic.like(data.login.email)
+                    rwSubTopic.write(subTopic)
                 } // hasn't DISLIKED yet
             }
         }
     }
 
-    private fun likeCommunityMainTopic(data: TopicOperationsData) {
-        val user = rw.readUser(data.login.email)
-        val topic = rw.readTopic(data.identifier.mainTopicID, data.communityID!!, null, true)
-        val creator = rw.readUser(data.identifier.mainTopicOwner)
-        val community = rw.readCommunity(data.communityID)
+    private fun likeCommunityMainTopic(data: TopicOperationsData, rwTopic: TopicRWInterface, rwUser: UserRWInterface, rwCommunity: CommunityRWInterface) {
+        val user = rwUser.read(data.login.email)
+        val topic = rwTopic.read(data.identifier.mainTopicID)
+        val creator = rwUser.read(data.identifier.mainTopicOwner)
+        val community = data.communityID?.let { rwCommunity.read(it) }
         lateinit var notification: NotificationData
 
-        if (verify.verifyTopic(topic) && verify.verifyUser(creator) && verify.verifyCommunity(community) && community.checkTopicApproval(topic.getID())) {
+        if (topic != null && community != null && user != null && creator != null && community.checkTopicApproval(topic.getID())) {
             notification = NotificationData("${user.getUserName()} liked your reply.", "Thread.")
             when (checkLikeDislike(topic, data.login.email)) {
                 0 -> {
                     topic.removeLike(data.login.email)
-                    rw.writeTopic(topic)
+                    rwTopic.write(topic)
                 }
                 1 -> {
                     if (user.getEmail() != creator.getEmail()) {
                         creator.updateInbox(notification)
-                        rw.writeUser(creator, creator.getEmail())
+                        rwUser.write(creator)
                     }
                     topic.dislikeToLike(data.login.email)
-                    rw.writeTopic(topic)
+                    rwTopic.write(topic)
                 } // like to dislike
                 2 -> {
                     if (user.getEmail() != creator.getEmail()) {
                         creator.updateInbox(notification)
-                        rw.writeUser(creator, creator.getEmail())
+                        rwUser.write(creator)
                     }
                     topic.like(data.login.email)
-                    rw.writeTopic(topic)
+                    rwTopic.write(topic)
                 } // hasn't DISLIKED yet
             }
         }
     }
 
-    private fun likeCommunitySubtopic(data: TopicOperationsData) {
-        val user = rw.readUser(data.login.email)
-        val topic = data.identifier.subTopicID?.let { rw.readTopic(it, data.communityID!!, data.identifier.mainTopicID, true) }
-        val creator = rw.readUser(data.identifier.mainTopicOwner)
-        val community = rw.readCommunity(data.communityID!!)
+    private fun likeCommunitySubtopic(data: TopicOperationsData, rwSubTopic: SubTopicRWInterface, rwUser: UserRWInterface, rwCommunity: CommunityRWInterface) {
+        val user = rwUser.read(data.login.email)
+        val subTopic = data.identifier.subTopicID?.let { rwSubTopic.read(it, data.identifier.mainTopicID) }
+        val creator = rwUser.read(data.identifier.mainTopicOwner)
+        val community = data.communityID?.let { rwCommunity.read(it) }
         lateinit var notification: NotificationData
 
-        if (topic != null && verify.verifyTopic(topic) && verify.verifyUser(creator) && verify.verifyCommunity(community) && community.checkTopicApproval(topic.getID())) {
+        if (subTopic != null && community != null && user != null && creator != null && community.checkTopicApproval(subTopic.getID())) {
             notification = NotificationData("${user.getUserName()} liked your reply.", "Thread.")
-            when (checkLikeDislike(topic, data.login.email)) {
+            when (checkLikeDislike(subTopic, data.login.email)) {
                 0 -> {
-                    topic.removeLike(data.login.email)
-                    rw.writeTopic(topic)
+                    subTopic.removeLike(data.login.email)
+                    rwSubTopic.write(subTopic)
                 }
                 1 -> {
                     if (user.getEmail() != creator.getEmail()) {
                         creator.updateInbox(notification)
-                        rw.writeUser(creator, creator.getEmail())
+                        rwUser.write(creator)
                     }
-                    topic.dislikeToLike(data.login.email)
-                    rw.writeTopic(topic)
+                    subTopic.dislikeToLike(data.login.email)
+                    rwSubTopic.write(subTopic)
                 } // like to dislike
                 2 -> {
                     if (user.getEmail() != creator.getEmail()) {
                         creator.updateInbox(notification)
-                        rw.writeUser(creator, creator.getEmail())
+                        rwUser.write(creator)
                     }
-                    topic.like(data.login.email)
-                    rw.writeTopic(topic)
+                    subTopic.like(data.login.email)
+                    rwSubTopic.write(subTopic)
                 } // hasn't DISLIKED yet
             }
         }

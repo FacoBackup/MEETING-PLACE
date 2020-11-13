@@ -1,6 +1,6 @@
 package br.meetingplace.server.controllers.subjects.entities.profile
 
-import br.meetingplace.server.controllers.dependencies.newRW.user.UserRWInterface
+import br.meetingplace.server.controllers.dependencies.readwrite.user.UserRWInterface
 import br.meetingplace.server.dto.Login
 import br.meetingplace.server.dto.user.ProfileData
 
@@ -14,7 +14,7 @@ class Profile private constructor() : ProfileInterface {
     override fun updateProfile(newProfile: ProfileData, rwUser: UserRWInterface) {
         val user = rwUser.read(newProfile.login.email)
 
-        if (user.getAge() >= 16 && user.getEmail().isNotBlank()) {
+        if (user != null) {
             user.updateProfile(
                     if (!newProfile.about.isNullOrBlank()) newProfile.about else user.getAbout(),
                     if (!newProfile.nationality.isNullOrBlank()) newProfile.nationality else user.getNationality(),
@@ -26,7 +26,9 @@ class Profile private constructor() : ProfileInterface {
 
     override fun clearNotifications(data: Login, rwUser: UserRWInterface) {
         val user = rwUser.read(data.email)
-        user.clearNotifications()
-        rwUser.write(user)
+        if(user != null){
+            user.clearNotifications()
+            rwUser.write(user)
+        }
     }
 }

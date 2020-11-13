@@ -1,7 +1,7 @@
 package br.meetingplace.server.subjects.services.community.dependencies.data
 
 data class Report(
-        val reportId: String,
+        val reportID: String,
         val creator: String,
         val serviceID: String,
         val reason: String?,

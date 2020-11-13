@@ -1,6 +1,6 @@
 package br.meetingplace.server.controllers.subjects.entities.factory
 
-import br.meetingplace.server.controllers.dependencies.newRW.user.UserRWInterface
+import br.meetingplace.server.controllers.dependencies.readwrite.user.UserRWInterface
 import br.meetingplace.server.dto.user.UserCreationData
 import br.meetingplace.server.subjects.entities.User
 
@@ -17,7 +17,7 @@ class UserFactory private constructor() : UserFactoryInterface {
 
         return if (newUser.age >= 16) {
             val existingUser = rwUser.read(user.getEmail())
-            return if (existingUser.getEmail().isNotBlank()) {
+            return if (existingUser != null) {
                 rwUser.write(user)
                 true
             } else false
