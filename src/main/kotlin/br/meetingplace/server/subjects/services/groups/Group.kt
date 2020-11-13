@@ -11,7 +11,7 @@ class Group(private val owner: GroupOwnerData, private val groupID: String, priv
     fun getOwner() = owner
     fun getNameGroup() = name
     fun getGroupID() = groupID
-    fun getChatId() = chatID
+    fun getChatID() = chatID
 
     init {
         startMembers(MemberData(owner.groupCreatorID, MemberType.CREATOR))

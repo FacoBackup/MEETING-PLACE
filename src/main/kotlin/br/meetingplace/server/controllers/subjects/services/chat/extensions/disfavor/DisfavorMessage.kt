@@ -11,7 +11,7 @@ class DisfavorMessage private constructor() {
     fun userDisfavorMessage(data: ChatSimpleOperator) {
         val user = rw.readUser(data.login.email)
         val receiver = rw.readUser(data.receiver.receiverID)
-        val chat = rw.readChat(iDs.getChatId(data.receiver.mainOwnerID, data.receiver.receiverID), data.receiver.mainOwnerID, "", group = false, community = false)
+        val chat = rw.readChat(iDs.getChatId(data.receiver.ownerID, data.receiver.receiverID), data.receiver.ownerID, "", group = false, community = false)
 
         if (verify.verifyUser(user) && verify.verifyUser(receiver) && verify.verifyChat(chat)) {
             chat.disfavorMessage(data)
@@ -22,7 +22,7 @@ class DisfavorMessage private constructor() {
     fun groupDisfavorMessage(data: ChatSimpleOperator) {
         when (data.receiver.communityGroup) {
             false -> {
-                val group = rw.readGroup(data.receiver.receiverID, data.receiver.mainOwnerID, false)
+                val group = rw.readGroup(data.receiver.receiverID, data.receiver.ownerID, false)
                 val user = rw.readUser(data.login.email)
 
                 if (verify.verifyUser(user) && verify.verifyGroup(group) && group.verifyMember(user.getEmail())) {
@@ -32,9 +32,9 @@ class DisfavorMessage private constructor() {
                 }
             }
             true -> {
-                val group = rw.readGroup(data.receiver.receiverID, data.receiver.mainOwnerID, true)
+                val group = rw.readGroup(data.receiver.receiverID, data.receiver.ownerID, true)
                 val user = rw.readUser(data.login.email)
-                val community = rw.readCommunity(data.receiver.mainOwnerID)
+                val community = rw.readCommunity(data.receiver.ownerID)
 
                 if (verify.verifyUser(user) && verify.verifyGroup(group) && verify.verifyCommunity(community)
                         && community.checkGroupApproval(group.getGroupID()) && group.verifyMember(user.getEmail())) {

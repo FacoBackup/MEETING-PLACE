@@ -19,7 +19,7 @@ class GroupDelete private constructor() {
         lateinit var members: List<String>
 
         if (user != null && group != null && data.login.email == group.getCreator() && !data.identifier.owner.isNullOrBlank()) {
-            val chat = rwChat.read(group.getChatId())
+            val chat = rwChat.read(group.getChatID())
             when (data.identifier.community) {
                 false -> { // USER
                         members = group.getMembers()

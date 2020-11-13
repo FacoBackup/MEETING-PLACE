@@ -15,7 +15,7 @@ class ShareMessage private constructor() {
         val receiver = rw.readUser(data.receiver.receiverID)
 
         if (verify.verifyUser(user) && verify.verifyUser(receiver)) {
-            val chat = rw.readChat(iDs.getChatId(data.source.mainOwnerID, data.source.receiverID), data.source.mainOwnerID, "", false, community = false)
+            val chat = rw.readChat(iDs.getChatId(data.source.ownerID, data.source.receiverID), data.source.ownerID, "", false, community = false)
             if (verify.verifyChat(chat)) {
                 val message = chat.shareMessage(data)
                 if (!message.isNullOrBlank())
@@ -27,7 +27,7 @@ class ShareMessage private constructor() {
     fun groupShareMessage(data: ChatComplexOperator) {
         when (data.receiver.communityGroup) {
             false -> {
-                val group = rw.readGroup(data.source.receiverID, data.source.mainOwnerID, false)
+                val group = rw.readGroup(data.source.receiverID, data.source.ownerID, false)
                 val user = rw.readUser(data.login.email)
 
                 if (verify.verifyUser(user) && verify.verifyGroup(group) && group.verifyMember(user.getEmail())) {
@@ -39,9 +39,9 @@ class ShareMessage private constructor() {
                 }
             }
             true -> {
-                val group = rw.readGroup(data.source.receiverID, data.source.mainOwnerID, true)
+                val group = rw.readGroup(data.source.receiverID, data.source.ownerID, true)
                 val user = rw.readUser(data.login.email)
-                val community = rw.readCommunity(data.source.mainOwnerID)
+                val community = rw.readCommunity(data.source.ownerID)
 
                 if (verify.verifyUser(user) && verify.verifyGroup(group) && verify.verifyCommunity(community)
                         && community.checkGroupApproval(group.getGroupID()) && group.verifyMember(user.getEmail())) {

@@ -15,7 +15,7 @@ class QuoteMessage private constructor() {
         lateinit var notification: NotificationData
 
         if (verify.verifyUser(user) && verify.verifyUser(receiver)) {
-            val chat = rw.readChat(iDs.getChatId(data.receiver.mainOwnerID, data.receiver.receiverID), data.receiver.mainOwnerID, "", false, community = false)
+            val chat = rw.readChat(iDs.getChatId(data.receiver.ownerID, data.receiver.receiverID), data.receiver.ownerID, "", false, community = false)
             if (verify.verifyChat(chat)) {
                 notification = NotificationData("${user.getUserName()} sent a new message.", "Message.")
                 chat.quoteMessage(data, iDs.generateId())
@@ -30,7 +30,7 @@ class QuoteMessage private constructor() {
     fun groupQuoteMessage(data: ChatComplexOperator) {
         when (data.receiver.communityGroup) {
             false -> {
-                val group = rw.readGroup(data.receiver.receiverID, data.receiver.mainOwnerID, false)
+                val group = rw.readGroup(data.receiver.receiverID, data.receiver.ownerID, false)
                 val user = rw.readUser(data.login.email)
 
                 if (verify.verifyUser(user) && verify.verifyGroup(group) && group.verifyMember(user.getEmail())) {
@@ -40,9 +40,9 @@ class QuoteMessage private constructor() {
                 }
             }
             true -> {
-                val group = rw.readGroup(data.receiver.receiverID, data.receiver.mainOwnerID, true)
+                val group = rw.readGroup(data.receiver.receiverID, data.receiver.ownerID, true)
                 val user = rw.readUser(data.login.email)
-                val community = rw.readCommunity(data.receiver.mainOwnerID)
+                val community = rw.readCommunity(data.receiver.ownerID)
 
                 if (verify.verifyUser(user) && verify.verifyGroup(group) && verify.verifyCommunity(community)
                         && community.checkGroupApproval(group.getGroupID()) && group.verifyMember(user.getEmail())) {
