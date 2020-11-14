@@ -54,7 +54,7 @@ import io.ktor.server.netty.*
 
 
 fun main() {
-    val port = System.getenv("PORT")?.toInt() ?: 3000
+    val port = System.getenv("PORT")?.toInt() ?: 32221
 
     embeddedServer(Netty, port) {
         routing {
