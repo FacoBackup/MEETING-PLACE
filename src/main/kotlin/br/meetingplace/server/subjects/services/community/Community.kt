@@ -36,13 +36,13 @@ class Community(private val name: String, private val id: String, private var ab
 
     fun updateFollower(data: String, remove: Boolean) {
         when (remove) {
-            true -> {
-                if (data in getMembers()) {
+            false -> {
+                if (!verifyMember(data)) {
                     updateMember(MemberData(data, MemberType.NORMAL), false)
                 }
             }
-            false -> {
-                if (data !in getMembers()) {
+            true -> {
+                if (verifyMember(data)) {
                     updateMember(MemberData(data, MemberType.NORMAL), true)
                 }
             }

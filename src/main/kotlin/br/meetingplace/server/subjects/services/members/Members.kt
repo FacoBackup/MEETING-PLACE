@@ -36,12 +36,10 @@ abstract class Members {
             true -> {
                 if (verifyMember(member.userEmail))
                     members.remove(member)
-
             }
             false -> {
                 if (!verifyMember(member.userEmail))
                     members.add(member)
-
             }
         }
     }

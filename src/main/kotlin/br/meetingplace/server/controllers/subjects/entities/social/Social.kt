@@ -1,4 +1,4 @@
-package br.meetingplace.server.controllers.subjects.entities.follow
+package br.meetingplace.server.controllers.subjects.entities.social
 
 import br.meetingplace.server.controllers.readwrite.community.CommunityRWInterface
 import br.meetingplace.server.controllers.readwrite.user.UserRWInterface
@@ -6,10 +6,10 @@ import br.meetingplace.server.controllers.readwrite.user.UserRWInterface
 import br.meetingplace.server.dto.SimpleOperator
 import br.meetingplace.server.subjects.services.notification.NotificationData
 
-class Follow private constructor() : FollowInterface {
+class Social private constructor() : SocialInterface {
 
     companion object {
-        private val Class = Follow()
+        private val Class = Social()
         fun getClass() = Class
     }
 
@@ -36,8 +36,8 @@ class Follow private constructor() : FollowInterface {
                 }
                 true -> { //COMMUNITY
                     val community = rwCommunity.read(data.identifier.ID)
-                    if (community != null && community.verifyMember(data.login.email)) {
 
+                    if (community != null && !community.verifyMember(data.login.email)) {
                         user.updateCommunitiesIFollow(community.getID(), false)
                         community.updateFollower(data.identifier.ID, false)
                         rwUser.write(user)
@@ -56,7 +56,7 @@ class Follow private constructor() : FollowInterface {
             when (data.identifier.community) {
                 false -> { //USER
                     val external = rwUser.read(data.identifier.ID)
-                    if (external != null && user.getEmail() in external.getFollowers()) {
+                    if (external != null && user.getEmail() !in external.getFollowers()) {
 
                         external.updateFollowers(user.getEmail(), true)
                         user.updateFollowing(external.getEmail(), true)
@@ -68,9 +68,8 @@ class Follow private constructor() : FollowInterface {
                 true -> { //COMMUNITY
                     val community = rwCommunity.read(data.identifier.ID)
 
-                    if (community != null && community.verifyMember(data.login.email)) {
-
-                        user.updateCommunitiesIFollow(data.identifier.ID, true)
+                    if (community != null && !community.verifyMember(data.login.email)) {
+                        user.updateCommunitiesIFollow(community.getID(), true)
                         community.updateFollower(data.identifier.ID, true)
                         rwUser.write(user)
                         rwCommunity.write(community)

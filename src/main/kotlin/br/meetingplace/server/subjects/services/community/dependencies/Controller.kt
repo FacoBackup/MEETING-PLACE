@@ -10,7 +10,7 @@ import br.meetingplace.server.subjects.services.topic.SimplifiedTopic
 
 abstract class Controller : Members(), CommunityTopicsInterface, CommunityGroupsInterface {
 
-    private val threads = CommunityTopics.getClass()
+    private val topics = CommunityTopics.getClass()
     private val groups = CommunityGroups.getClass()
 
     override fun checkGroupApproval(id: String): Boolean {
@@ -18,7 +18,7 @@ abstract class Controller : Members(), CommunityTopicsInterface, CommunityGroups
     }
 
     override fun checkTopicApproval(id: String): Boolean {
-        return threads.checkTopicApproval(id)
+        return topics.checkTopicApproval(id)
     }
 
     override fun getApprovedGroups(): List<String> {
@@ -30,19 +30,19 @@ abstract class Controller : Members(), CommunityTopicsInterface, CommunityGroups
     }
 
     override fun getIdReports(): List<String> {
-        return threads.getIdReports()
+        return topics.getIdReports()
     }
 
     override fun getIdTopics(): List<SimplifiedTopic> {
-        return threads.getIdTopics()
+        return topics.getIdTopics()
     }
 
     override fun getReportedTopics(): List<Report> {
-        return threads.getReportedTopics()
+        return topics.getReportedTopics()
     }
 
     override fun getTopicsInValidation(): List<SimplifiedTopic> {
-        return threads.getTopicsInValidation()
+        return topics.getTopicsInValidation()
     }
 
     override fun removeApprovedGroup(group: String) {
@@ -50,7 +50,7 @@ abstract class Controller : Members(), CommunityTopicsInterface, CommunityGroups
     }
 
     override fun removeApprovedTopic(topic: SimplifiedTopic) {
-        threads.removeApprovedTopic(topic)
+        topics.removeApprovedTopic(topic)
     }
 
     override fun updateGroupsInValidation(group: String, approve: Boolean?) {
@@ -58,10 +58,10 @@ abstract class Controller : Members(), CommunityTopicsInterface, CommunityGroups
     }
 
     override fun updateReport(data: Report, delete: Boolean) {
-        threads.updateReport(data, delete)
+        topics.updateReport(data, delete)
     }
 
     override fun updateTopicInValidation(topic: SimplifiedTopic, approve: Boolean?) {
-        threads.updateTopicInValidation(topic, approve)
+        topics.updateTopicInValidation(topic, approve)
     }
 }

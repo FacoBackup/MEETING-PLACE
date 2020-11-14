@@ -1,0 +1,30 @@
+{
+  "userName": "cafe",
+  "age": 18,
+  "email": "joao@gmail.com",
+  "password": "9876",
+  "profile": {},
+  "social": {
+    "followers": [],
+    "following": []
+  },
+  "notifications": {
+    "inbox": []
+  },
+  "chat": {
+    "myChats": []
+  },
+  "topics": {
+    "myTopics": []
+  },
+  "groups": {
+    "myGroups": [],
+    "memberIn": []
+  },
+  "communities": {
+    "moderatorIn": [
+      "teste"
+    ],
+    "communitiesIFollow": []
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "userName": "cafe",
+  "age": 18,
+  "email": "cafe@gmail.com",
+  "password": "9876",
+  "profile": {},
+  "social": {
+    "followers": [],
+    "following": []
+  },
+  "notifications": {
+    "inbox": []
+  },
+  "chat": {
+    "myChats": []
+  },
+  "topics": {
+    "myTopics": []
+  },
+  "groups": {
+    "myGroups": [],
+    "memberIn": []
+  },
+  "communities": {
+    "moderatorIn": [],
+    "communitiesIFollow": []
+  }
+}

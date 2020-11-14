@@ -7,7 +7,7 @@ import br.meetingplace.server.controllers.readwrite.topic.TopicRW
 import br.meetingplace.server.controllers.readwrite.user.UserRW
 import br.meetingplace.server.controllers.subjects.entities.delete.UserDelete
 import br.meetingplace.server.controllers.subjects.entities.factory.UserFactory
-import br.meetingplace.server.controllers.subjects.entities.follow.Follow
+import br.meetingplace.server.controllers.subjects.entities.social.Social
 import br.meetingplace.server.controllers.subjects.entities.profile.Profile
 import br.meetingplace.server.controllers.subjects.entities.reader.UserReader
 import br.meetingplace.server.controllers.subjects.services.chat.base.delete.DeleteMessage
@@ -22,7 +22,6 @@ import br.meetingplace.server.controllers.subjects.services.community.moderators
 import br.meetingplace.server.controllers.subjects.services.group.delete.GroupDelete
 import br.meetingplace.server.controllers.subjects.services.group.factory.GroupFactory
 import br.meetingplace.server.controllers.subjects.services.group.members.GroupMembers
-import br.meetingplace.server.controllers.subjects.services.search.community.CommunitySearch
 import br.meetingplace.server.controllers.subjects.services.search.group.GroupSearch
 import br.meetingplace.server.controllers.subjects.services.search.user.UserSearch
 import br.meetingplace.server.controllers.subjects.services.topic.delete.DeleteTopic
@@ -85,7 +84,7 @@ fun main() {
 
             get("/search/community") {
                 val data = call.receive<SimpleOperator>()
-                val search = CommunitySearch.getClass().searchCommunity(data, rwCommunity = CommunityRW.getClass())
+                val search = CommunityRW.getClass().read(data.identifier.ID)
 
                 if (search == null)
                     call.respond("Nothing found.")
@@ -144,11 +143,11 @@ fun main() {
             }
             patch("/follow") {
                 val follow = call.receive<SimpleOperator>()
-                call.respond(Follow.getClass().follow(follow, rwUser = UserRW.getClass(),rwCommunity = CommunityRW.getClass()))
+                call.respond(Social.getClass().follow(follow, rwUser = UserRW.getClass(),rwCommunity = CommunityRW.getClass()))
             }
             patch("/unfollow") {
                 val unfollow = call.receive<SimpleOperator>()
-                call.respond(Follow.getClass().unfollow(unfollow, rwUser = UserRW.getClass(),rwCommunity = CommunityRW.getClass()))
+                call.respond(Social.getClass().unfollow(unfollow, rwUser = UserRW.getClass(),rwCommunity = CommunityRW.getClass()))
             }
             //CHAT
             get("/see/chat") {
