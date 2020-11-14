@@ -1,7 +1,5 @@
 package br.meetingplace.server.subjects.entities.dependencies.services.topic
 
-import br.meetingplace.server.subjects.services.topic.SimplifiedTopic
-
 class UserTopics private constructor() : UserTopicsInterface {
     companion object {
         private val Class = UserTopics()

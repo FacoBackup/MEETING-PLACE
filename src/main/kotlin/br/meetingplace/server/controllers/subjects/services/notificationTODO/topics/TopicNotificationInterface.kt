@@ -1,3 +1,0 @@
-package br.meetingplace.server.controllers.subjects.services.notificationTODO.topics
-
-interface TopicNotificationInterface

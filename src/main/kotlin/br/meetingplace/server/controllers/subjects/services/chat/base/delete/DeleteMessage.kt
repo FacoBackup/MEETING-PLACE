@@ -23,16 +23,25 @@ class DeleteMessage private constructor() {
                         when(data.receiver.communityGroup){
                             true->{
                                 val community = rwCommunity.read(group.getOwner().groupOwnerID)
-                                if(community != null && chat != null)
+                                if(community != null && chat != null) {
                                     chat.deleteMessage(data)
+                                    rwChat.write(chat)
+                                }
+
                             }
-                            false-> chat?.deleteMessage(data)
+                            false-> if(chat!= null){
+                                        chat.deleteMessage(data)
+                                        rwChat.write(chat)
+                                    }
                         }
                     }
                 }
                 false->{ //USER <-> USER
                     val chat = rwChat.read(data.receiver.chatID)
-                    chat?.deleteMessage(data)
+                    if(chat!= null){
+                        chat.deleteMessage(data)
+                        rwChat.write(chat)
+                    }
                 }
             }
         }

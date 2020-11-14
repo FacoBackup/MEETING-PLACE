@@ -14,9 +14,11 @@ class UserRW private constructor(): UserRWInterface {
 
     override fun delete(data: User) {
         val directory = (File("build.gradle").absolutePath.removeSuffix("build.gradle") + "/src/main/kotlin/br/meetingplace/DATA_BASE/USERS/${data.getEmail()}")
-        val file = File(directory)
+        val filePath = "$directory/${data.getEmail()}.json"
+
         try {
-            file.delete()
+            File(filePath).delete()
+            File(directory).delete()
         } catch (e: Exception) {
             println(e.message)
         }

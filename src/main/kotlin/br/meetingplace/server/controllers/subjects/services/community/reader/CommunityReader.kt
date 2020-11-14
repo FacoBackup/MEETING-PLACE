@@ -5,7 +5,6 @@ import br.meetingplace.server.controllers.dependencies.readwrite.topic.main.Topi
 import br.meetingplace.server.controllers.dependencies.readwrite.user.UserRWInterface
 import br.meetingplace.server.dto.SimpleOperator
 import br.meetingplace.server.subjects.services.community.dependencies.data.Report
-import br.meetingplace.server.subjects.services.groups.Group
 import br.meetingplace.server.subjects.services.members.data.MemberType
 import br.meetingplace.server.subjects.services.topic.SimplifiedTopic
 import br.meetingplace.server.subjects.services.topic.Topic
@@ -55,18 +54,18 @@ class CommunityReader {
         return listOf()
     }
 
-    fun seeGroups(data: SimpleOperator): List<Group> {
-//        val logged = rw.readLoggedUser().email
-//        val user = rw.readUser(logged)
-//        val community = rw.readCommunity(iDs.getCommunityId(data.ID))
+//    fun seeGroups(data: SimpleOperator): List<Group> {
+////        val logged = rw.readLoggedUser().email
+////        val user = rw.readUser(logged)
+////        val community = rw.readCommunity(iDs.getCommunityId(data.ID))
+////
+////        if (verify.verifyUser(user) && verify.verifyCommunity(community)){
+////            val groupIDs = community.getApprovedGroups()
+////            //for (i in groupIDs.indices)
+////
+////        }
+////        return listOf()
 //
-//        if (verify.verifyUser(user) && verify.verifyCommunity(community)){
-//            val groupIDs = community.getApprovedGroups()
-//            //for (i in groupIDs.indices)
-//
-//        }
-//        return listOf()
-
-        TODO("NOT IMPLEMENTED YET")
-    }
+//        TODO("NOT IMPLEMENTED YET")
+//    }
 }

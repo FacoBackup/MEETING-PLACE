@@ -124,7 +124,7 @@ fun main() {
                 call.respond(UserDelete.getClass().delete(data, rwUser = UserRW.getClass(),rwTopic = TopicRW.getClass()))
             }
 
-            post("/user/clear/notifications") {
+            patch("/clear") {
                 val data = call.receive<Login>()
                 call.respond(Profile.getClass().clearNotifications(data, rwUser = UserRW.getClass()))
             }
@@ -151,30 +151,30 @@ fun main() {
                     call.respond(chat)
             }
             post("/message") {
-                val chat = call.receive<MessageData>()
-                call.respond(SendMessage.getClass().sendMessage(chat, rwChat = ChatRW.getClass(),rwCommunity = CommunityRW.getClass(),rwGroup = GroupRW.getClass(),rwUser = UserRW.getClass()))
+                val data = call.receive<MessageData>()
+                call.respond(SendMessage.getClass().sendMessage(data, rwChat = ChatRW.getClass(),rwCommunity = CommunityRW.getClass(),rwGroup = GroupRW.getClass(),rwUser = UserRW.getClass()))
             }
             delete("/message") {
-                val chat = call.receive<ChatSimpleOperator>()
-                call.respond(DeleteMessage.getClass().deleteMessage(chat, rwChat = ChatRW.getClass(),rwCommunity = CommunityRW.getClass(),rwGroup = GroupRW.getClass(),rwUser = UserRW.getClass()))
+                val data = call.receive<ChatSimpleOperator>()
+                call.respond(DeleteMessage.getClass().deleteMessage(data, rwChat = ChatRW.getClass(),rwCommunity = CommunityRW.getClass(),rwGroup = GroupRW.getClass(),rwUser = UserRW.getClass()))
             }
 
             post("/message/quote") {
-                val chat = call.receive<ChatComplexOperator>()
-                call.respond(QuoteMessage.getClass().quoteMessage(chat))
+                val data = call.receive<ChatComplexOperator>()
+                call.respond(QuoteMessage.getClass().quoteMessage(data, rwUser = UserRW.getClass(),rwGroup = GroupRW.getClass(),rwCommunity = CommunityRW.getClass(),rwChat = ChatRW.getClass()))
             }
 
             patch("/message/favorite") {
-                val chat = call.receive<ChatSimpleOperator>()
-                call.respond(FavoriteMessage.getClass().favoriteMessage(chat))
+                val data = call.receive<ChatSimpleOperator>()
+                call.respond(FavoriteMessage.getClass().favoriteMessage(data, rwUser = UserRW.getClass(),rwGroup = GroupRW.getClass(),rwCommunity = CommunityRW.getClass(),rwChat = ChatRW.getClass()))
             }
-            patch("/message/unFavorite") {
-                val chat = call.receive<ChatSimpleOperator>()
-                call.respond(DisfavorMessage.getClass().disfavorMessage(chat))
+            patch("/message/disfavor") {
+                val data = call.receive<ChatSimpleOperator>()
+                call.respond(DisfavorMessage.getClass().disfavorMessage(data, rwUser = UserRW.getClass(),rwGroup = GroupRW.getClass(),rwCommunity = CommunityRW.getClass(),rwChat = ChatRW.getClass()))
             }
             patch("/message/share") {
-                val chat = call.receive<ChatComplexOperator>()
-                call.respond(ShareMessage.getClass().shareMessage(chat))
+                val data = call.receive<ChatComplexOperator>()
+                call.respond(ShareMessage.getClass().shareMessage(data, rwUser = UserRW.getClass(),rwGroup = GroupRW.getClass(),rwCommunity = CommunityRW.getClass(),rwChat = ChatRW.getClass()))
             }
 
             //TOPICS

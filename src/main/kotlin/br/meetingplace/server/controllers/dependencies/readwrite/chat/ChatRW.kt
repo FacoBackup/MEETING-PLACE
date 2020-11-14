@@ -14,9 +14,9 @@ class ChatRW private constructor() : ChatRWInterface{
 
     override fun delete(data: Chat) {
         val directory = (File("build.gradle").absolutePath.removeSuffix("build.gradle") + "/src/main/kotlin/br/meetingplace/DATA_BASE/CHATS/${data.getID()}.json")
-        val file = File(directory)
+
         try {
-            file.delete()
+            File(directory).delete()
         } catch (e: Exception) {
             println(e.message)
         }
@@ -41,9 +41,6 @@ class ChatRW private constructor() : ChatRWInterface{
         try {
             val file = File(directory)
             val json = gson.toJson(data)
-
-            if (!File(directory).exists())
-                File(directory).mkdir()
 
             file.writeText(json)
         } catch (e: Exception) {

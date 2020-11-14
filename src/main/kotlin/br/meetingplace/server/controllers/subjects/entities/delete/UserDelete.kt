@@ -19,7 +19,8 @@ class UserDelete private constructor() : UserDeleteInterface {
         if (user != null && data.email == user.getEmail() && data.password == user.getPassword()) {
             followers = user.getFollowers()
             following = user.getFollowing()
-
+            println(followers)
+            println(following)
             for (index in followers.indices) {
                 val userExternal = rwUser.read(followers[index])
                 if (userExternal != null) {

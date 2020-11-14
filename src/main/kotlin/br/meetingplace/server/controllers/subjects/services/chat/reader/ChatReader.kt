@@ -3,7 +3,6 @@ package br.meetingplace.server.controllers.subjects.services.chat.reader
 import br.meetingplace.server.controllers.dependencies.readwrite.chat.ChatRWInterface
 import br.meetingplace.server.controllers.dependencies.readwrite.community.CommunityRWInterface
 import br.meetingplace.server.controllers.dependencies.readwrite.group.GroupRWInterface
-import br.meetingplace.server.controllers.dependencies.readwrite.user.UserRW
 import br.meetingplace.server.controllers.dependencies.readwrite.user.UserRWInterface
 import br.meetingplace.server.dto.chat.ChatFinderOperator
 import br.meetingplace.server.subjects.services.chat.Chat

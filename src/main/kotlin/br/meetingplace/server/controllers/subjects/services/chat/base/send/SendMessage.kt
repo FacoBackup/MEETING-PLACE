@@ -5,12 +5,10 @@ import br.meetingplace.server.controllers.dependencies.readwrite.community.Commu
 import br.meetingplace.server.controllers.dependencies.readwrite.group.GroupRWInterface
 import br.meetingplace.server.controllers.dependencies.readwrite.user.UserRWInterface
 import br.meetingplace.server.dto.chat.MessageData
-import br.meetingplace.server.subjects.entities.User
 import br.meetingplace.server.subjects.services.chat.Chat
 import br.meetingplace.server.subjects.services.chat.SimplifiedChat
 import br.meetingplace.server.subjects.services.chat.dependencies.data.MessageContent
 import br.meetingplace.server.subjects.services.chat.dependencies.data.MessageType
-import br.meetingplace.server.subjects.services.groups.Group
 import br.meetingplace.server.subjects.services.notification.NotificationData
 import br.meetingplace.server.subjects.services.owner.OwnerType
 import br.meetingplace.server.subjects.services.owner.chat.ChatOwnerData
@@ -23,7 +21,7 @@ class SendMessage private constructor() {
     }
     fun sendMessage(data: MessageData, rwUser: UserRWInterface, rwGroup: GroupRWInterface, rwCommunity: CommunityRWInterface, rwChat: ChatRWInterface){
         val user = rwUser.read(data.login.email)
-        if(user != null){
+        if(user != null && data.receiver.receiverID != data.login.email){
             when(data.receiver.userGroup || data.receiver.communityGroup){
                 true -> { //GROUP
                     val group = rwGroup.read(data.receiver.receiverID)
@@ -33,13 +31,15 @@ class SendMessage private constructor() {
                             true -> {
                                 val community = rwCommunity.read(group.getOwner().groupOwnerID)
                                 if (community != null && chat != null) {
-                                    val messageContent = MessageContent(data.message, UUID.randomUUID().toString(), user.getEmail(), MessageType.NORMAL)
-                                    chat.addMessage(messageContent)
+                                    chat.addMessage(MessageContent(data.message, UUID.randomUUID().toString(), user.getEmail(), data.messageType ?: MessageType.NORMAL))
+                                    rwChat.write(chat)
                                 }
                             }
                             false -> {
-                                val messageContent = MessageContent(data.message, UUID.randomUUID().toString(), user.getEmail(), MessageType.NORMAL)
-                                chat?.addMessage(messageContent)
+                                if(chat != null){
+                                    chat.addMessage(MessageContent(data.message, UUID.randomUUID().toString(), user.getEmail(), data.messageType ?: MessageType.NORMAL))
+                                    rwChat.write(chat)
+                                }
                             }
                         }
                     }
@@ -47,8 +47,8 @@ class SendMessage private constructor() {
                 false->{ //USER <-> USER
                     val chat = rwChat.read(data.receiver.chatID)
                     if(chat != null){
-                        val messageContent = MessageContent(data.message, UUID.randomUUID().toString(), user.getEmail(), MessageType.NORMAL)
-                        chat.addMessage(messageContent)
+                        chat.addMessage(MessageContent(data.message, UUID.randomUUID().toString(), user.getEmail(), data.messageType ?: MessageType.NORMAL))
+                        rwChat.write(chat)
                     }
                     else createChat(data, rwUser, rwChat)
                 }
@@ -66,7 +66,7 @@ class SendMessage private constructor() {
         lateinit var chat: Chat
 
         if (user != null && receiver!= null) {
-            chat = Chat(UUID.randomUUID().toString(), ChatOwnerData(user.getEmail(), user.getEmail(), OwnerType.USER, OwnerType.USER))
+            chat = Chat(UUID.randomUUID().toString(), ChatOwnerData(user.getEmail(), receiver.getEmail(), OwnerType.USER, OwnerType.USER))
             notification = NotificationData("${user.getUserName()} started a conversation with you.", "Message.")
 
             messageContent = MessageContent(data.message, UUID.randomUUID().toString(), logged, data.messageType ?: MessageType.NORMAL)
@@ -76,7 +76,7 @@ class SendMessage private constructor() {
             user.updateMyChats(SimplifiedChat(chat.getID(), receiver.getEmail()))
             receiver.updateMyChats(SimplifiedChat(chat.getID(), user.getEmail()))
             receiver.updateInbox(notification)
-
+            println ("HEre ")
             rwChat.write(chat)
             rwUser.write(user)
             rwUser.write(receiver)

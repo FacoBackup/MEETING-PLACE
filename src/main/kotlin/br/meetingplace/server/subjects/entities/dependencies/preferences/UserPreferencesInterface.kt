@@ -1,3 +1,0 @@
-package br.meetingplace.server.subjects.entities.dependencies.preferences
-
-interface UserPreferencesInterface

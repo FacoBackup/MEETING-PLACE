@@ -1,6 +1,5 @@
 package br.meetingplace.server.subjects.entities.dependencies
 
-import br.meetingplace.server.subjects.entities.SimplifiedUser
 import br.meetingplace.server.subjects.entities.dependencies.profile.UserProfile
 import br.meetingplace.server.subjects.entities.dependencies.profile.UserProfileInterface
 import br.meetingplace.server.subjects.entities.dependencies.services.chat.UserChat
@@ -17,16 +16,15 @@ import br.meetingplace.server.subjects.entities.dependencies.services.topic.User
 import br.meetingplace.server.subjects.entities.dependencies.services.topic.UserTopicsInterface
 import br.meetingplace.server.subjects.services.chat.SimplifiedChat
 import br.meetingplace.server.subjects.services.notification.NotificationData
-import br.meetingplace.server.subjects.services.topic.SimplifiedTopic
 
 
 abstract class Controller : UserChatInterface, UserCommunityInterface, UserFollowInterface, UserGroupsInterface,
         UserTopicsInterface, UserProfileInterface, UserNotificationsInterface {
     private val profile = UserProfile.getClass()
-    private val follow = UserFollow.getClass()
+    private val social = UserFollow.getClass()
     private val notifications = UserNotifications.getClass()
     private val chat = UserChat.getClass()
-    private val threads = UserTopics.getClass()
+    private val topics = UserTopics.getClass()
     private val groups = UserGroups.getClass()
     private val communities = UserCommunity.getClass()
 
@@ -80,11 +78,11 @@ abstract class Controller : UserChatInterface, UserCommunityInterface, UserFollo
 
     //FOLLOW
     override fun getFollowers(): List<String> {
-        return follow.getFollowers()
+        return social.getFollowers()
     }
 
     override fun getFollowing(): List<String> {
-        return follow.getFollowing()
+        return social.getFollowing()
     }
 
     //CHAT
@@ -94,20 +92,20 @@ abstract class Controller : UserChatInterface, UserCommunityInterface, UserFollo
 
     //THREADS
     override fun getMyTopics(): List<String> {
-        return threads.getMyTopics()
+        return topics.getMyTopics()
     }
 
     override fun updateMyTopics(topic: String, add: Boolean) {
-        threads.updateMyTopics(topic, add)
+        topics.updateMyTopics(topic, add)
     }
 
 
     override fun updateFollowers(data: String, remove: Boolean) {
-        follow.updateFollowers(data, remove)
+        social.updateFollowers(data, remove)
     }
 
     override fun updateFollowing(data: String, remove: Boolean) {
-        follow.updateFollowing(data, remove)
+        social.updateFollowing(data, remove)
     }
 
     //GROUPS
