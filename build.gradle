@@ -1,11 +1,11 @@
 plugins {
     id 'java'
-	id 'com.github.johnrengelman.shadow' version '6.0.0'
+	//id 'com.github.johnrengelman.shadow' version '6.0.0'
  	 id 'org.jetbrains.kotlin.jvm' version '1.4.0'
     id 'application'
 }
 
-group 'br.meetingplace'
+group 'br.meetingplace.server'
 version 'alpha-1.01'
 
 repositories {
