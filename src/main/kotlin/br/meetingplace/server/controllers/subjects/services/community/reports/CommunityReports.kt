@@ -1,9 +1,9 @@
 package br.meetingplace.server.controllers.subjects.services.community.reports
 
-import br.meetingplace.server.controllers.dependencies.readwrite.community.CommunityRWInterface
-import br.meetingplace.server.controllers.dependencies.readwrite.report.ReportRWInterface
-import br.meetingplace.server.controllers.dependencies.readwrite.topic.main.TopicRWInterface
-import br.meetingplace.server.controllers.dependencies.readwrite.user.UserRWInterface
+import br.meetingplace.server.controllers.readwrite.community.CommunityRWInterface
+import br.meetingplace.server.controllers.readwrite.report.ReportRWInterface
+import br.meetingplace.server.controllers.readwrite.topic.TopicRWInterface
+import br.meetingplace.server.controllers.readwrite.user.UserRWInterface
 import br.meetingplace.server.dto.community.ApprovalData
 import br.meetingplace.server.dto.community.ReportData
 import br.meetingplace.server.subjects.services.community.dependencies.data.Report
@@ -21,7 +21,7 @@ class CommunityReports private constructor() {
 
 
         if (user != null && community != null && community.checkTopicApproval(data.identifier.ID)) {
-            val topic = rwTopic.read(data.identifier.ID)
+            val topic = rwTopic.read(data.identifier.ID, null)
             if (topic != null) {
                 val newReport = Report(
                         UUID.randomUUID().toString(),

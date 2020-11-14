@@ -1,8 +1,8 @@
 package br.meetingplace.server.controllers.subjects.services.community.reader
 
-import br.meetingplace.server.controllers.dependencies.readwrite.community.CommunityRWInterface
-import br.meetingplace.server.controllers.dependencies.readwrite.topic.main.TopicRWInterface
-import br.meetingplace.server.controllers.dependencies.readwrite.user.UserRWInterface
+import br.meetingplace.server.controllers.readwrite.community.CommunityRWInterface
+import br.meetingplace.server.controllers.readwrite.topic.TopicRWInterface
+import br.meetingplace.server.controllers.readwrite.user.UserRWInterface
 import br.meetingplace.server.dto.SimpleOperator
 import br.meetingplace.server.subjects.services.community.dependencies.data.Report
 import br.meetingplace.server.subjects.services.members.data.MemberType
@@ -43,7 +43,7 @@ class CommunityReader {
             val communityTopics = mutableListOf<Topic>()
 
             for (element in topics) {
-                val topic = rwTopic.read(element.ID)
+                val topic = rwTopic.read(element.ID, null)
                 if (topic != null)
                     communityTopics.add(topic)
             }

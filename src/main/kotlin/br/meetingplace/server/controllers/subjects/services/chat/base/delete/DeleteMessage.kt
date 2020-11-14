@@ -1,9 +1,9 @@
 package br.meetingplace.server.controllers.subjects.services.chat.base.delete
 
-import br.meetingplace.server.controllers.dependencies.readwrite.chat.ChatRWInterface
-import br.meetingplace.server.controllers.dependencies.readwrite.community.CommunityRWInterface
-import br.meetingplace.server.controllers.dependencies.readwrite.group.GroupRWInterface
-import br.meetingplace.server.controllers.dependencies.readwrite.user.UserRWInterface
+import br.meetingplace.server.controllers.readwrite.chat.ChatRWInterface
+import br.meetingplace.server.controllers.readwrite.community.CommunityRWInterface
+import br.meetingplace.server.controllers.readwrite.group.GroupRWInterface
+import br.meetingplace.server.controllers.readwrite.user.UserRWInterface
 import br.meetingplace.server.dto.chat.ChatSimpleOperator
 
 class DeleteMessage private constructor() {

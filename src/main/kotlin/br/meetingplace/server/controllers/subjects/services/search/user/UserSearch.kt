@@ -1,6 +1,6 @@
 package br.meetingplace.server.controllers.subjects.services.search.user
 
-import br.meetingplace.server.controllers.dependencies.readwrite.user.UserRWInterface
+import br.meetingplace.server.controllers.readwrite.user.UserRWInterface
 import br.meetingplace.server.dto.SimpleOperator
 import br.meetingplace.server.subjects.entities.SimplifiedUser
 

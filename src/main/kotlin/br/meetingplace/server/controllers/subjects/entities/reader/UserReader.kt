@@ -1,7 +1,7 @@
 package br.meetingplace.server.controllers.subjects.entities.reader
 
-import br.meetingplace.server.controllers.dependencies.readwrite.topic.main.TopicRWInterface
-import br.meetingplace.server.controllers.dependencies.readwrite.user.UserRWInterface
+import br.meetingplace.server.controllers.readwrite.topic.TopicRWInterface
+import br.meetingplace.server.controllers.readwrite.user.UserRWInterface
 import br.meetingplace.server.dto.Login
 import br.meetingplace.server.subjects.services.topic.Topic
 
@@ -12,7 +12,7 @@ class UserReader private constructor() : UserReaderInterface {
         fun getClass() = Class
     }
 
-    override fun getMyThreads(data: Login, rwUser: UserRWInterface, rwTopic: TopicRWInterface): MutableList<Topic> {
+    override fun getMyTopics(data: Login, rwUser: UserRWInterface, rwTopic: TopicRWInterface): MutableList<Topic> {
         val user = rwUser.read(data.email)
         val myThreads = mutableListOf<Topic>()
         lateinit var myTopicIds: List<String>
@@ -21,7 +21,7 @@ class UserReader private constructor() : UserReaderInterface {
             myTopicIds = user.getMyTopics()
 
             for (element in myTopicIds) {
-                val topic = rwTopic.read(element)
+                val topic = rwTopic.read(element, null)
                 if (topic != null)
                     myThreads.add(topic)
             }
@@ -42,7 +42,7 @@ class UserReader private constructor() : UserReaderInterface {
                 if (following != null) {
                     val followingThreads = following.getMyTopics()
                     for (element in followingThreads) {
-                        val topic = rwTopic.read(element)
+                        val topic = rwTopic.read(element, null)
                         if (topic != null)
                             myTimeline.add(topic)
                     }

@@ -1,11 +1,10 @@
 package br.meetingplace.server
 
-import br.meetingplace.server.controllers.dependencies.readwrite.chat.ChatRW
-import br.meetingplace.server.controllers.dependencies.readwrite.community.CommunityRW
-import br.meetingplace.server.controllers.dependencies.readwrite.group.GroupRW
-import br.meetingplace.server.controllers.dependencies.readwrite.topic.main.TopicRW
-import br.meetingplace.server.controllers.dependencies.readwrite.topic.sub.SubTopicRW
-import br.meetingplace.server.controllers.dependencies.readwrite.user.UserRW
+import br.meetingplace.server.controllers.readwrite.chat.ChatRW
+import br.meetingplace.server.controllers.readwrite.community.CommunityRW
+import br.meetingplace.server.controllers.readwrite.group.GroupRW
+import br.meetingplace.server.controllers.readwrite.topic.TopicRW
+import br.meetingplace.server.controllers.readwrite.user.UserRW
 import br.meetingplace.server.controllers.subjects.entities.delete.UserDelete
 import br.meetingplace.server.controllers.subjects.entities.factory.UserFactory
 import br.meetingplace.server.controllers.subjects.entities.follow.Follow
@@ -26,10 +25,10 @@ import br.meetingplace.server.controllers.subjects.services.group.members.GroupM
 import br.meetingplace.server.controllers.subjects.services.search.community.CommunitySearch
 import br.meetingplace.server.controllers.subjects.services.search.group.GroupSearch
 import br.meetingplace.server.controllers.subjects.services.search.user.UserSearch
-import br.meetingplace.server.controllers.subjects.services.topic.delete.Delete
-import br.meetingplace.server.controllers.subjects.services.topic.dislike.Dislike
+import br.meetingplace.server.controllers.subjects.services.topic.delete.DeleteTopic
+import br.meetingplace.server.controllers.subjects.services.topic.dislike.DislikeTopic
 import br.meetingplace.server.controllers.subjects.services.topic.factory.TopicFactory
-import br.meetingplace.server.controllers.subjects.services.topic.like.Like
+import br.meetingplace.server.controllers.subjects.services.topic.like.LikeTopic
 import br.meetingplace.server.dto.CreationData
 import br.meetingplace.server.dto.Login
 import br.meetingplace.server.dto.MemberOperator
@@ -40,6 +39,7 @@ import br.meetingplace.server.dto.chat.ChatSimpleOperator
 import br.meetingplace.server.dto.chat.MessageData
 import br.meetingplace.server.dto.community.ApprovalData
 import br.meetingplace.server.dto.topics.TopicData
+import br.meetingplace.server.dto.topics.TopicIdentifier
 import br.meetingplace.server.dto.topics.TopicOperationsData
 import br.meetingplace.server.dto.user.ProfileData
 import br.meetingplace.server.dto.user.UserCreationData
@@ -52,9 +52,8 @@ import io.ktor.routing.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 
-
 fun main() {
-    val port = System.getenv("PORT")?.toInt() ?: 32221
+    val port = System.getenv("PORT")?.toInt() ?: 8080
 
     embeddedServer(Netty, port) {
         routing {
@@ -64,6 +63,16 @@ fun main() {
                 }
             }
             //SEARCH
+            get("/search/topic"){
+                val data = call.receive<TopicIdentifier>()
+                val search = if(!data.subTopicID.isNullOrBlank()) TopicRW.getClass().read(data.subTopicID,data.mainTopicID)
+                else TopicRW.getClass().read(data.mainTopicID, null)
+
+                if (search == null)
+                    call.respond("Nothing found.")
+                else
+                    call.respond(search)
+            }
             get("/search/user") {
                 val data = call.receive<SimpleOperator>()
                 val search = UserSearch.getClass().searchUser(data, rwUser = UserRW.getClass())
@@ -180,7 +189,7 @@ fun main() {
             //TOPICS
             get("/user/topics") {
                 val data = call.receive<Login>()
-                val topics = UserReader.getClass().getMyThreads(data, rwUser = UserRW.getClass(),rwTopic = TopicRW.getClass())
+                val topics = UserReader.getClass().getMyTopics(data, rwUser = UserRW.getClass(),rwTopic = TopicRW.getClass())
                 if (topics.isEmpty())
                     call.respond("Nothing Found.")
                 else
@@ -196,21 +205,21 @@ fun main() {
             }
             post("/topic") {
                 val new = call.receive<TopicData>()
-                call.respond(TopicFactory.getClass().create(new, rwUser = UserRW.getClass(),rwTopic = TopicRW.getClass(),rwCommunity = CommunityRW.getClass(),rwSubTopic = SubTopicRW.getClass()))
+                call.respond(TopicFactory.getClass().create(new, rwUser = UserRW.getClass(),rwTopic = TopicRW.getClass(),rwCommunity = CommunityRW.getClass()))
             }
             delete("/topic") {
                 val topic = call.receive<TopicOperationsData>()
-                call.respond(Delete.getClass().delete(topic, rwUser = UserRW.getClass(),rwTopic = TopicRW.getClass(),rwCommunity = CommunityRW.getClass(),rwSubTopic = SubTopicRW.getClass()))
+                call.respond(DeleteTopic.getClass().delete(topic, rwUser = UserRW.getClass(),rwTopic = TopicRW.getClass(),rwCommunity = CommunityRW.getClass()))
             }
 
             patch("/topic/like") {
                 val post = call.receive<TopicOperationsData>()
-                call.respond(Like.getClass().like(post,rwUser = UserRW.getClass(),rwTopic = TopicRW.getClass(),rwCommunity = CommunityRW.getClass(),rwSubTopic = SubTopicRW.getClass()))
+                call.respond(LikeTopic.getClass().like(post,rwUser = UserRW.getClass(),rwTopic = TopicRW.getClass(),rwCommunity = CommunityRW.getClass()))
             }
 
             patch("/topic/dislike") {
                 val post = call.receive<TopicOperationsData>()
-                call.respond(Dislike.getClass().dislike(post, rwUser = UserRW.getClass(),rwTopic = TopicRW.getClass(),rwCommunity = CommunityRW.getClass(),rwSubTopic = SubTopicRW.getClass()))
+                call.respond(DislikeTopic.getClass().dislike(post, rwUser = UserRW.getClass(),rwTopic = TopicRW.getClass(),rwCommunity = CommunityRW.getClass()))
             }
 
             //GROUPS

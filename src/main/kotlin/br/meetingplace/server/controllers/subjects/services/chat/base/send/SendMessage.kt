@@ -1,9 +1,9 @@
 package br.meetingplace.server.controllers.subjects.services.chat.base.send
 
-import br.meetingplace.server.controllers.dependencies.readwrite.chat.ChatRWInterface
-import br.meetingplace.server.controllers.dependencies.readwrite.community.CommunityRWInterface
-import br.meetingplace.server.controllers.dependencies.readwrite.group.GroupRWInterface
-import br.meetingplace.server.controllers.dependencies.readwrite.user.UserRWInterface
+import br.meetingplace.server.controllers.readwrite.chat.ChatRWInterface
+import br.meetingplace.server.controllers.readwrite.community.CommunityRWInterface
+import br.meetingplace.server.controllers.readwrite.group.GroupRWInterface
+import br.meetingplace.server.controllers.readwrite.user.UserRWInterface
 import br.meetingplace.server.dto.chat.MessageData
 import br.meetingplace.server.subjects.services.chat.Chat
 import br.meetingplace.server.subjects.services.chat.SimplifiedChat
@@ -56,7 +56,7 @@ class SendMessage private constructor() {
         }
     }
 
-    private fun createChat(data: MessageData,rwUser: UserRWInterface, rwChat: ChatRWInterface) {
+    private fun createChat(data: MessageData, rwUser: UserRWInterface, rwChat: ChatRWInterface) {
         val logged = data.login.email
         val user = rwUser.read(data.login.email)
         val receiver = rwUser.read(data.receiver.receiverID)

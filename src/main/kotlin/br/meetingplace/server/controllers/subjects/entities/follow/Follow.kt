@@ -1,7 +1,7 @@
 package br.meetingplace.server.controllers.subjects.entities.follow
 
-import br.meetingplace.server.controllers.dependencies.readwrite.community.CommunityRWInterface
-import br.meetingplace.server.controllers.dependencies.readwrite.user.UserRWInterface
+import br.meetingplace.server.controllers.readwrite.community.CommunityRWInterface
+import br.meetingplace.server.controllers.readwrite.user.UserRWInterface
 
 import br.meetingplace.server.dto.SimpleOperator
 import br.meetingplace.server.subjects.services.notification.NotificationData

@@ -1,6 +1,6 @@
 package br.meetingplace.server.controllers.subjects.entities.profile
 
-import br.meetingplace.server.controllers.dependencies.readwrite.user.UserRWInterface
+import br.meetingplace.server.controllers.readwrite.user.UserRWInterface
 import br.meetingplace.server.dto.Login
 import br.meetingplace.server.dto.user.ProfileData
 

@@ -1,7 +1,7 @@
 package br.meetingplace.server.controllers.subjects.entities.delete
 
-import br.meetingplace.server.controllers.dependencies.readwrite.topic.main.TopicRWInterface
-import br.meetingplace.server.controllers.dependencies.readwrite.user.UserRWInterface
+import br.meetingplace.server.controllers.readwrite.topic.TopicRWInterface
+import br.meetingplace.server.controllers.readwrite.user.UserRWInterface
 import br.meetingplace.server.dto.Login
 
 class UserDelete private constructor() : UserDeleteInterface {
@@ -54,7 +54,7 @@ class UserDelete private constructor() : UserDeleteInterface {
         if (user != null) {
             val myTopics = user.getMyTopics()
             for (element in myTopics) {
-                val topic = rwTopic.read(element)
+                val topic = rwTopic.read(element, null)
                 if (topic != null)
                     rwTopic.delete(topic)
             }

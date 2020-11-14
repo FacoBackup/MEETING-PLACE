@@ -1,9 +1,9 @@
 package br.meetingplace.server.controllers.subjects.services.community.moderators
 
-import br.meetingplace.server.controllers.dependencies.readwrite.community.CommunityRWInterface
-import br.meetingplace.server.controllers.dependencies.readwrite.group.GroupRWInterface
-import br.meetingplace.server.controllers.dependencies.readwrite.topic.main.TopicRWInterface
-import br.meetingplace.server.controllers.dependencies.readwrite.user.UserRWInterface
+import br.meetingplace.server.controllers.readwrite.community.CommunityRWInterface
+import br.meetingplace.server.controllers.readwrite.group.GroupRWInterface
+import br.meetingplace.server.controllers.readwrite.topic.TopicRWInterface
+import br.meetingplace.server.controllers.readwrite.user.UserRWInterface
 import br.meetingplace.server.dto.MemberOperator
 import br.meetingplace.server.dto.community.ApprovalData
 import br.meetingplace.server.subjects.services.members.data.MemberType
@@ -21,7 +21,7 @@ class Moderator private constructor() {
         val community = data.identifier.owner?.let { rwCommunity.read(it) }
 
         if (user != null && community != null && data.login.email in community.getModerators() && !data.identifier.owner.isNullOrBlank()) {
-            val topic = rwTopic.read(data.identifier.ID)
+            val topic = rwTopic.read(data.identifier.ID, null)
             if (topic != null) {
                 community.updateTopicInValidation(SimplifiedTopic(data.identifier.ID, topic.getOwner()), true)
                 rwCommunity.write(community)

@@ -1,8 +1,8 @@
 package br.meetingplace.server.controllers.subjects.services.group.members
 
-import br.meetingplace.server.controllers.dependencies.readwrite.community.CommunityRWInterface
-import br.meetingplace.server.controllers.dependencies.readwrite.group.GroupRWInterface
-import br.meetingplace.server.controllers.dependencies.readwrite.user.UserRWInterface
+import br.meetingplace.server.controllers.readwrite.community.CommunityRWInterface
+import br.meetingplace.server.controllers.readwrite.group.GroupRWInterface
+import br.meetingplace.server.controllers.readwrite.user.UserRWInterface
 import br.meetingplace.server.dto.MemberOperator
 import br.meetingplace.server.subjects.services.members.data.MemberData
 import br.meetingplace.server.subjects.services.members.data.MemberType
@@ -14,7 +14,7 @@ class GroupMembers private constructor() {
         fun getClass() = Class
     }
 
-    fun addMember(data: MemberOperator, rwCommunity: CommunityRWInterface,rwGroup: GroupRWInterface, rwUser: UserRWInterface) {
+    fun addMember(data: MemberOperator, rwCommunity: CommunityRWInterface, rwGroup: GroupRWInterface, rwUser: UserRWInterface) {
         val user = rwUser.read(data.login.email)
         val newMember = rwUser.read(data.memberEmail)
 
@@ -54,7 +54,7 @@ class GroupMembers private constructor() {
         }
     }
 
-    fun changeMemberRole(data: MemberOperator,rwGroup: GroupRWInterface, rwUser: UserRWInterface) {
+    fun changeMemberRole(data: MemberOperator, rwGroup: GroupRWInterface, rwUser: UserRWInterface) {
         val user = rwUser.read(data.login.email)
         val member = rwUser.read(data.memberEmail)
 
