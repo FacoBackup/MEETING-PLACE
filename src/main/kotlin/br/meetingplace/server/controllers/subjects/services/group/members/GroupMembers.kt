@@ -7,6 +7,8 @@ import br.meetingplace.server.dto.MemberOperator
 import br.meetingplace.server.subjects.services.members.data.MemberData
 import br.meetingplace.server.subjects.services.members.data.MemberType
 import br.meetingplace.server.subjects.services.notification.NotificationData
+import br.meetingplace.server.subjects.services.notification.data.NotificationMainType
+import br.meetingplace.server.subjects.services.notification.data.NotificationSubType
 
 class GroupMembers private constructor() {
     companion object {
@@ -29,7 +31,7 @@ class GroupMembers private constructor() {
                     if (group != null && group.verifyMember(data.login.email)
                             && !group.verifyMember(data.memberEmail)) {
 
-                        notification = NotificationData("You're now a member of ${group.getNameGroup()}", "Group.")
+                        notification = NotificationData(NotificationMainType.GROUP, NotificationSubType.ADDED_IN_GROUP)
 
                         group.updateMember(toBeAdded, false)
                         newMember.updateMemberIn(group.getGroupID(), false)
@@ -42,7 +44,7 @@ class GroupMembers private constructor() {
                     val group = rwGroup.read(data.identifier.ID)
                     val community = rwCommunity.read(data.identifier.owner)
                     if (group != null && community != null && (data.login.email == group.getCreator() || data.login.email in community.getModerators())) {
-                        notification = NotificationData("You're now a member of ${group.getNameGroup()}", "Group.")
+                        notification = NotificationData(NotificationMainType.GROUP, NotificationSubType.ADDED_IN_GROUP)
                         group.updateMember(toBeAdded, false)
                         newMember.updateMemberIn(group.getGroupID(), false)
                         newMember.updateInbox(notification)

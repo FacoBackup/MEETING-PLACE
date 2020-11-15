@@ -8,6 +8,8 @@ import br.meetingplace.server.dto.CreationData
 import br.meetingplace.server.subjects.services.chat.Chat
 import br.meetingplace.server.subjects.services.groups.Group
 import br.meetingplace.server.subjects.services.notification.NotificationData
+import br.meetingplace.server.subjects.services.notification.data.NotificationMainType
+import br.meetingplace.server.subjects.services.notification.data.NotificationSubType
 import br.meetingplace.server.subjects.services.owner.OwnerType
 import br.meetingplace.server.subjects.services.owner.chat.ChatOwnerData
 import br.meetingplace.server.subjects.services.owner.group.GroupOwnerData
@@ -43,7 +45,7 @@ class GroupFactory private constructor() {
                     val community = rwCommunity.read(data.identifier.ID)
                     if (community != null ) {
                         communityMods = community.getModerators()
-                        notification = NotificationData("${data.login.email} wants to create a new group in ${community.getName()}.", "Community Group")
+                        notification = NotificationData(NotificationMainType.COMMUNITY, NotificationSubType.CREATION_REQUEST)
                         for (moderator in communityMods) {
                             val mod = rwUser.read(moderator)
                             if (mod != null && mod != user)

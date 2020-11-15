@@ -5,6 +5,8 @@ import br.meetingplace.server.controllers.readwrite.topic.TopicRWInterface
 import br.meetingplace.server.controllers.readwrite.user.UserRWInterface
 import br.meetingplace.server.dto.topics.TopicOperationsData
 import br.meetingplace.server.subjects.services.notification.NotificationData
+import br.meetingplace.server.subjects.services.notification.data.NotificationMainType
+import br.meetingplace.server.subjects.services.notification.data.NotificationSubType
 import br.meetingplace.server.subjects.services.topic.Topic
 
 class LikeTopic private constructor() {
@@ -49,7 +51,7 @@ class LikeTopic private constructor() {
         lateinit var notification: NotificationData
 
         if (user != null && topic != null && creator != null) {
-            notification = NotificationData("${user.getUserName()} liked your reply.", "Thread.")
+            notification = NotificationData(NotificationMainType.TOPIC, NotificationSubType.LIKE)
             when (checkLikeDislike(topic, data.login.email)) {
                 0 -> {
                     topic.removeLike(data.login.email)
@@ -82,7 +84,7 @@ class LikeTopic private constructor() {
         lateinit var notification: NotificationData
 
         if (subTopic != null && user != null && creator != null) {
-            notification = NotificationData("${user.getUserName()} liked your reply.", "Thread.")
+            notification = NotificationData(NotificationMainType.TOPIC, NotificationSubType.LIKE)
             when (checkLikeDislike(subTopic, data.login.email)) {
                 0 -> {
                     subTopic.removeLike(data.login.email)
@@ -116,7 +118,7 @@ class LikeTopic private constructor() {
         lateinit var notification: NotificationData
 
         if (topic != null && community != null && user != null && creator != null && community.checkTopicApproval(topic.getID())) {
-            notification = NotificationData("${user.getUserName()} liked your reply.", "Thread.")
+            notification = NotificationData(NotificationMainType.TOPIC, NotificationSubType.LIKE)
             when (checkLikeDislike(topic, data.login.email)) {
                 0 -> {
                     topic.removeLike(data.login.email)
@@ -150,7 +152,7 @@ class LikeTopic private constructor() {
         lateinit var notification: NotificationData
 
         if (subTopic != null && community != null && user != null && creator != null && community.checkTopicApproval(subTopic.getID())) {
-            notification = NotificationData("${user.getUserName()} liked your reply.", "Thread.")
+            notification = NotificationData(NotificationMainType.TOPIC, NotificationSubType.LIKE)
             when (checkLikeDislike(subTopic, data.login.email)) {
                 0 -> {
                     subTopic.removeLike(data.login.email)

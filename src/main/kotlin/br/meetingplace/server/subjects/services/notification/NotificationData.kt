@@ -1,3 +1,6 @@
 package br.meetingplace.server.subjects.services.notification
 
-data class NotificationData(val notification: String, val Type: String)
+import br.meetingplace.server.subjects.services.notification.data.NotificationMainType
+import br.meetingplace.server.subjects.services.notification.data.NotificationSubType
+
+data class NotificationData(val mainType: NotificationMainType, val subType: NotificationSubType)

@@ -6,6 +6,8 @@ import br.meetingplace.server.dto.CreationData
 import br.meetingplace.server.dto.MemberOperator
 import br.meetingplace.server.subjects.services.community.Community
 import br.meetingplace.server.subjects.services.notification.NotificationData
+import br.meetingplace.server.subjects.services.notification.data.NotificationMainType
+import br.meetingplace.server.subjects.services.notification.data.NotificationSubType
 
 class CommunityFactory private constructor() {
 
@@ -45,10 +47,7 @@ class CommunityFactory private constructor() {
                 when (community.getModerators().isEmpty()) {
                     true -> rwCommunity.delete(community)
                     false -> {
-                        notification = NotificationData(
-                                "${user.getUserName()} requested for a community deletion, if you approve the deletion you have to step-down from moderator.",
-                                "Community"
-                        )
+                        notification = NotificationData(NotificationMainType.COMMUNITY, NotificationSubType.DELETE_REQUEST)
                         mods = community.getModerators()
                         for (i in mods.indices) {
                             val moderator = rwUser.read(mods[i])

@@ -5,6 +5,8 @@ import br.meetingplace.server.controllers.readwrite.user.UserRWInterface
 
 import br.meetingplace.server.dto.SimpleOperator
 import br.meetingplace.server.subjects.services.notification.NotificationData
+import br.meetingplace.server.subjects.services.notification.data.NotificationMainType
+import br.meetingplace.server.subjects.services.notification.data.NotificationSubType
 
 class Social private constructor() : SocialInterface {
 
@@ -22,7 +24,7 @@ class Social private constructor() : SocialInterface {
             when (data.identifier.community) {
                 false -> { //USER
                     val external = rwUser.read(data.identifier.ID)
-                    notification = NotificationData("${user.getUserName()} is now following you.", "New follower.")
+                    notification = NotificationData(NotificationMainType.USER, NotificationSubType.FOLLOWING)
                     if (external != null && user.getEmail() !in external.getFollowers()) {
 
 

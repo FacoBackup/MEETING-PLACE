@@ -21,9 +21,9 @@ class BaseChat private constructor() : BaseChatInterface {
     }
 
     override fun addMessage(message: MessageContent) {
-        if (message.messageID !in idMessages) {
+        if (message.ID !in idMessages) {
             messages.add(message)
-            idMessages.add(message.messageID)
+            idMessages.add(message.ID)
         }
     }
 
@@ -39,14 +39,14 @@ class BaseChat private constructor() : BaseChatInterface {
     override fun shareMessage(operations: ChatComplexOperator): String? {
         val index = idMessages.indexOf(operations.messageID)
         return if (index != -1)
-            messages[index].message
+            messages[index].content
         else null
     }
 
     override fun quoteMessage(message: ChatComplexOperator, newId: String) {
         val index = idMessages.indexOf(message.messageID)
         if (index != -1) {
-            message.message = "|${messages[index].message}|  " + message.message
+            message.message = "|${messages[index].content}|  " + message.message
             val newMessage = MessageContent(message.message, newId, messages[index].creator, MessageType.QUOTED)
             addMessage(newMessage)
         }
